@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('code');
             $table->integer('discount');
             $table->date('expiration_date')->nullable();
-            $table->integer('usage_limit')->default('♾️');
+            $table->integer('usage_limit')->default(null);
             $table->integer('times_used');
             $table->timestamps();
         });

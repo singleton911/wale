@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onUpdate('cascade')->onDelete('cascade');
             $table->string('store_name', 50);
-            $table->longText('store_description')->default('No description yet.');
+            $table->longText('store_description')->nullable();
             $table->text('store_pgp')->nullable();
             $table->string('store_key');
             $table->integer('width_sales')->default(0);

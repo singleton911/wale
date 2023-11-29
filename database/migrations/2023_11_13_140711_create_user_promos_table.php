@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('user_promos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreignId('promocode_id')->constrained('promocodes')->onUpdate('cascade')->onDelete('calcade');
+            $table->foreignId('promocode_id')->constrained('promocodes')->onUpdate('cascade')->onDelete('cascade');
             $table->unsignedInteger('cart_id');
             $table->unsignedInteger('discount');
             $table->enum('cart_state', ['not_checked_out', 'checked_out'])->default('not_checked_out');

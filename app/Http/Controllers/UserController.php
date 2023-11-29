@@ -41,7 +41,7 @@ class UserController extends Controller
     public function create($action)
     {
         if ($action == 'login') {
-            return view('/auth/login', ['icon' => GeneralController::encodeImages()]);
+            return view('Auth.login', ['icon' => GeneralController::encodeImages()]);
         } elseif ($action == 'signup') {
             return view('Auth.register', ['icon'   => GeneralController::encodeImages()]);
         }

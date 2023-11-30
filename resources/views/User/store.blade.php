@@ -31,7 +31,11 @@
                         <div class="div-p">
                             <p class="store-name">{{ $store->store_name }}<span style="font-size: .5em;">Store</span>
                             </p>
-                            <p class="span3" style="border: 2px solid skyblue; border-radius:.5rem; padding:5px;"> 5.0⭐
+                            <p class="span3" style="border: 2px solid skyblue; border-radius:.5rem; padding:5px;">
+                                @php
+                                $weightedAverage = \App\Models\Review::claculateStoreRating($store->id);
+                                @endphp
+                                {{ $weightedAverage != 0 ? $weightedAverage : '5.0' }}⭐
                             </p>
                         </div>
                         <div style="margin-top: 0; display:flex; justify-content:space-around">

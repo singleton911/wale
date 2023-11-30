@@ -102,7 +102,7 @@
                             <div class="reviewer-info">
                                 <img src="data:image/png;base64,{{ $icon['user'] }}" class="icon-filter"
                                     width="25">
-                                <p><span>{{ $review->user->public_name }}</span></p>
+                                    <p><span>{{ substr($review->user->public_name, 0, 1) . str_repeat('*', max(strlen($review->user->public_name) - 2, 0)) . substr($review->user->public_name, -1) }}</span></p>
                             </div>
                             <div class="reviewer-reviews">
                                 <div class="reviews-rating">
@@ -125,7 +125,7 @@
                                     <p style="margin-top: 5px;"> {{ $review->comment }} <br>
                                     <p style='color: #4682B4; text-align: right;'>
                                         Price: ${{ $review->product->price }} 
-                                        Date: {{ $review->created_at->format('d/m/y') }}</p>
+                                        Last Updated: {{ $review->updated_at->format('d/m/y') }}</p>
                                     </p>
                                 </div>
                             </div>

@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Route;
 
 // Middleware group for 'user' role
 Route::middleware(['role:user'])->group(function () {
-    //Route::get('/', [UserController::class, 'show']);
+    Route::post('/', [UserController::class, 'show']);
     // Dynamic routes
     Route::get('/{name}', [UserController::class, 'show']);
     Route::get('/category/{name}/{action}', [UserController::class, 'index']);
@@ -51,6 +51,7 @@ Route::middleware(['role:user'])->group(function () {
     Route::get('/listing/{created_at}/{product}', [ProductController::class, 'show']);
     Route::post('/listing/{created_at}/{product}', [ProductController::class, 'checkAction']);
     Route::post('/listing/report/{created_at}/{product}', [ReportController::class, 'listing']);
+    Route::get('/listing/reviews/{created_at}/{product}', [ProductController::class, 'reviews']);
 
     // Messages for store
     Route::get('/store/message/{name}/{store}', [MessageController::class, 'create']);

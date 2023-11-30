@@ -17,6 +17,7 @@ use App\Models\Review;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
@@ -170,6 +171,7 @@ class ProductController extends Controller
     private function initiateOrder(Request $request, Product $product)
     {
         // Your existing logic for initiating an order
+        $user_id = auth()->user()->id;
         $sendData = $request->validate([
             'items' => 'required|integer|min:1|max:100000',
             'extra_shipping_option' => 'required|integer|min:1',
@@ -179,7 +181,7 @@ class ProductController extends Controller
         $notificationType = NotificationType::where('action', 'created')->where('icon', 'order')->first();
 
         $order                    = new Order();
-        $order->user_id           = auth()->user()->id;
+        $order->user_id           = $user_id;
         $order->product_id        = $product->id;
         $order->store_id          = $product->store_id;
         $order->quantity          = $sendData['items'];
@@ -187,8 +189,8 @@ class ProductController extends Controller
         $order->shipping_address  = $sendData['address_text'];
         $order->save();
 
-        NotificationController::create(auth()->user()->id, null, $notificationType->id, $order->id);
-        NotificationController::create($product->store_id, null, $notificationType->id, $order->id);
+        NotificationController::create($user_id, null, $notificationType->id, $order->id);
+        NotificationController::create($product->store->user_id, null, $notificationType->id, $order->id);
 
         return $order;
     }
@@ -239,4 +241,18 @@ class ProductController extends Controller
         return redirect()->back();
     }
     
+    public function reviews($created_at, Product $product)
+    {
+        if ($created_at == strtotime($product->created_at)) {
+            return view('User.productReviews', [
+                'name' => $product->product_name,
+                'user' => auth()->user(),
+                'action' => Null,
+                'product' => $product,
+                'icon'  => GeneralController::encodeImages(),
+            ]);
+        }
+
+        return abort(403);
+    }
 }

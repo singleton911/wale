@@ -96,6 +96,7 @@ class ConversationController extends Controller
     public function createMessage($store, StoreConversationRequest $request)
     {
         $user_id  = auth()->user()->id;
+        $store_user_id = Store::find($store)->user_id;
         $data   = $request->validate([
             'subject' => 'required|string|min:1|max:100',
             'contents' => 'required|string|min:2|max:5000',
@@ -108,7 +109,7 @@ class ConversationController extends Controller
         $conversation->save();
 
         // Participants
-        foreach ([$user_id, $store] as $id) {
+        foreach ([$user_id, $store_user_id] as $id) {
             $participant = new Participant();
             $participant->user_id = $id;
             $participant->conversation_id = $conversation->id;
@@ -123,7 +124,7 @@ class ConversationController extends Controller
         $message->message_type     = $data['message_type'];
         $message->save();
 
-        foreach ([$user_id, $store] as $participant) {
+        foreach ([$user_id, $store_user_id] as $participant) {
             $messageStatus = new MessageStatus();
             $messageStatus->message_id = $message->id;
             $messageStatus->user_id    = $participant;

@@ -404,12 +404,12 @@
                         </span>
                         <hr>
                     </h3>
-                    @forelse ($product->reviews()->paginate(1) as $review)
+                    @forelse ($product->reviews()->paginate(15) as $review)
                         <div class="displayed-reviews">
                             <div class="reviewer-info">
                                 <img src="data:image/png;base64,{{ $icon['user'] }}" class="icon-filter"
                                     width="25">
-                                <p><span>{{ $review->user->public_name }}</span></p>
+                                    <p><span>{{ substr($review->user->public_name, 0, 1) . str_repeat('*', max(strlen($review->user->public_name) - 2, 0)) . substr($review->user->public_name, -1) }}</span></p>
                             </div>
                             <div class="reviewer-reviews">
                                 <div class="reviews-rating">
@@ -429,8 +429,8 @@
                                 </div>
                                 <div class="rating-texts">
                                     <p style="margin-top: 5px;"> {{ $review->comment }} <br>
-                                    <p style='color: #4682B4; text-align: right;'> Date:
-                                        {{ $review->created_at->format('d/m/y') }}</p>
+                                    <p style='color: #4682B4; text-align: right;'> Last Updated:
+                                        {{ $review->updated_at->format('d/m/y') }}</p>
                                     </p>
                                 </div>
                             </div>
@@ -438,6 +438,9 @@
                     @empty
                         <p>No review found for this product, buy this product to leave a review!</p>
                     @endforelse
+                    @if ($product->reviews->count() > 10)
+                        <a href="/listing/reviews/{{ $product->created_at->timestamp }}/{{ $product->id }}" style="text-decoration: underline">See All Reviews</a>
+                    @endif
                 </div>
             </div>
 

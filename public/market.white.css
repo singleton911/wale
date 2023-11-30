@@ -201,8 +201,7 @@ Style the alert box ::-moz-dialog {
     display: flex;
     flex-direction: row;
     font-size: 1.1rem;
-    font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-        "Lucida Sans", Arial, sans-serif;
+    font-family: Helvetica, sans-serif;
     align-items: center;
     justify-content: center;
 }

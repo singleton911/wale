@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\FAQ;
 use App\Http\Requests\StoreFAQRequest;
 use App\Http\Requests\UpdateFAQRequest;
+use App\Models\Category;
 
 class FAQController extends Controller
 {
@@ -21,7 +22,14 @@ class FAQController extends Controller
      */
     public function create()
     {
-        //
+        $user = auth()->user();
+        return view('User.faq', [
+            'user' => $user,
+            'parentCategories' => Category::whereNull('parent_category_id')->get(),
+            'subCategories' => Category::whereNotNull('parent_category_id')->get(),
+            'categories' => Category::all(),
+            'icon' => GeneralController::encodeImages(),
+        ]);
     }
 
     /**

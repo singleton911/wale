@@ -11,7 +11,7 @@
     </div>
     <div class="notific-container">
         <h1 class="notifications-h1" style="text-transform: capitalize"> {{ $action }} > Orders({{ $user->orders->where('status', $action)->count() }})</h1>
-        <table class="notification-table">
+        <table>
             <thead>
                 <tr>
                     <th>Item</th>

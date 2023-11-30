@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\Store;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManagerStatic as Image;
@@ -138,16 +141,66 @@ class GeneralController extends Controller
         //return dd($request);
     }
 
-    // replace  the center of a word as *
-    public static function maskWord(String $word)
+
+
+    public function search(Request $request)
     {
-        $length = strlen($word);
-        if ($length <= 2) {
-            return $word;
+        $searchType = $request->input('search_type');
+        $productName = $request->input('pn');
+        $minPrice = $request->input('pf');
+        $maxPrice = $request->input('pt');
+        $sortBy = $request->input('filter-product');
+        $categoryId = $request->input('category');
+        $productType = $request->input('pt2');
+    
+        // Choose the model based on the search type
+        $model = $searchType === 'store' ? Store::query() : Product::query();
+    
+        // Build your search query based on the input parameters
+        $query = $model;
+    
+        if ($productName) {
+            $query->where('name', 'like', '%' . $productName . '%');
         }
-        $start = substr($word, 0, 1);
-        $end = substr($word, -1);
-        $mask = str_repeat('*', $length - 2);
-        return $start . $mask . $end;
+    
+        if ($minPrice) {
+            $query->where('price', '>=', $minPrice);
+        }
+    
+        if ($maxPrice) {
+            $query->where('price', '<=', $maxPrice);
+        }
+    
+        // Add more conditions based on other form inputs...
+    
+        // Execute the query
+        $results = $query->get();
+    
+        // Pass the results to your view or do whatever you want with them
+        return view('User.search', ['products' => $results, 'resultType' => $searchType]);
+    }  
+    
+    
+    public function team(){
+        $user = auth()->user();
+        return view('User.team', [
+            'user' => $user,
+            'parentCategories' => Category::whereNull('parent_category_id')->get(),
+            'subCategories' => Category::whereNotNull('parent_category_id')->get(),
+            'categories' => Category::all(),
+            'icon' => GeneralController::encodeImages(),
+        ]);
+    }
+
+
+    public function canary(){
+        $user = auth()->user();
+        return view('User.canary', [
+            'user' => $user,
+            'parentCategories' => Category::whereNull('parent_category_id')->get(),
+            'subCategories' => Category::whereNotNull('parent_category_id')->get(),
+            'categories' => Category::all(),
+            'icon' => GeneralController::encodeImages(),
+        ]);
     }
 }

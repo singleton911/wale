@@ -36,8 +36,8 @@ Route::middleware(['guest'])->group(function () {
 
 // Include other routes from user.php
 require_once('user.php');
-require_once('store.php');
-require_once('admin.php');
+// require_once('store.php');
+// require_once('admin.php');
 // Include other routes from store.php
 
 

@@ -221,9 +221,13 @@ class UserController extends Controller
 
     public function userLogout()
     {
+        // Log out the authenticated user
         auth()->logout();
+    
+        // Redirect the user back to the previous page
         return redirect()->back();
     }
+    
 
     private function adminIndex($action, $name, $user)
     {

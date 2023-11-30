@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Bug;
 use App\Http\Requests\StoreBugRequest;
 use App\Http\Requests\UpdateBugRequest;
+use App\Models\Category;
 
 class BugController extends Controller
 {
@@ -21,7 +22,14 @@ class BugController extends Controller
      */
     public function create()
     {
-        //
+        $user = auth()->user();
+        return view('User.bugs', [
+            'user' => $user,
+            'parentCategories' => Category::whereNull('parent_category_id')->get(),
+            'subCategories' => Category::whereNotNull('parent_category_id')->get(),
+            'categories' => Category::all(),
+            'icon' => GeneralController::encodeImages(),
+        ]);
     }
 
     /**

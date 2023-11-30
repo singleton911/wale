@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\News;
 use App\Http\Requests\StoreNewsRequest;
 use App\Http\Requests\UpdateNewsRequest;
+use App\Models\Category;
 
 class NewsController extends Controller
 {
@@ -21,7 +22,15 @@ class NewsController extends Controller
      */
     public function create()
     {
-        //
+        $user = auth()->user();
+        return view('User.news', [
+            // 'news' => News::where('created_at')->get();
+            'user' => $user,
+            'parentCategories' => Category::whereNull('parent_category_id')->get(),
+            'subCategories' => Category::whereNotNull('parent_category_id')->get(),
+            'categories' => Category::all(),
+            'icon' => GeneralController::encodeImages(),
+        ]);
     }
 
     /**

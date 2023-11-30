@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Notification;
 use App\Http\Requests\StoreNotificationRequest;
 use App\Http\Requests\UpdateNotificationRequest;
+use App\Models\Category;
 
 class NotificationController extends Controller
 {
@@ -78,5 +79,16 @@ class NotificationController extends Controller
     public function destroy(Notification $notification)
     {
         //
+    }
+
+    public function showNotifications(){
+        $user = auth()->user();
+        return view('User.notification', [
+            'user' => $user,
+            'parentCategories' => Category::whereNull('parent_category_id')->get(),
+            'subCategories' => Category::whereNotNull('parent_category_id')->get(),
+            'categories' => Category::all(),
+            'icon' => GeneralController::encodeImages(),
+        ]);
     }
 }

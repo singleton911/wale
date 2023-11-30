@@ -101,7 +101,7 @@
             </div>
         </div><br>
         <div>
-            <table class="notification-table">
+            <table>
                 <thead>
                     <tr>
                         <th>Name</th>

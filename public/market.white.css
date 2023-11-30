@@ -272,8 +272,6 @@ Style the alert box ::-moz-dialog {
     color: var(--dark-color-text);
     text-decoration: none;
     transition: background-color 0.4s ease;
-    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
-        sans-serif;
 }
 
 .hideout-menus a:hover {

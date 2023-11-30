@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Http\Requests\StoreCartRequest;
 use App\Http\Requests\UpdateCartRequest;
+use App\Models\Category;
 use App\Models\Promocode;
 use App\Models\UserPromos;
 use Illuminate\Http\Request;
@@ -25,7 +26,14 @@ class CartController extends Controller
      */
     public function create()
     {
-        //
+        $user = auth()->user();
+        return view('User.cart', [
+            'user' => $user,
+            'parentCategories' => Category::whereNull('parent_category_id')->get(),
+            'subCategories' => Category::whereNotNull('parent_category_id')->get(),
+            'categories' => Category::all(),
+            'icon' => GeneralController::encodeImages(),
+        ]);
     }
 
     /**

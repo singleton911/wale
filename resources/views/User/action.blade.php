@@ -1,50 +1,4 @@
-
-@if ($action === null)
-    @switch($name)
-        @case('cart')
-            @include('User.cart')
-        @break
-
-        @case('open-store')
-            @include('User.open-store')
-        @break
-
-        @case('messages')
-            @include('User.message')
-        @break
-
-        @case('notification')
-            @include('User.notification')
-        @break
-
-        @case('canary')
-            @include('User.canary')
-        @break
-
-        @case('news')
-            @include('User.news')
-        @break
-
-        @case('team')
-            @include('User.team')
-        @break
-
-        @case('faq')
-            @include('User.faq')
-        @break
-
-        @case('ticket')
-            @include('User.ticket')
-        @break
-
-        @case('bugs')
-            @include('User.bugs')
-        @break
-
-        @default
-            @include('User.main')
-    @endswitch
-@else
+@if ($action != null)
     @switch($action)
         @case('pgp')
             @include('User.2fa')
@@ -95,8 +49,8 @@
         @break
 
         @case('all')
-        @include('User.orders')
-    @break
+            @include('User.orders')
+        @break
 
         @case('pending')
             @include('User.orders')
@@ -121,4 +75,6 @@
         @default
             @include('User.main')
     @endswitch
+@else
+    @include('User.main')
 @endif

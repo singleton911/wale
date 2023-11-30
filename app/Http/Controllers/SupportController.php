@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Support;
 use App\Http\Requests\StoreSupportRequest;
 use App\Http\Requests\UpdateSupportRequest;
+use App\Models\Category;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\MessageStatus;
@@ -112,5 +113,16 @@ class SupportController extends Controller
     public function destroy(Support $support)
     {
         //
+    }
+
+    public function showTicket(){
+        $user = auth()->user();
+        return view('User.ticket', [
+            'user' => $user,
+            'parentCategories' => Category::whereNull('parent_category_id')->get(),
+            'subCategories' => Category::whereNotNull('parent_category_id')->get(),
+            'categories' => Category::all(),
+            'icon' => GeneralController::encodeImages(),
+        ]);
     }
 }

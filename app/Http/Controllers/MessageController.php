@@ -12,6 +12,7 @@ use App\Models\Store;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use App\Models\Category;
 
 class MessageController extends Controller
 {
@@ -167,4 +168,16 @@ class MessageController extends Controller
 
     //     return redirect()->back();
     // }
+
+
+    public function showMessages(){
+        $user = auth()->user();
+        return view('User.message', [
+            'user' => $user,
+            'parentCategories' => Category::whereNull('parent_category_id')->get(),
+            'subCategories' => Category::whereNotNull('parent_category_id')->get(),
+            'categories' => Category::all(),
+            'icon' => GeneralController::encodeImages(),
+        ]);
+    }
 }

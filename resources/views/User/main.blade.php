@@ -18,7 +18,7 @@
 
                 <div class="news-div">
                         <h2 class="news-title" style="text-decoration: underline">{{ $news->title }}</h2>
-                        <p class="news-content">{{ Str::limit($news->content, 450, '...') }} </p>
+                        <p class="news-content">{{ Str::limit($news->content, 400, '...') }} </p>
                         <div style="text-align:right; margin-right:5px; font-size: .8rem; color: #acacac;">
                             <a href="/news/"
                                 style="font-size: .8rem; margin-right:1em; text-decoration:underline">Clcik
@@ -33,8 +33,8 @@
             </div>
             <div class="search-div">
                 <h3>Quick Search Listings</h3>
-                <form action="/" method="post" class="search-form">
-                    @csrf
+                <form action="/search" method="post" class="search-form">
+                    {{-- @csrf --}}
                     <input type="text" class="search_name" name="pn"
                         placeholder="Quick search (product.., store...)" value="">
                     <div class="price-range">
@@ -43,6 +43,13 @@
                             value="">
                         <input type="number" name="pt" min="1" placeholder="max $0.0" id="price-input"
                             value="">
+                    </div>
+                    <div style="display: flex; gap:1em">
+                        <select name="search_type">
+                            <option value="product">Search Products</option>
+                            <option value="store">Search Stores</option>
+                        </select>
+
                     </div>
                     <div style="display: flex; gap:1em">
                         <select name="filter-product" id="">
@@ -91,8 +98,7 @@
         </div>
 
         <div class="products-grid">
-
-
+            <p style="padding:0px; margin:0px;">No sticky listing yet...</p>
         </div>
 
 

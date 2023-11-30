@@ -6,7 +6,7 @@
         @if (session('success'))
         <p style="text-align: center; color: green;">{{ session('success') }}</p>
     @endif
-        <table class="notification-table">
+        <table>
             <thead>
                 <tr>
                     <th>Store Name</th>

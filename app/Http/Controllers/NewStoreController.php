@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\NewStore;
 use App\Http\Requests\StoreNewStoreRequest;
 use App\Http\Requests\UpdateNewStoreRequest;
+use App\Models\Category;
 
 class NewStoreController extends Controller
 {
@@ -21,7 +22,14 @@ class NewStoreController extends Controller
      */
     public function create()
     {
-        //
+        $user = auth()->user();
+        return view('User.open-store', [
+            'user' => $user,
+            'parentCategories' => Category::whereNull('parent_category_id')->get(),
+            'subCategories' => Category::whereNotNull('parent_category_id')->get(),
+            'categories' => Category::all(),
+            'icon' => GeneralController::encodeImages(),
+        ]);
     }
 
     /**

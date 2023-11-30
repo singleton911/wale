@@ -18,9 +18,6 @@
     @if (($product->auto_delivery_content != NULL or $product->auto_delivery_content != ''))
     <h3 style="background-color: darkgoldenrod; color:#f1f1f1; border-radius: .3rem; margin-top: 0;">
         AutoShop: Yes</h3>
-    @else
-    <h3 style="background-color: darkgoldenrod; color:#f1f1f1; border-radius: .3rem; margin-top: 0;">
-        AutoShop: No</h3>
     @endif
     @endif
     <div class="buttons">

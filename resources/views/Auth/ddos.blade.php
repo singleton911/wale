@@ -1,23 +1,27 @@
 @php
-    $wait_time = mt_rand(3, 10); // time < 1 minute
+    $waitTime = mt_rand(15, 30); // Wait time in seconds
 
-    if (!session()->has('start_time') || time() - session('start_time') > $wait_time) {
+    if (!session()->has('start_time') || time() - session('start_time') > $waitTime) {
         session(['start_time' => time()]);
     } else {
-        $wait_time = session('start_time') - time() + $wait_time;
+        $waitTime = session('start_time') - time() + $waitTime;
     }
 
-    if (time() < session('start_time') + $wait_time) {
-        $wait_time = session('start_time') + $wait_time - time();
+    if (time() < session('start_time') + $waitTime) {
+        $waitTime = session('start_time') + $waitTime - time();
+        session(['ddos_visited' => true]);
     } else {
-        session->put('ddos_visited', true);
-        exit();
+        // Uncomment the following two lines if you want to set 'ddos_visited' to true and exit
+        //session(['ddos_visited' => '15']);
+        session(['ddos_visited' => true]);
+        // exit();
     }
 @endphp
 
+
 <head>
     <title>WM | DDOS DEFENDER</title>
-    <meta http-equiv="refresh" content="{{ $wait_time }}">
+    <meta http-equiv="refresh" content="{{ $waitTime }};/auth/login">
 </head>
 
 

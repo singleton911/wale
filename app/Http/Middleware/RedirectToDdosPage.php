@@ -17,11 +17,12 @@ class RedirectToDdosPage
     {
         $sessionKey = 'ddos_visited';
 
-        // Check if the user has visited the site before
-        if (!session()->exists($sessionKey)) {
+        // Check if the required value is present in the session
+        if (!session($sessionKey)) {
             return redirect('/ddos');
         }
+    
         return $next($request);
-        
+    
     }
 }

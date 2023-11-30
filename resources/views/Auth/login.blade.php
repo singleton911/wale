@@ -1,4 +1,4 @@
-{{-- @if (session('ddos_visited')) --}}
+@if (session('ddos_visited'))
     
 
 <html lang="en">
@@ -58,6 +58,6 @@
 </body>
 
 </html>
-{{-- @else
-    @include('Auth.ddos')
-@endif --}}
+@else
+session: expired;
+@endif

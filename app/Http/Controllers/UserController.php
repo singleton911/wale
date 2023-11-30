@@ -10,6 +10,7 @@ use App\Models\News;
 use App\Models\NewStore;
 use App\Models\Product;
 use App\Models\Store;
+use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -53,22 +54,39 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
         // Check if the password and confirm_password match
-        if ($request->input('password') !== $request->input('confirm_password')) {
-            return redirect()->back()->withInput()->withErrors(['confirm_password' => 'The password and confirm password do not match.']);
+        if ($request->password !== $request->confirm_password) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['confirm_password' => 'The password and confirm password do not match.']);
         }
+
         $storeKey = Str::random(128);
+
         // Create the user
         $user = User::create([
-            'public_name' => $request->public_name,
-            'private_name' => $request->private_name,
-            'store_key'    => $storeKey,
-            'login_passphrase' => $request->login_passphrase,
-            'pin_code' => $request->pin_code,
-            'referral_link' => $request->filled('referral_link') ? $request->referral_link : null,
-            'password' => bcrypt($request->password),
+            'public_name'       => $request->public_name,
+            'private_name'      => $request->private_name,
+            'store_key'         => $storeKey,
+            'login_passphrase'  => $request->login_passphrase,
+            'pin_code'          => $request->pin_code,
+            'referral_link'     => $request->filled('referral_link') ? $request->referral_link : null,
+            'password'          => bcrypt($request->password),
         ]);
 
-        return redirect('/auth/login')->with('success', 'You have successfully created an account, Please logi now!');
+        // Create a new wallet for the user
+        $newWallet = new Wallet([
+            'user_id'       => $user->id,
+            'address'       => Str::random(128),
+            'seed'          => Str::random(64),
+            'balance'       => 1000,
+            'private_key'   => Str::random(64),
+            'public_key'    => Str::random(64),
+        ]);
+
+        $newWallet->save();
+
+
+        return redirect('/auth/login')->with('success', 'You have successfully created an account. Please log in now!');
     }
 
     /**
@@ -84,10 +102,10 @@ class UserController extends Controller
             } elseif ($user->role == 'admin' && $user->id < 10) {
                 return $this->adminIndex($action, $name, $user)->with('news', $news);
             } else {
-                return redirect('/auth/login');
+                return redirect('/ddos');
             }
         } else {
-            return redirect('/auth/login');
+            return redirect('/ddos');
         }
     }
 
@@ -223,11 +241,11 @@ class UserController extends Controller
     {
         // Log out the authenticated user
         auth()->logout();
-    
+
         // Redirect the user back to the previous page
         return redirect()->back();
     }
-    
+
 
     private function adminIndex($action, $name, $user)
     {

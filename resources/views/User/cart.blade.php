@@ -67,18 +67,7 @@
                                         value="{{ $cart->quantity }}"></td>
                                 <td>+{{ $cart->extraShipping->cost ?? '$0.00' }}</td>
                                 <td>${{ $cart->product->price }}</td>
-                                <th>
-                                    @php
-                                        $discount = $user->usedPromocodes->where('cart_id', $cart->id)->first();
-                                    @endphp
-    
-                                    @if ($discount != null && $discount->promocode->code_type == 'fixed')
-                                        {{ '-$' . round($discount->discount, 2) }}
-                                    @elseif ($discount != null && $discount->promocode->code_type == 'percentage')
-                                        {{ '-' . $discount->discount . '%' }}
-                                    @else
-                                        {{ '-$0.00' }}
-                                    @endif
+                                <th>$0.00
                                 </th>
                                 <td>
                                     <textarea name="note" id="" style="width:100%;"

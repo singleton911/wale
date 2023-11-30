@@ -32,9 +32,9 @@
         
         
         
-        <legend> Deposit History</legend>
+      <p style="text-align: center;">Deposit History</p>
         <form action="">
-            <table class="notification-table">
+            <table>
                 <thead>
                     <tr>
                         <th>Adress</th>

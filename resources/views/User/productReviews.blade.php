@@ -15,7 +15,9 @@
 
     <div class="container">
         <div class="main-div">
-            <h3 style="text-align:center;">Reviews > <a href="/listing/{{ $product->created_at->timestamp }}/{{ $product->id }}">{{ $product->product_name }}</a></h3>
+            <h3 style="text-align:center;">Reviews > <a
+                    href="/listing/{{ $product->created_at->timestamp }}/{{ $product->id }}">{{ $product->product_name }}</a>
+            </h3>
             <div class="products-overview">
                 <div style="display: flex; gap: 2em;" class="reviews">
                     <table style="border: 1px solid gray;">
@@ -110,7 +112,8 @@
                     <div class="displayed-reviews">
                         <div class="reviewer-info">
                             <img src="data:image/png;base64,{{ $icon['user'] }}" class="icon-filter" width="25">
-                            <p><span>{{ substr($review->user->public_name, 0, 1) . str_repeat('*', max(strlen($review->user->public_name) - 2, 0)) . substr($review->user->public_name, -1) }}</span></p>
+                            <p><span>{{ substr($review->user->public_name, 0, 1) . str_repeat('*', max(strlen($review->user->public_name) - 2, 0)) . substr($review->user->public_name, -1) }}</span>
+                            </p>
                         </div>
                         <div class="reviewer-reviews">
                             <div class="reviews-rating">
@@ -136,6 +139,36 @@
                             </div>
                         </div>
                     </div>
+
+                    {{-- Display here store replies --}}
+                    @if ($review->reply && $review->reply->count() > 0)
+                        <div class="displayed-reviews" style="margin-left: 1em; border: 2px solid #4682B4;">
+                            <div class="reviewer-info">
+                                <img src="data:image/png;base64,{{ $icon['reply'] }}" class="icon-filter"
+                                    width="25">
+                                <p><span>{{ $product->store->store_name }}</span>
+                                </p>
+                            </div>
+                            <div class="reviewer-reviews">
+                                <div class="reviews-rating">
+                                    <div>
+                                        <span>{{ $review->created_at->format('d/m/y') }}</span><br>
+                                        <span>Store Reply</span>
+                                    </div>
+                                </div>
+                                <div class="rating-texts">
+                                    <p style="margin-top: 5px;"> {{ $review->reply->reply }} <br>
+                                    <form action="" method="post" style="margin:0px; padding:0px;">
+                                        <p style='color: #4682B4; text-align: right; margin:0px; margin-top:12px;'>
+
+                                            Last Updated: {{ $review->reply->updated_at->format('d/m/y') }}
+                                        </p>
+                                    </form>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                 @empty
                     <p>No review found for this product, buy this product to leave a review!</p>
                 @endforelse

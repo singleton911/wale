@@ -15,13 +15,14 @@
     @include('User.navebar')
     <div class="cart-div">
         {{ session('test') }}
-        <div class="notific-container">
+        <div class="notific-container" style="margin-right: 1em;">
             <h1 class="notifications-h1">Shopping Cart</h1>
             <p class="notifications-p">For any change made to the cart please try to update it, else changes will not
                 take
                 effect! <br>
                 Please encrypt all your address or any note for your own security, we check if you note is not encrypted
-                and we do it for you but still please do it your self which is <span style="background-color: yellow">highly
+                and we do it for you but still please do it your self which is <span
+                    style="background-color: yellow">highly
                     recommended!!!</span>
             </p>
             <p>
@@ -57,18 +58,17 @@
                                 <td>
                                     <img src="data:image/png;base64,{{ $icon['osint'] }}" width="70">
                                 </td>
-                                <input type="hidden" name="user_id" value="{{ $cart->user_id }}">
                                 <input type="hidden" name="cart_id" value="{{ $cart->id }}">
                                 <input type="hidden" name="product_id" value="{{ $cart->product_id }}">
                                 <td><a
-                                        href="/Item/{{ strtotime($cart->product->created_at) }}">{{ Str::limit($cart->product->product_name, 20, '...') }}</a>
+                                        href="/listing/{{ $cart->product->created_at->timestamp }}/{{ $cart->product->id }}">{{ Str::limit($cart->product->product_name, 3, '...') }}</a>
                                 </td>
                                 <td><input type="number" name="quantity" id="" min="1"
                                         value="{{ $cart->quantity }}"></td>
                                 <td>+{{ $cart->extraShipping->cost ?? '$0.00' }}</td>
                                 <td>${{ $cart->product->price }}</td>
-                                <th>$0.00
-                                </th>
+                                <td>$0.00
+                                </td>
                                 <td>
                                     <textarea name="note" id="" style="width:100%;"
                                         placeholder="Write here you note like: address or any note to send to this product owner." rows="2">{{ $cart->note != null ? $cart->note : '' }}</textarea>
@@ -82,7 +82,7 @@
                             </tr>
                         </form>
                     @empty
-    
+
                         <tr>
                             <td colspan="5">
                                 <p class="no-notification">Cart is empty.</p>
@@ -92,7 +92,7 @@
                 </tbody>
             </table>
         </div>
-    
+
         <div class="left-side-div">
             <div class="notific-container">
                 <h1 class="notifications-h1">Cart Summary</h1>
@@ -103,7 +103,7 @@
                             @php
                                 $total = 0;
                             @endphp
-    
+
                             @foreach ($user->carts as $cart)
                                 @if ($cart->product)
                                     @php
@@ -111,7 +111,7 @@
                                     @endphp
                                 @endif
                             @endforeach
-    
+
                             <td>${{ round($total, 2) }}</td>
                         </tr>
                         <tr style="font-size: 0.8rem;">
@@ -157,7 +157,7 @@
                         <p style="color:red">{{ session('invalidPromo') }}</p>
                     @endif
                     @csrf
-    
+
                     <div class="coupon-code" style="margin: 2em;">
                         <input type="text" name="promocode" placeholder="Enter code: " pattern="[A-Za-z0-9]+"
                             class="apply_now_copons_text" style="margin-bottom: 2em;">

@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::create('escrows', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreignId('order_id')->constrained('orders')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('order_id')->index();
+            $table->decimal('fiat_amount', 10, 2); // Assuming Monero uses 8 decimal places.
+            $table->string('address');
+            $table->enum('status', ['pending', 'released', 'dispute'])->default('pending');
             $table->timestamps();
         });
     }

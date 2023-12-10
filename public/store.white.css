@@ -132,7 +132,7 @@ body::-webkit-scrollbar {
   .main {
       display: grid;
       grid-template-columns: 1fr 4fr;
-      padding: 20px;
+      gap: 20px;
   }
   /* Media Queries */
   @media (max-width: 768px) {
@@ -188,10 +188,11 @@ body::-webkit-scrollbar {
   }
   
   .cls-left {
-      border: 1px solid #eeeeee;
-      padding: 10px;
-      margin-right: 20px;
+      border: 2px solid #eeeeee;
+      padding: 5px;
+      margin-right: 10px;
       border-radius: .5rem;
+      background: #f8f8f8;
   }
   
   .wlc-info {
@@ -200,19 +201,10 @@ body::-webkit-scrollbar {
       justify-content: center;
   }
   
-  .avater {
-      margin: auto;
-  }
-  
-  .wlc-info .avater .bg-img {
-      position: relative;
-  }
-  
   .wlc-info .avater .bg-img .background-img {
-     
-      max-height: 200px;
       align-self: center;
       border-radius: .5rem;
+      width: 15em;
   }
   
   .name-status {
@@ -273,4 +265,140 @@ body::-webkit-scrollbar {
   }
   
   
-  
+  .latest-orders,
+.top-products {
+    border: 2px solid #eeeeee;
+    padding: 1em;
+    background: #f8f8f8;
+}
+.top-products{
+  margin-top: 1em;
+}
+.title-latest {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 5px;
+    align-items: center;
+    text-align: center;
+}
+
+.title-latest h4 {
+    font-size: 1rem;
+    color: #0066cc;
+}
+
+.view-latest a {
+    color: #ffffff;
+    text-decoration: none;
+    padding:5px;
+    background-color: #0066cc;
+    border-radius: .5rem;
+    font-size: .8rem;
+}
+
+/* create a listings  */
+.listing-type{
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  height: fit-content;
+  width: calc(100vw - 70%);
+  background: #f8f8f8;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+  border-radius: 0.5rem;
+  box-sizing: border-box;
+  padding: 10px;
+}
+
+.listing-type a, 
+.listing-type h3{
+  text-decoration: none;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 1.3rem;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: .5rem;
+  color: #0080ff;
+}
+.listing-type a{
+  margin-bottom: 20px;
+}
+.listing-type a:visited{
+  color: #0b3996;
+}
+.listing-type h3{
+  border: none;
+}
+
+.form-container {
+  font-family: 'Arial', sans-serif;
+max-width: 800px;
+margin: 0 auto;
+padding: 20px;
+background: #f8f8f8;
+border-radius: 8px;
+/* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
+}
+
+/* Style form labels */
+.form-label {
+display: block;
+margin-bottom: 8px;
+font-weight: bold;
+}
+
+/* Style form inputs and textareas */
+.form-input,
+.form-textarea,
+.form-select {
+width: 100%;
+padding: 10px;
+margin-bottom: 10px;
+box-sizing: border-box;
+border: 1px solid #ccc;
+border-radius: 4px;
+}
+
+/* Style the submit button */
+.submit-nxt {
+background-color: #4caf50;
+color: white;
+padding: 10px 15px;
+border: none;
+border-radius: 4px;
+cursor: pointer;
+font-size: 16px;
+}
+
+/* Add some spacing to the optional message */
+.form-container span {
+display: block;
+margin-top: 10px;
+margin-bottom: 20px;
+text-align: center;
+color: darkred;
+}
+
+/* Style file input */
+.form-input[type="file"] {
+padding: 5px;
+}
+
+/* Style the optional return policy input */
+.form-input[name="return_policy"] {
+width: 100%;
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+.form-container {
+  width: 90%;
+}
+}

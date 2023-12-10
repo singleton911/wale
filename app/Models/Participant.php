@@ -15,8 +15,7 @@ class Participant extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function messages()
-    {
-        return $this->hasMany(Message::class, 'user_id', 'user_id');
+    public function conversation(){
+        return $this->belongsTo(Conversation::class);
     }
 }

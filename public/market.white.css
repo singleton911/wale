@@ -1,7 +1,7 @@
 :root {
     /* --white-background-color: #0A2647; */
     /* --white-background-color: #f1f1f1; */
-      --white-background-color: #f1f1f1; 
+    --white-background-color: #f1f1f1;
     /* --white-background-color: rgb(43, 43, 64); */
     --main-color: #0b3996;
     --shadow: 0 1px 3px 0 rgba(48, 48, 48, 0.15);
@@ -10,7 +10,7 @@
     --secondary-white-bg: white;
     /* --secondary-white-bg: rgb(13, 13, 39); */
     /* --dark-color-text: #f1f1f1; */
-    --dark-color-text: #0A2647;
+    --dark-color-text: #0a2647;
     --text-color-for-blue-bg: beige;
 }
 
@@ -200,7 +200,7 @@ Style the alert box ::-moz-dialog {
 .logout {
     display: flex;
     flex-direction: row;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-family: Helvetica, sans-serif;
     align-items: center;
     justify-content: center;
@@ -272,6 +272,7 @@ Style the alert box ::-moz-dialog {
     color: var(--dark-color-text);
     text-decoration: none;
     transition: background-color 0.4s ease;
+    font-size: 0.8rem !important;
 }
 
 .hideout-menus a:hover {
@@ -282,7 +283,7 @@ Style the alert box ::-moz-dialog {
 .hideout-menus h3 {
     margin: 0;
     padding: 5px 0;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: bold;
     color: var(--dark-color-text);
     text-align: center;
@@ -581,9 +582,9 @@ Style the alert box ::-moz-dialog {
     box-sizing: border-box;
     padding-bottom: 7px;
     box-shadow: 0 1px 2px 0 rgba(48, 48, 48, 0.3),
-    0 1px 3px 1px rgba(48, 48, 48, 0.15);
+        0 1px 3px 1px rgba(48, 48, 48, 0.15);
 }
-.left-news-div{
+.left-news-div {
     height: fit-content;
     background-color: var(--secondary-white-bg);
     border-radius: 0.5rem;
@@ -745,22 +746,23 @@ Style the alert box ::-moz-dialog {
 }
 
 .products-grid > div {
-    background-color: var(--secondary-white-bg);
+    /* background-color: var(--secondary-white-bg); */
+    background: #f8f8f8;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     border-radius: 0.5rem;
     box-sizing: border-box;
-    padding: .4em;
-    border: 1px solid rgb(184, 184, 184);
+    padding: 0.4em;
+    border: 2px solid rgb(184, 184, 184);
 }
 
-.products-grid > div:hover{
-        box-shadow: 0 1px 2px 0 rgba(48, 48, 48, 0.3),
+.products-grid > div:hover {
+    box-shadow: 0 1px 2px 0 rgba(48, 48, 48, 0.3),
         0 1px 3px 1px rgba(48, 48, 48, 0.15);
-        border: none;
-        padding: .5em;
+    border: none;
+    padding: 0.5em;
 }
 .products-grid > div > .image > img {
     height: 15vh;
@@ -1052,32 +1054,6 @@ a {
     margin-bottom: 20px;
 }
 
-table {
-    border-collapse: collapse;
-    width: 100%;
-}
-
-thead {
-    background-color: #3498db; /* Stylish blue */
-    color: white; /* White text for contrast */
-}
-
-th,
-td {
-    padding: 7px;
-    text-align: left;
-    border-bottom: 1px solid #ddd; /* Subtle border for separation */
-    border: none;
-}
-
-th {
-    font-size: 0.8rem;
-    font-weight: 600; /* Slightly lighter for a sleek look */
-    text-transform: uppercase; /* Uppercase for a modern touch */
-}
-
-
-
 .self-container {
     padding: 10px 0; /* Adds space above and below each row */
     /*background-color: #f0f0f0;  Just for illustration */
@@ -1236,6 +1212,32 @@ select option:hover {
     margin-top: 20px;
 }
 
+
+/* Style the table */
+table {
+    width: 100%;
+    margin-bottom: 20px;
+    border-collapse: collapse;
+    }
+    
+    /* Style table rows */
+    tr {
+      border-bottom: 2px solid #ddd;
+      }
+    
+    /* Style table headers */
+    th {
+    background-color: #0b3996 !important;
+    color: white;
+    padding: 10px;
+    text-align: left;
+    }
+    
+    /* Style table cells */
+    td {
+    padding: 10px;
+    }
+    
 /* Important listing style*/
 .others a,
 .input-listing {
@@ -1639,10 +1641,10 @@ select option:hover {
 .notification-container {
     display: flex;
     align-items: center;
-    padding: .5em;
+    padding: 0.5em;
     border: 1px solid #ccc;
     border-radius: 8px;
-    margin-bottom: .5em;
+    margin-bottom: 0.5em;
     background-color: #f0f0f0;
     box-shadow: var(--shadow);
     font-family: Helvetica, sans-serif;
@@ -1682,11 +1684,11 @@ select option:hover {
     font-size: 0.7em;
 }
 
-.count-unread-messages{
+.count-unread-messages {
     background-color: #0080ff;
-    padding: .3rem;
+    padding: 0.3rem;
     color: #f2f2f2;
-    border-radius: .5rem;
+    border-radius: 0.5rem;
 }
 
 @keyframes unread {
@@ -1804,12 +1806,12 @@ input[type="password"]:focus,
     outline: none;
 }
 
-.message-heading{
-  text-align: center;
-  font-size: 1.3rem; 
-  text-align: center;
-  margin: 5px 0px;
-  font-family: Helvetica, sans-serif;
+.message-heading {
+    text-align: center;
+    font-size: 1.3rem;
+    text-align: center;
+    margin: 5px 0px;
+    font-family: Helvetica, sans-serif;
 }
 
 .message-div {
@@ -1888,19 +1890,19 @@ input[type="password"]:focus,
 .subject {
     outline: none;
 }
-.message-read{
-  color: green;
-  content: 'Read';
+.message-read {
+    color: green;
+    content: "Read";
 }
-.message-unread{
-  color: red;
-  content: 'UnRead';
+.message-unread {
+    color: red;
+    content: "UnRead";
 }
 .subject-label {
-  display: flex;
-  margin-bottom: 10px;
-  font-weight: bold;
-  text-transform: capitalize;
+    display: flex;
+    margin-bottom: 10px;
+    font-weight: bold;
+    text-transform: capitalize;
 }
 
 .submit-nxt {
@@ -2026,14 +2028,14 @@ store info  */
 .active,
 .open,
 .release,
-.completed{
+.completed {
     color: green;
     text-transform: capitalize;
     font-family: Helvetica, sans-serif;
 }
-.pending{
-  color: darkgreen;
-  font-family: Helvetica, sans-serif;
+.pending {
+    color: darkgreen;
+    font-family: Helvetica, sans-serif;
 }
 .banned,
 .closed,
@@ -2054,7 +2056,7 @@ store info  */
     font-family: Helvetica, sans-serif;
 }
 .dispute,
-.disputed{
+.disputed {
     color: darkorange;
     text-transform: capitalize;
     font-family: Helvetica, sans-serif;
@@ -2078,4 +2080,47 @@ store info  */
 .storem {
     text-transform: capitalize;
     font-weight: bold;
+}
+
+.news-div {
+    margin-bottom: 20px;
+    padding: 1em;
+    transition: transform 0.3s ease-in-out;
+}
+
+.news-div:hover {
+    transform: scale(1.02);
+}
+
+.news-title {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.icon-filter {
+    margin-right: 10px;
+}
+
+.news-content {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.news-meta {
+    font-size: 0.9rem;
+    color: #8a8a8a;
+    text-align: right;
+}
+
+.author {
+    font-weight: bold;
+    color: #3498db; /* Blue color, you can choose your own */
+}
+
+.date {
+    font-style: italic;
+    color: #7f8c8d; /* Gray color, you can choose your own */
 }

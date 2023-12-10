@@ -61,15 +61,23 @@
 
 
 <div class="main-div">
+
     <div class="notific-container">
         <h1>CHANGE PASSWORD</h1>
-
+        @if (session('success'))
+        <p style="text-align: center; color:green;">{{ session('success') }}</p>
+    @endif
+    @if ($errors->any())
+        @foreach ($errors->all() as $error)
+            <p style="text-align: center; color:red;">{{ $error }}</p>
+        @endforeach
+    @endif
         <form action="" method="POST">
             @csrf
             <input type="password" name="old-passwrd" placeholder="Old password" required><br><br>
             <input type="password" name="new-passwrd" placeholder="New password" required><br><br>
             <input type="password" name="confirm-new-passwrd" placeholder="Confirm New password" required><br><br>
-            <input type="number" name="secret-code" placeholder="Enter Secret code" required><br><br>
+            <input type="number" name="secret_code" placeholder="Enter Secret code" required><br><br>
             <div class="two-btns">
                 <input type="submit" class="save-pgp" name="save-pass" value="Save">
             </div>

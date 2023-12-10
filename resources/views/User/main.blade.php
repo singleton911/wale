@@ -17,8 +17,10 @@
                 @include('User.categories')
 
                 <div class="news-div">
-                        <h2 class="news-title" style="text-decoration: underline">{{ $news->title }}</h2>
-                        <p class="news-content">{{ Str::limit($news->content, 400, '...') }} </p>
+                        <h2 class="news-title" style="text-decoration: underline"><img src="data:image/png;base64,{{ $icon['news'] }}"
+                            class="icon-filter" width="25"> {{ $news->title }} <img src="data:image/png;base64,{{ $icon['news'] }}"
+                            class="icon-filter" width="25"></h2>
+                        <p class="news-content">{{ Str::limit($news->content, 150, '...') }} </p>
                         <div style="text-align:right; margin-right:5px; font-size: .8rem; color: #acacac;">
                             <a href="/news/"
                                 style="font-size: .8rem; margin-right:1em; text-decoration:underline">Clcik

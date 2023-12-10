@@ -26,7 +26,12 @@
         <div class="main-div" style="margin-top:0px">
             <div class="main-store-div">
                 <div class="s-main-image">
-                    <img src="data:image/png;base64,{{ $icon['osint'] }}">
+                   
+                    @php
+                    $avatarKey = $store->avatar;
+                @endphp
+                <img src="data:image/png;base64,{{ !empty($upload_image[$avatarKey]) ? $upload_image[$avatarKey] : $icon['default'] }}"
+                    class="background-img"> 
                     <div>
                         <div class="div-p">
                             <p class="store-name">{{ $store->store_name }}<span style="font-size: .5em;">Store</span>
@@ -50,7 +55,7 @@
                         </div>
                         <div class="div-p">
                             <p>Listings: {{ $store->products->count() }}</p> |
-                            <p>Favorited: {{ $store->favoriteStores->count() }}</p>
+                            <p>Favorited: {{ $store->StoreFavorited->count() }}</p>
                         </div>
                         <div class="div-p">
                             <p class="selling">Selling: <a href=""
@@ -71,10 +76,10 @@
                 <form action="" method="POST">
                     @csrf
                 <div class="div-p" style="display: flex; gap: 1.3em; justify-content:center;">
-                    <a href="/store/pgp/{{ $store->store_name }}/{{ $store->id }}" class="input-listing">PGP Key
+                    <a href="/store/show/pgp/{{ $store->store_name }}/{{ $store->id }}" class="input-listing">PGP Key
                     </a>
 
-                    <a href="/store/message/{{ $store->store_name }}/{{ $store->id }}" class="input-listing">
+                    <a href="/store/show/message/{{ $store->store_name }}/{{ $store->id }}" class="input-listing">
                         Message</a>
                     @if ($user->favoriteStores->count() > 0)
                         @php $storeFavorited = false; @endphp
@@ -92,12 +97,12 @@
                     @else
                         <input type="submit" name="favorite_store" class="input-listing" value="Favorite Store">
                     @endif
-                    <a href="/store/reviews/{{ $store->store_name }}/{{ $store->id }}" class="input-listing">
+                    <a href="/store/show/reviews/{{ $store->store_name }}/{{ $store->id }}" class="input-listing">
                         Reviews({{ $store->reviews->count() }}) </a><span class="last">
 
                     <input type="submit" name="block_store" value="Block Store" class="input-listing">
 
-                    <a href="/store/report/{{ $store->store_name }}/{{ $store->id }}" class="input-listing"
+                    <a href="/store/show/report/{{ $store->store_name }}/{{ $store->id }}" class="input-listing"
                             style="margin:1em"> Report</a>
                     
                 </div>
@@ -123,13 +128,14 @@
                 <h3> {{ $store->store_name }} > Listings</h3>
             </div>
             <div class="products-grid">
-                @forelse ($store->products as $product)
+                @forelse ($store->products()->paginate(50) as $product)
                     @include('User.products')
                 @empty
                     No product found.
                 @endforelse
 
             </div>
+            {{ $store->products()->paginate(50)->render('vendor.pagination.custom_pagination') }}
         </div>
     </div>
 

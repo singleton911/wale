@@ -43,7 +43,6 @@
 
     .notification-message {
         margin-top: 10px;
-        font-size: 0.9em;
     }
 </style>
 
@@ -71,7 +70,7 @@
             @forelse ($user->notifications->sortByDesc('created_at') as $notification)
                 <div class="notification-container {{ $notification->is_read ? 'read' : '' }}">
                     {{-- $notification->notificationType->icon --}}
-                    <img src="data:image/jpeg;base64,{{ $icon['ads'] }}" alt="" width="30">
+                    <img src="data:image/jpeg;base64,{{ $icon[$notification->notificationType->icon] }}" alt="" width="30">
                     <div class="notification-content">
                         <div style="display: flex;">
                             <span>{{ $notification->user->public_name }}</span>
@@ -90,10 +89,10 @@
                                     style="cursor: pointer;">
                             </form>
                         </div>
-                        <p class="notification-message">{{ $notification->notificationType->content }}
+                        <p class="notification-message" style="margin-top: 0px; font-size: .9rem">{{ $notification->notificationType->content }}
                             @if ($notification->notificationType->icon == 'order')
                                 <a href="/order/{{ $notification->order->created_at->timestamp }}/{{ $notification->option_id }}"
-                                    style="font-size:1rem; text-decoration:underline;">see order details here</a>
+                                    style="font-size: 1rem; text-decoration:underline;">see order details here</a>
                             @endif
                         </p>
                     </div>

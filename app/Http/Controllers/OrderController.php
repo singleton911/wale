@@ -12,6 +12,7 @@ use App\Models\Message;
 use App\Models\MessageStatus;
 use App\Models\NotificationType;
 use App\Models\Participant;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 
 class OrderController extends Controller
@@ -53,9 +54,33 @@ class OrderController extends Controller
                 'subCategories' => Category::whereNotNull('parent_category_id')->get(),
                 'categories' => Category::all(),
                 'icon' => GeneralController::encodeImages(),
+                'upload_image' => GeneralController::encodeImages('Upload_Images'),
+                'product_image' => GeneralController::encodeImages('Product_Images'),
                 'order' => $order,
                 'name'  => 'order',
                 'action' => null,
+            ]);
+        }
+
+        return abort(403);
+    }
+
+
+    public function showStoreOrder($store, $created_at, Order $order)
+    {
+        $store = auth()->user()->store;
+        if (strtotime($order->created_at) == $created_at) {
+            return view('Store.orderView', [
+                'storeUser' => auth()->user(),
+                'store' => $store,
+                'parentCategories' => Category::whereNull('parent_category_id')->get(),
+                'subCategories' => Category::whereNotNull('parent_category_id')->get(),
+                'categories' => Category::all(),
+                'icon' => GeneralController::encodeImages(),
+                'upload_image' => GeneralController::encodeImages('Upload_Images'),
+                'product_image' => GeneralController::encodeImages('Product_Images'),
+                'order' => $order,
+                'action' => 'order',
             ]);
         }
 
@@ -182,5 +207,14 @@ class OrderController extends Controller
         }
 
         return;
+    }
+
+    public function addStoreNote(Request $request, $store, $created_at, Order $order){
+        if ($store == $order->store->store_name  && $created_at == strtotime($order->created_at)) {
+            $request->validate(['store_note' => 'required|min:3|max:5000']);
+            $order->store_notes = $request->store_note;
+            $order->save();
+            return redirect()->back()->with('success', 'You have successfully update the store note for this order.');
+        }
     }
 }

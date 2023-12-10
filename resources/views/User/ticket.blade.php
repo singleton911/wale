@@ -69,11 +69,11 @@
                                 </td>
                                 <td class="{{ $ticket->staff != 0 ? $ticket->staff->role : '' }}">
                                     {{ $ticket->staff != 0 ? $ticket->staff->public_name : 'No Staff Yet' }}</td>
-                                <th class="{{ $ticket->status }}">{{ $ticket->status }}</th>
+                                <td class="{{ $ticket->status }}">{{ $ticket->status }}</td>
                                 <td><a
                                         href="/messages/{{ $ticket->conversation->created_at->timestamp }}/{{ $ticket->conversation_id }}">View</a>
                                 </td>
-                                <th>{{ $ticket->created_at->diffForHumans() }}</th>
+                                <td>{{ $ticket->created_at->diffForHumans() }}</td>
                             </tr>
                         @empty
                             <tr>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ShareAccess;
 use App\Http\Requests\StoreShareAccessRequest;
 use App\Http\Requests\UpdateShareAccessRequest;
+use Illuminate\Http\Request;
 
 class ShareAccessController extends Controller
 {
@@ -13,15 +14,17 @@ class ShareAccessController extends Controller
      */
     public function index()
     {
-        //
+
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        if ($request->has('new_share_access')) {
+            return redirect()->back()->with('new_share_access', true);
+        }
     }
 
     /**

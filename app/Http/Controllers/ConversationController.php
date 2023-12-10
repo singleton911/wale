@@ -56,6 +56,20 @@ class ConversationController extends Controller
         $user = auth()->user();
         $type = null;
         if (strtotime($conversation->created_at) == $created_at) {
+            // Mark all messages under this conversation as read for the specified user
+            foreach ($conversation->messages as $message) {
+                foreach ($message->status->where('user_id', $user->id) as $status) {
+                    if ($status->is_read == 0) {
+                        // Assuming MessageStatus is an Eloquent model
+                        $messageStatus = MessageStatus::find($status->id);
+                        if ($messageStatus) {
+                            $messageStatus->is_read = 1;
+                            $messageStatus->save();
+                            return redirect('/messages/' . $created_at . '/' . $conversation->id);
+                        }
+                    }
+                }
+            }
             return view('User.displayMessages', [
                 'user' => $user,
                 'icon'   => GeneralController::encodeImages(),
@@ -133,5 +147,38 @@ class ConversationController extends Controller
         }
 
         return redirect()->back()->with('success', 'Your message has been successfully sent to the store.');
+    }
+
+
+    public function showStore($name, $created_at, Conversation $conversation)
+    {
+        $user = auth()->user();
+        $store = auth()->user()->store;
+
+        if (strtotime($conversation->created_at) == $created_at) {
+            // Mark all messages under this conversation as read for the specified user
+            foreach ($conversation->messages as $message) {
+                foreach ($message->status->where('user_id', $user->id) as $status) {
+                    if ($status->is_read == 0) {
+                        // Assuming MessageStatus is an Eloquent model
+                        $messageStatus = MessageStatus::find($status->id);
+                        if ($messageStatus) {
+                            $messageStatus->is_read = 1;
+                            $messageStatus->save();
+                            return redirect('/store/'.$store->store_name.'/show/messages/' . $created_at . '/' . $conversation->id);
+                        }
+                    }
+                }
+            }
+            return view('Store.displayMessages', [
+                'store' => $store,
+                'user' => $user,
+                'storeUser' => $user,
+                'icon'   => GeneralController::encodeImages(),
+                'conversation' => $conversation,
+            ]);
+        }
+
+        return abort(404);
     }
 }

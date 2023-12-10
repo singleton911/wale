@@ -3,20 +3,21 @@
       <div class="left-div" style="display: flex; gap: 50px;">
         <div>
           <p>Active Users: 0</p>
+          <p>Banned Users: 0</p>
           <p>Active Stores: 0</p>
-          <p>Blocked Stores: 0</p>
+          <p>Banned Stores: 0</p>
         </div>
         <div>
-          <p>Admin: <a href="?action=admin" target="_blank" rel="noopener noreferrer">bigWhale</a></p>
+          <p>Admin: <a href="" style="font-size:12px;" rel="noopener noreferrer">OSINT</a></p>
           <p>Senior Mods:</p>
           <p>Junior Mods:</p>
         </div>
       </div>
       <div class="right-div">
         <div class="canary-news">
-          <a href="/store/settings">Settings(Edit)</a>
-          <a href="/store/canary">Canary & pgp keys</a>
-          <a href="/store/faq">F.A.Q</a>
+          <a href="/store/{{ $store->store_name }}/show/settings">Settings(Edit)</a>
+          <a href="/canary">Canary & pgp keys</a>
+          <a href="/faq">F.A.Q</a>
         </div>
         <p class="lunched"><?php
                             $current_time = gmdate('F j, Y H:i:s');

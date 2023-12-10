@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('conversation_id')->constrained('conversations')->onUpdate('cascade')->onDelete('cascade');
             $table->enum('status', ['pending', 'open', 'closed', 'escalated', 'de-escalated'])->default('pending');
-            $table->foreignId('staff_id')->default(0)->constrained('users')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('staff_id')->nullable()->constrained('users')->onUpdate('cascade')->onDelete('cascade');
             $table->enum('priority', ['low', 'medium', 'high'])->default('medium');
             $table->timestamps();
         });

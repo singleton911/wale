@@ -112,7 +112,7 @@ class ReportController extends Controller
             $report->report     = $data['report'];
             $report->is_store    = true;
             $report->save();
-            return redirect()->back()->with('success', 'You have successfully reported this store. Please with for admin or mods to review your report. we will message.');
+            return redirect()->back()->with('success', 'You have successfully reported this store. Please with for admin or mods to review your report. we will message you.');
         }
     }
 
@@ -129,7 +129,7 @@ class ReportController extends Controller
             $report->subject    =  $data['subject'];
             $report->report     = $data['report'];
             $report->save();
-            return redirect()->back()->with('success', 'You have successfully reported this listing. Please with for admin or mods to review your report, we will message.');
+            return redirect()->back()->with('success', 'You have successfully reported this listing. Please with for admin or mods to review your report, we will message you.');
         }
     }
 }

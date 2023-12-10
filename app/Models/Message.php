@@ -9,6 +9,7 @@ class Message extends Model
 {
     use HasFactory;
     protected $guarded = ['id'];
+    
     public function conversation(){
         return $this->belongsTo(Conversation::class);
     }

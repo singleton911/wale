@@ -92,4 +92,8 @@ class User extends Model implements Authenticatable
     public function usedPromocodes(){
         return $this->hasMany(userPromos::class);
     }
+
+    public function waiver(){
+        return $this->hasOne(Waiver::class);
+    }
 }

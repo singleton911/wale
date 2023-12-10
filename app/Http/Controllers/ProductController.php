@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateProductRequest;
 use App\Models\BlockStore;
 use App\Models\Cart;
 use App\Models\Category;
+use App\Models\Escrow;
 use App\Models\ExtraOption;
 use App\Models\FavoriteListing;
 use App\Models\FavoriteStore;
@@ -18,6 +19,7 @@ use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 
 class ProductController extends Controller
 {
@@ -31,38 +33,32 @@ class ProductController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create($store, $action)
     {
-        //
+        if ($action == 'physical') {
+            return $this->createPhysicalListing();
+        } elseif ($action == 'digital') {
+            return $this->createDigitalListing();
+        }
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreProductRequest $request)
+    public function store(Request $request)
     {
-        // Retrieve validated data from the request
-        $validatedData = $request->validated();
+        $store = auth()->user()->store;
 
-        // Save the images to public/storage/Product_Images with unique, encrypted names
-        $imagePaths = [];
-        foreach (['image_path1', 'image_path2', 'image_path3'] as $key) {
-            if ($request->hasFile($key)) {
-                $file = $request->file($key);
-
-                // Call the function to process and store the image
-                $imagePath = GeneralController::processAndStoreImage($file, 'Product_Images');
-
-                $imagePaths[$key] = $imagePath;
-            }
+        if ($request->next == 'Next') {
+            $this->saveProduct($request);
+        } elseif ($request->extra_set == 'Save') {
+            $this->saveExtraOptions($request);
+        } elseif ($request->skip == 'Skip') {
+            return redirect()->back()->with('success', 'Product created successfully and it has no extra shipping or options, it now pending waiting to be approved by mods or admin.');
         }
 
-        // Create a new Product instance with the validated data and image paths
-        $product = Product::create($request->all());
-
         // Redirect to the appropriate route or view
-        // You might want to redirect to the product details page or another page
-        return redirect()->back()->with('success', 'Product created successfully');
+        return redirect()->back();
     }
 
 
@@ -81,6 +77,8 @@ class ProductController extends Controller
                 'parentCategories' => Category::where('parent_category_id', NULL)->get(),
                 'subCategories' => Category::where('parent_category_id', '!=', NULL)->get(),
                 'icon'   => GeneralController::encodeImages(),
+                'product_image' => GeneralController::encodeImages('Product_Images'),
+                'upload_image' => GeneralController::encodeImages('Upload_Images'),
             ]);
         }
 
@@ -90,17 +88,40 @@ class ProductController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Product $product)
+    public function edit($store, $created_at, Product $product)
     {
-        //
+        return view('Store.index', [
+            'product' => $product,
+            'store' => auth()->user()->store,
+            'storeUser' => auth()->user(),
+            'action' => "edit-product",
+            'icon'  => GeneralController::encodeImages(),
+            'product_image' => GeneralController::encodeImages('Product_Images'),
+            'upload_image' => GeneralController::encodeImages('Upload_Images'),
+            'categories' => Category::all(),
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateProductRequest $request, Product $product)
+    public function update(Request $request, $store, $created_at, Product $product)
     {
-        //
+        if ($store == $product->store->store_name && $created_at == strtotime($product->created_at)) {
+
+            if ($request->save_next == 'Save and Next') {
+                return $this->updateProduct($request, $product->id);
+            } elseif ($request->skip_next == 'Skip and Next') {
+                return redirect()->back()->with('next-form', true)->with('product_id', Crypt::encrypt($product->id));
+            } elseif ($request->skip == 'Skip') {
+                // return $this->saveExtraOptions($request);
+                return redirect()->back()->with('success', 'Product created successfully and it has no extra shipping or options, it now pending waiting to be approved by mods or admin.');
+            } elseif ($request->skip == 'Skip') {
+                return redirect()->back()->with('success', 'Product created successfully and it has no extra shipping or options, it now pending waiting to be approved by mods or admin.');
+            }
+        } else {
+            return "Stop modifying the URL, the admin knows!!!";
+        }
     }
 
     /**
@@ -119,7 +140,6 @@ class ProductController extends Controller
         if ($timestamp !== false && $timestamp == $created_at) {
             if ($request->has('add_to_cart')) {
                 return $this->addToCart($request, $product);
-
             } elseif ($request->has('buy_now')) {
                 // Check user's wallet balance before initiating the order
                 if ($this->checkUserWalletBalance($user_id, ($product->price + $extra))) {
@@ -177,7 +197,7 @@ class ProductController extends Controller
             'extra_shipping_option' => 'required|integer|min:1',
             'address_text' => 'sometimes|nullable|string|max:100000',
         ]);
-        
+
         $notificationType = NotificationType::where('action', 'created')->where('icon', 'order')->first();
 
         $order                    = new Order();
@@ -209,6 +229,16 @@ class ProductController extends Controller
         return false;
     }
 
+    // add the order to escrow
+    public function makeEscrow($order, $amount, $adderss){
+        $new_eascrow = new Escrow();
+        $new_eascrow->order_id = $order;
+        $new_eascrow->amount   = $amount;
+        $new_eascrow->address = $adderss;
+        $new_eascrow->save();
+    }
+
+    // Add to cart
     private function addToCart($request, $product)
     {
         // Check if the product is already in the cart for the current user
@@ -240,7 +270,7 @@ class ProductController extends Controller
         }
         return redirect()->back();
     }
-    
+
     public function reviews($created_at, Product $product)
     {
         if ($created_at == strtotime($product->created_at)) {
@@ -250,9 +280,238 @@ class ProductController extends Controller
                 'action' => Null,
                 'product' => $product,
                 'icon'  => GeneralController::encodeImages(),
+                'product_image' => GeneralController::encodeImages('Product_Images'),
+                'upload_image' => GeneralController::encodeImages('Upload_Images'),
             ]);
         }
 
         return abort(403);
+    }
+
+
+    private function createPhysicalListing()
+    {
+        return view('Store.index', [
+            'store' => auth()->user()->store,
+            'storeUser' => auth()->user(),
+            'action' => "physical",
+            'icon'  => GeneralController::encodeImages(),
+            'product_image' => GeneralController::encodeImages('Product_Images'),
+            'upload_image' => GeneralController::encodeImages('Upload_Images'),
+            'categories' => Category::all(),
+        ]);
+    }
+
+    private function createDigitalListing()
+    {
+        return view('Store.index', [
+            'store' => auth()->user()->store,
+            'storeUser' => auth()->user(),
+            'action' => "digital",
+            'icon'  => GeneralController::encodeImages(),
+            'product_image' => GeneralController::encodeImages('Product_Images'),
+            'upload_image' => GeneralController::encodeImages('Upload_Images'),
+            'categories' => Category::all(),
+        ]);
+    }
+
+
+    private function saveProduct($request)
+    {
+        // Validate the request data
+        $request->validate([
+            'store_id'              => 'required|integer',
+            'product_name'          => 'required|string|min:3|max:80',
+            'product_description'   => 'required|string|max:2500',
+            'price'                 => 'required|numeric|min:0|regex:/^\d+(\.\d{1,2})?$/',
+            'quantity'              => 'required|integer|min:1',
+            'ship_from'             => 'string|max:50',
+            'payment_type'          => 'required|string|min:2|max:7',
+            'product_type'          => 'required|string|in:digital,physical',
+            'ship_to'               => 'string|max:50',
+            'parent_category_id'    => 'required|integer',
+            'sub_category_id'       => 'required|integer',
+            'return_policy'         => 'sometimes|nullable|min:3|max:500',
+            'auto_delivery_content' => 'sometimes|nullable|string|max:500',
+            'image_path1'           => 'required|image|mimes:jpeg,png,jpg|max:2000|distinct',
+            'image_path2'           => 'sometimes|image|mimes:jpeg,png,jpg|max:2000|distinct',
+            'image_path3'           => 'sometimes|image|mimes:jpeg,png,jpg|max:2000|distinct',
+        ]);
+
+        //Save the images to public/storage/Product_Images with unique, encrypted names
+        $imagePaths = [];
+        foreach (['image_path1', 'image_path2', 'image_path3'] as $key) {
+            if ($request->hasFile($key)) {
+                $file = $request->file($key);
+
+                // Call the function to process and store the image
+                $imagePath = GeneralController::processAndStoreImage($file, 'Product_Images');
+
+                $imagePaths[$key] = $imagePath;
+            }
+        }
+
+        $product = new Product();
+        $product->store_id              = auth()->user()->store->id;
+        $product->product_name          = $request->product_name;
+        $product->product_description   = $request->product_description;
+        $product->price                 = $request->price;
+        $product->quantity              = $request->quantity;
+        $product->ship_from             = $request->ship_from;
+        $product->payment_type          = $request->payment_type;
+        $product->product_type          = $request->product_type;
+        $product->ship_to               = $request->ship_to;
+        $product->parent_category_id    = $request->parent_category_id;
+        $product->sub_category_id       = $request->sub_category_id;
+        $product->return_policy         = $request->return_policy ?? null;
+        $product->auto_delivery_content = $request->auto_delivery_content ?? null;
+        $product->image_path1           = $imagePaths['image_path1'];
+        $product->image_path2           = $imagePaths['image_path2'] ?? null;
+        $product->image_path3           = $imagePaths['image_path3'] ?? null;
+        $product->save();
+        return redirect()->back()->with('success', 'Product created successfully')->with('next-form', true)->with('product_id', Crypt::encrypt($product->id));
+    }
+
+    private function saveExtraOptions($request)
+    {
+        $store = auth()->user()->store;
+        $product_id = $request->product_id != null ? Crypt::decrypt($request->product_id) : null;
+
+        // Validate the request data for each shipping method
+        for ($i = 1; $i <= 10; $i++) {
+            $request->validate([
+                "shipping_method{$i}" => 'sometimes|nullable|string|max:255',
+                "shipping_cost{$i}" => 'sometimes|nullable|numeric|min:0|regex:/^\d+(\.\d{1,2})?$/',
+            ]);
+
+            // Check if the shipping method key exists in the request
+            $shipping_method_key = "shipping_method{$i}";
+            // Break out of the loop if the shipping method is null or an empty string
+            if ($request->$shipping_method_key === null || $request->$shipping_method_key === '') {
+                break;
+            }
+
+
+            // Create and save ExtraOption model instance
+            try {
+                $extra = new ExtraOption();
+                $extra->product_id = $product_id;
+                $extra->name = $request->$shipping_method_key;
+                $extra->cost = $request->has("shipping_cost{$i}") ? $request->{"shipping_cost{$i}"} : "0.00";
+                $extra->save();
+            } catch (\Exception $e) {
+                // Handle the exception, log it, or redirect with an error message
+                return redirect()->back()->with('error', 'An error occurred while saving extra options.');
+            }
+        }
+
+        return redirect()->back()->with('success', 'Product created successfully with extra shipping options. It is now pending approval by mods or admin.');
+    }
+
+    private function updateProduct($request, $product_id)
+    {
+        // Validate the request data
+        $request->validate([
+            'product_description'   => 'required|string|max:2500',
+            'price'                 => 'required|numeric|min:0|regex:/^\d+(\.\d{1,2})?$/',
+            'quantity'              => 'required|integer|min:1',
+            'ship_from'             => 'string|max:50',
+            'product_type'          => 'required|string|in:digital,physical',
+            'ship_to'               => 'string|max:50',
+            'return_policy'         => 'sometimes|nullable|min:3|max:500',
+            'auto_delivery_content' => 'sometimes|nullable|string|max:500',
+            'image_path2'           => 'sometimes|image|mimes:jpeg,png,jpg|max:2000|distinct',
+            'image_path3'           => 'sometimes|image|mimes:jpeg,png,jpg|max:2000|distinct',
+        ]);
+
+        //Save the images to public/storage/Product_Images with unique, encrypted names
+        $imagePaths = [];
+        $allowedKeys = ['image_path2', 'image_path3'];
+
+        foreach ($allowedKeys as $key) {
+            if ($request->hasFile($key)) {
+                $file = $request->file($key);
+
+                // Call the function to process and store the image
+                $imagePath = GeneralController::processAndStoreImage($file, 'Product_Images');
+
+                // Use the original key in the $imagePaths array
+                $imagePaths[$key] = $imagePath;
+            }
+        }
+
+        $product = Product::find($product_id);
+
+        $product->product_description   = $request->product_description;
+        $product->price                 = $request->price;
+        $product->quantity              = $request->quantity;
+        $product->ship_from             = $request->ship_from;
+        $product->product_type          = $request->product_type;
+        $product->ship_to               = $request->ship_to;
+        $product->return_policy         = $request->return_policy ?? null;
+        $product->auto_delivery_content = $request->auto_delivery_content ?? null;
+
+        // Check if keys exist in the $imagePaths array before accessing them
+        $product->image_path2 = $imagePaths['image_path2'] ?? $product->image_path2;
+        $product->image_path3 = $imagePaths['image_path3'] ?? $product->image_path3;
+
+        $product->save();
+
+
+        return redirect()->back()->with('success', 'Product update successfully')->with('next-form', true)->with('product_id', Crypt::encrypt($product->id));
+    }
+
+    public function singleView($store, $created_at, Product $product)
+    {
+        $timestamp = strtotime($product->created_at);
+
+        if ($timestamp !== false && $timestamp == $created_at) {
+            return view('Store.index', [
+                'product' => $product,
+                'store' => auth()->user()->store,
+                'storeUser' => auth()->user(),
+                'action' => 'view',
+                'parentCategories' => Category::where('parent_category_id', NULL)->get(),
+                'subCategories' => Category::where('parent_category_id', '!=', NULL)->get(),
+                'icon'   => GeneralController::encodeImages(),
+                'product_image' => GeneralController::encodeImages('Product_Images'),
+                'upload_image' => GeneralController::encodeImages('Upload_Images'),
+            ]);
+        }
+    }
+
+    public function productStatus(Request $request)
+    {
+        $product_id = $request->product_id ?? null;
+
+        // Decrypt product_id if it is not null
+        if ($product_id !== null) {
+            $product_id = Crypt::decrypt($product_id);
+        }
+
+        // Check if product_id is still not null after decryption
+        if ($product_id !== null) {
+            $product = Product::find($product_id);
+
+            // Check if the product status is not 'pending'
+            if ($product && $product->status != 'Pending' && $product->status != 'Rejected') {
+                if ($request->statusChange == 'Pause') {
+                    $product->status = 'Paused';
+                    $product->save();
+                } elseif ($request->statusChange == 'UnPause') {
+                    $product->status = 'Active';
+                    $product->save();
+                }
+            }elseif ($request->boost == 'Boost') {
+                return "Still under developement... sorry :xD";
+            } else {
+                return redirect()->back()->with('error', 'Product is still pending or rejected or Invalid product ID.');
+            }
+        } else {
+            return redirect()->back()->with('error', 'Invalid product ID');
+        }
+
+        // Flash success message if no exception is thrown
+        return redirect()->back()->with('success', 'Product status updated successfully');
     }
 }

@@ -26,4 +26,8 @@ class Order extends Model
     public function dispute(){
         return $this->hasOne(Dispute::class);
     }
+
+    public function store(){
+        return $this->belongsTo(Store::class);
+    }
 }

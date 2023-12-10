@@ -76,13 +76,16 @@ class CartController extends Controller
     }
 
     public function checkAction(UpdateCartRequest $req, Cart $cart){
-        if ($req->update === '✔️') {
-           return $this->update($req, $cart);
-        }elseif ($req->remove === '❌') {
-            return $this->destroy($cart);
+        if (auth()->user()->id === $cart->user_id) {
+            if ($req->update === '✔️') {
+                return $this->update($req, $cart);
+             }elseif ($req->remove === '❌') {
+                 return $this->destroy($cart);
+             }
+     
+             return redirect()->back();
         }
-
-        return redirect()->back();
+        return abort(403);
     }
 
     /**

@@ -31,15 +31,19 @@ Route::middleware(['guest'])->group(function () {
     Route::post('/auth/signup', [UserController::class, 'store']);
 });
 
-
-//Route::get('/', [UserController::class, 'show']);
-
-// Include other routes from user.php
+// Include user routes from user.php
 require_once('user.php');
-// require_once('store.php');
-// require_once('admin.php');
-// Include other routes from store.php
 
+
+Route::middleware(['role:store'])->group(function () {
+    // Include store routes from store.php
+    require_once('store.php');
+});
+
+// Route::middleware(['role:admin'])->group(function () {
+//     // Include admin routes from admin.php
+//     require_once('admin.php');
+// });
 
 
 

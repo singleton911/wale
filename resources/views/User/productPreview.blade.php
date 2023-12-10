@@ -50,12 +50,25 @@
                     <div class="desc-photo">
                         <div class="photo">
                             <div class="main-pic">
-                                <img src="data:image/png;base64,{{ $icon['osint'] }}">
+                                @php
+                                    $img1 = $product->image_path1;
+                                @endphp
+                                <img
+                                    src="data:image/png;base64,{{ !empty($product_image[$img1]) ? $product_image[$img1] : $icon['default'] }}">
                             </div>
                             <div class="sub-pics">
-                                <img src="data:image/png;base64,{{ $icon['osint'] }}">
-                                <img src="data:image/png;base64,{{ $icon['osint'] }}">
-                                <img src="data:image/png;base64,{{ $icon['osint'] }}">
+
+                                <img
+                                    src="data:image/png;base64,{{ !empty($product_image[$img1]) ? $product_image[$img1] : $icon['default'] }}">
+
+                                @if ($product->image_path2 != null)
+                                    <img src="data:image/png;base64,{{ $product_image[$product->image_path2] }}">
+                                @endif
+
+                                @if ($product->image_path3 != null)
+                                    <img src="data:image/png;base64,{{ $product_image[$product->image_path3] }}">
+                                @endif
+
                             </div>
                             <div class="desc-others">
                                 <div class="description">
@@ -64,7 +77,7 @@
                                 </div>
                                 @if ($product->return_policy != null)
                                     <div class="refund-policy">
-                                        <h3>Store Refund Policy</h3>
+                                        <h3>Refund Policy</h3>
                                         <p>{{ $product->return_policy }}</p>
                                     </div>
                                 @endif
@@ -92,7 +105,11 @@
                                     @endforeach
                                     <div class="main-store-div" style="margin: 1px;">
                                         <div class="s-main-image">
-                                            <img src="data:image/png;base64,{{ $icon['osint'] }}">
+                                            @php
+                                                $avatarKey = $product->store->avatar;
+                                            @endphp
+                                            <img src="data:image/png;base64,{{ !empty($upload_image[$avatarKey]) ? $upload_image[$avatarKey] : $icon['default'] }}"
+                                                class="background-img">
                                             <div>
                                                 <div class="div-p">
                                                     <p class="store-name">{{ $product->store->store_name }}<span
@@ -123,14 +140,14 @@
                                                 </div>
                                                 <div class="div-p">
                                                     <p>Listings: {{ $product->store->products->count() }}</p> |
-                                                    <p>Favorited: {{ $product->store->favoriteStores->count() }}</p>
+                                                    <p>Favorited: {{ $product->store->StoreFavorited->count() }}</p>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="div-p" style="display: flex; gap: 1.3em; justify-content:center;">
-                                            <a href="/store/message/{{ $product->store->store_name }}/{{ $product->store->id }}"
+                                            <a href="/store/show/message/{{ $product->store->store_name }}/{{ $product->store->id }}"
                                                 class="input-listing"> Message</a>
-                                            <a href="/store/{{ $product->store->store_name }}/{{ $product->store->id }}"
+                                            <a href="/store/show/{{ $product->store->store_name }}/{{ $product->store->id }}"
                                                 class="input-listing">See
                                                 Store</a>
                                             @if ($user->favoriteStores->count() > 0)
@@ -153,7 +170,7 @@
                                             @endif
                                             <input type="submit" name="block_store" value="Block Store"
                                                 class="input-listing">
-                                            <a href="/store/report/{{ $product->store->store_name }}/{{ $product->store->id }}"
+                                            <a href="/store/show/report/{{ $product->store->store_name }}/{{ $product->store->id }}"
                                                 class="input-listing"> Report</a>
 
                                         </div>
@@ -176,7 +193,8 @@
                                             <p>Product Type: <span
                                                     style="color: #28a745">{{ $product->product_type }}</span>
                                             </p>
-                                            <p>In Stocks: <span style="color: #28a745">{{ $product->in_stocks }}</span>
+                                            <p>In Stocks: <span
+                                                    style="color: #28a745">{{ $product->quantity - $product->sold }}</span>
                                             </p>
                                         </div>
                                         <div class="div-p">
@@ -194,7 +212,8 @@
                                                     style="color:#dc3545;">Lost
                                                     ({{ $product->disputes_lost }})</span>]</p>
                                         </div>
-                                        <div class="div-p" style="display: flex; gap: 1.3em; justify-content:center;">
+                                        <div class="div-p"
+                                            style="display: flex; gap: 1.3em; justify-content:center;">
                                             @if ($user->favoriteListings->count() > 0)
                                                 @php $listingFavorited = false; @endphp
                                                 @foreach ($user->favoriteListings as $favoriteListing)
@@ -409,7 +428,8 @@
                             <div class="reviewer-info">
                                 <img src="data:image/png;base64,{{ $icon['user'] }}" class="icon-filter"
                                     width="25">
-                                    <p><span>{{ substr($review->user->public_name, 0, 1) . str_repeat('*', max(strlen($review->user->public_name) - 2, 0)) . substr($review->user->public_name, -1) }}</span></p>
+                                <p><span>{{ substr($review->user->public_name, 0, 1) . str_repeat('*', max(strlen($review->user->public_name) - 2, 0)) . substr($review->user->public_name, -1) }}</span>
+                                </p>
                             </div>
                             <div class="reviewer-reviews">
                                 <div class="reviews-rating">
@@ -435,11 +455,42 @@
                                 </div>
                             </div>
                         </div>
+
+                        {{-- Display here store replies --}}
+                        @if ($review->reply && $review->reply->count() > 0)
+                            <div class="displayed-reviews" style="margin-left: 1em; border: 2px solid #4682B4;">
+                                <div class="reviewer-info">
+                                    <img src="data:image/png;base64,{{ $icon['reply'] }}" class="icon-filter"
+                                        width="25">
+                                    <p><span>{{ $product->store->store_name }}</span>
+                                    </p>
+                                </div>
+                                <div class="reviewer-reviews">
+                                    <div class="reviews-rating">
+                                        <div>
+                                            <span>{{ $review->created_at->format('d/m/y') }}</span><br>
+                                            <span>Store Reply</span>
+                                        </div>
+                                    </div>
+                                    <div class="rating-texts">
+                                        <p style="margin-top: 5px;"> {{ $review->reply->reply }} <br>
+                                        <form action="" method="post" style="margin:0px; padding:0px;">
+                                            <p style='color: #4682B4; text-align: right; margin:0px; margin-top:12px;'>
+
+                                                Last Updated: {{ $review->reply->updated_at->format('d/m/y') }}
+                                            </p>
+                                        </form>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     @empty
                         <p>No review found for this product, buy this product to leave a review!</p>
                     @endforelse
                     @if ($product->reviews->count() > 10)
-                        <a href="/listing/reviews/{{ $product->created_at->timestamp }}/{{ $product->id }}" style="text-decoration: underline">See All Reviews</a>
+                        <a href="/listing/reviews/{{ $product->created_at->timestamp }}/{{ $product->id }}"
+                            style="text-decoration: underline">See All Reviews</a>
                     @endif
                 </div>
             </div>

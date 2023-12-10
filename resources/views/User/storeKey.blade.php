@@ -126,11 +126,11 @@ more. <br><br> please do not replay to this message.<br>
                     <li>Store products must be descriptive and unique.</li>
                     <li>Publishing or displaying contact information in a listing, is not allowed.</li>
                     <li>Dealing outside of the market is not allowed, Store caught doing so will result in store banned.</li>
-                    <li>If we see 10 bad reviews and we verified it, Your store will get escalated and all the money in your
+                    <li>If we see 50 bad reviews and we verified it, Your store will get escalated and all the money in your
                         escrow account will be return to the verious owners.</li>
                     <li>If your store got escalated all your products will be hide and no one can reach your store.</li>
-                    <li>Digital orders auto-finalize after 3.5 days, and physical orders auto-finalize after 15 days.</li>
-                    <li>Fernalize earlier is given to stores with more than 1500 positives reviews and less then 10 bad reviews!
+                    <li>Digital orders auto-finalize after 4 days, and physical orders auto-finalize after 15 days.</li>
+                    <li>Fernalize earlier is given to stores with more than 1500 positives reviews and less then 50 bad reviews!
                     </li>
                     <li>If you're not an established vendor with good reviews, you have to take a picture of your product with
                         your store name and Whales market written on a paper near the product.</li>
@@ -139,6 +139,7 @@ more. <br><br> please do not replay to this message.<br>
         
                 </ol>
             </div>
+            {{-- @if ($user->twofa_enable == 'yes') --}}
             <div class="complete">
                 <label>
                     <input type="checkbox" name="complete" required>
@@ -147,9 +148,12 @@ more. <br><br> please do not replay to this message.<br>
                 <input type="submit" class="accpet-and-continue" name="accetp-and-Continue" value="Pay 2 XMR & Continue">
             </div>
             <div class="help-area">
-                <span>You need a support? <a href="/support/ticket">[enter here]</a></span>
+                <span>You need a support? <a href="/ticket">[enter here]</a></span>
                 <span>Looking for store waiver? <a href="/store/waiver">[enter here]</a> </span>
             </div>
+            {{-- @else
+            PLease Enable 2FA to continue...
+            @endif --}}
         </form>
     </div>
 </div>

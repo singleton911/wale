@@ -73,6 +73,23 @@ class NotificationController extends Controller
         return abort(403);
     }
 
+
+    public function updateStore(UpdateNotificationRequest $request, $store, $created_at, Notification $notification)
+    {
+        if ($created_at == strtotime($notification->created_at)) {
+            if ($request->read == 'Mark as read' && auth()->user()->id == $notification->user_id) {
+                $notification->is_read = 1;
+                $notification->save();
+                return redirect()->back();
+            }elseif ($request->delete == 'Delete' && auth()->user()->id == $notification->user_id) {
+                $notification->id;
+                $notification->delete();
+                return redirect()->back();
+            }
+        }
+        return abort(403);
+    }
+
     /**
      * Remove the specified resource from storage.
      */

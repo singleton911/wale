@@ -66,7 +66,9 @@ class MessageController extends Controller
     {
         $user = auth()->user();
         $type = null;
+
         if (strtotime($conversation->created_at) == $created_at) {
+            
             return view('User.displayMessages', [
                 'user' => $user,
                 'icon'   => GeneralController::encodeImages(),
@@ -79,6 +81,7 @@ class MessageController extends Controller
 
         return abort(404);
     }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -126,51 +129,17 @@ class MessageController extends Controller
             $messageStatus = new MessageStatus();
             $messageStatus->message_id = $message->id;
             $messageStatus->user_id    = $participant->user_id;
-            $messageStatus->is_read    = $user_id === $participant ? 1 : 0;
+            $messageStatus->is_read    = $user_id == $participant->user_id ? 1 : 0;
             $messageStatus->save();
         }
 
         return redirect()->back()->with('success', 'Yes, everything created');
     }
 
-
-
-    // public function createMessage($created_at, StoreConversationRequest $request){
-    //     $user_id  = auth()->user()->id;
-    //     $data   = $request->validate([
-    //         'contents' => 'required|string|min:2|max:5000',
-    //         'conversation' => 'required|min:100',
-    //         'message_type' => 'required|in:message,ticket,dispute',
-    //     ]);
-    //     $conversation = Conversation::where('id', Crypt::decrypt($data['conversation']))->first();
-    //     if ($conversation->support->status != 'closed') {
-    //         if ($created_at == strtotime($conversation->created_at)) {
-    //             $message = new Message();
-    //             $message->content  = $data['contents'];
-    //             $message->user_id = $user_id;
-    //             $message->conversation_id  = $conversation->id;
-    //             $message->message_type     = $data['message_type'];
-    //             $message->save();
-
-    //             $participants = Participant::where('conversation_id', $conversation->id)->get();
-    //             foreach ($participants as $participant) {
-    //                 $messageStatus = new MessageStatus();
-    //                 $messageStatus->message_id = $message->id;
-    //                 $messageStatus->user_id    = $participant->user_id;
-    //                 $messageStatus->is_read    = $user_id == $participant->user_id ? 1 : 0;
-    //                 $messageStatus->save();
-    //             }
-    //         }
-    //     } else {
-    //         return redirect()->back()->with('ticket_closed', true);
-    //     }
-
-
-    //     return redirect()->back();
-    // }
-
-
-    public function showMessages(){
+    public function showMessages()
+    {
+        $conversations = Conversation::all();
+        $participants = Participant::where('user_id', auth()->user()->id)->get();
         $user = auth()->user();
         return view('User.message', [
             'user' => $user,
@@ -178,6 +147,20 @@ class MessageController extends Controller
             'subCategories' => Category::whereNotNull('parent_category_id')->get(),
             'categories' => Category::all(),
             'icon' => GeneralController::encodeImages(),
+            'userConversations'   => $participants,
+            'conversations'   => $conversations,
         ]);
+    }
+
+    public function storeUser(Request $request, $name, $created_at, Conversation $conversation)
+    {
+        if ($request->has('new_message')) {
+            return redirect()->back()->with('new_message', true);
+        }
+
+        if ($created_at == strtotime($conversation->created_at)) {
+            return $this->createMessage($conversation->id, $request);
+        }
+        return abort(401);
     }
 }

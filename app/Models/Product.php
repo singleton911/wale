@@ -51,4 +51,13 @@ class Product extends Model
     public function store(){
         return $this->belongsTo(Store::class);
     }
+
+    
+    public function listingReports(){
+        return $this->hasMany(Report::class, 'reported_id')->where('is_store', 0);
+    }
+
+    public function coupon(){
+        return $this->hasMany(Promocode::class);
+    }
 }

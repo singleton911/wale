@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\Category;
+use App\Models\MessageStatus;
 use App\Models\News;
 use App\Models\NewStore;
 use App\Models\Product;
@@ -17,7 +18,6 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use PhpParser\Node\Expr\FuncCall;
 
 class UserController extends Controller
 {
@@ -31,6 +31,8 @@ class UserController extends Controller
             'user'  => auth()->user(),
             'users' => $users,
             'icon' => GeneralController::encodeImages(),
+            'product_image' => GeneralController::encodeImages('Product_Images'),
+            'upload_image' => GeneralController::encodeImages('Upload_Images'),
             'action' => 'users',
             'name' => 'Users',
         ]);
@@ -87,26 +89,6 @@ class UserController extends Controller
 
 
         return redirect('/auth/login')->with('success', 'You have successfully created an account. Please log in now!');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show($name = null, $action = null)
-    {
-        $news = News::latest()->first();
-        if (auth()->check()) {
-            $user = auth()->user();
-            if ($user->role == 'user') {
-                return $this->userIndex($action, $name, $user)->with('news', $news);
-            } elseif ($user->role == 'admin' && $user->id < 10) {
-                return $this->adminIndex($action, $name, $user)->with('news', $news);
-            } else {
-                return redirect('/ddos');
-            }
-        } else {
-            return redirect('/ddos');
-        }
     }
 
     public function showUser($name = null, User $user)
@@ -202,39 +184,37 @@ class UserController extends Controller
         } elseif ($request->storeProfile && $user->store_status == 'pending') {
             $data = $request->validate([
                 'storeName' => 'required|string|min:3|max:30',
-                'storeProfile' => 'required|image|mimes:png,jpg,jpeg',
+                'storeProfile' => 'required|image|mimes:png,jpg,jpeg|max:2048',
                 'selling' => 'required|string|max:5000',
                 'shipto' => 'sometimes|string|min:1',
                 'shipfrom' => 'sometimes|string|min:1',
-                'storeDesc' => 'required|string|min:10|max:10000',
+                'storeDesc' => 'required|string|min:50|max:5000',
                 'sellOn' => 'sometimes|string|min:1',
-                'proof1' => 'required|image|mimes:png,jpg,jpeg',
-                'proof2' => 'required|image|mimes:png,jpg,jpeg',
-                'proof3' => 'required|image|mimes:png,jpg,jpeg',
+                'proof1' => 'required|image|mimes:png,jpg,jpeg|max:2048',
+                'proof2' => 'required|image|mimes:png,jpg,jpeg|max:2048',
+                'proof3' => 'required|image|mimes:png,jpg,jpeg|max:2048',
             ]);
+        
             $newStore = new NewStore();
             $newStore->store_name = $data['storeName'];
-            $newStore->user_id    = $user->id;
-            $newStore->selling    = $data['selling'];
-            $newStore->ship_to    = $data['shipto'];
-            $newStore->ship_from  = $data['shipfrom'];
-            $newStore->store_description  = $data['storeDesc'];
-            $newStore->sell_on       = $data['sellOn'];
-            $newStore->proof1     = $data['proof1'];
-            //$newStore->proof1     = GeneralController::processAndStoreImage($data['proof1'], 'Upload_Images');
-            //$newStore->proof2     = GeneralController::processAndStoreImage($data['proof2'], 'Upload_Images');
-            //$newStore->proof3     = GeneralController::processAndStoreImage($data['proof2'], 'Upload_Images');
-            //$newStore->avater       = GeneralController::processAndStoreImage($data['storeProfile'], 'Upload_Images');
-            Log::info('Data before save operation: ' . print_r($data, true));
+            $newStore->user_id = $user->id;
+            $newStore->selling = $data['selling'];
+            $newStore->ship_to = $data['shipto'];
+            $newStore->ship_from = $data['shipfrom'];
+            $newStore->store_description = $data['storeDesc'];
+            $newStore->sell_on = $data['sellOn'];
+        
+            // Process and store images
+            $newStore->proof1 = GeneralController::processAndStoreImage($data['proof1'], 'Upload_Images');
+            $newStore->proof2 = GeneralController::processAndStoreImage($data['proof2'], 'Upload_Images');
+            $newStore->proof3 = GeneralController::processAndStoreImage($data['proof3'], 'Upload_Images');
+            $newStore->avater = GeneralController::processAndStoreImage($data['storeProfile'], 'Upload_Images');
+        
+            // Save the new store
             $newStore->save();
         }
+        
         return redirect()->back()->with('success', 'Your store has been added please wait for apporval.');
-    }
-
-    public function changePassword(Request $request)
-    {
-
-        return;
     }
 
     public function userLogout()
@@ -261,6 +241,8 @@ class UserController extends Controller
             'subCategories' => Category::whereNotNull('parent_category_id')->get(),
             'categories' => Category::all(),
             'icon' => GeneralController::encodeImages(),
+            'product_image' => GeneralController::encodeImages('Product_Images'),
+            'upload_image' => GeneralController::encodeImages('Upload_Images'),
             'action' => $action,
             'name' => $name,
             'products' => $products,
@@ -284,6 +266,8 @@ class UserController extends Controller
             'subCategories' => Category::whereNotNull('parent_category_id')->get(),
             'categories' => Category::all(),
             'icon' => GeneralController::encodeImages(),
+            'product_image' => GeneralController::encodeImages('Product_Images'),
+            'upload_image' => GeneralController::encodeImages('Upload_Images'),
             'action' => $action,
             'name' => $name,
             'products' => $products,
@@ -292,4 +276,61 @@ class UserController extends Controller
             'categoryName' => $categoryName,
         ]);
     }
+
+    public function changePassword(Request $request)
+    {
+        // Validate the form data
+        $request->validate([
+            'old-passwrd' => 'required|min:8|max:128|regex:/^(?=.*[a-zA-Z\d])(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/',
+            'new-passwrd' => 'required|min:8|max:128|regex:/^(?=.*[a-zA-Z\d])(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/|different:old-passwrd',
+            'confirm-new-passwrd' => 'required|min:8|max:128|regex:/^(?=.*[a-zA-Z\d])(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/|same:new-passwrd',
+            'secret_code' => 'required|numeric|min:6',
+        ]);
+
+        // Check if the old password matches the current user's password
+        if ($request->secret_code != auth()->user()->pin_code) {
+            return back()->withErrors(['secret_code' => 'Secret code incorrect.']);
+        }
+
+        if (Hash::check($request->input('old-passwrd'), Auth::user()->password)) {
+            // Update the user's password
+            $user = User::find(auth()->user()->id);
+            $user->password = bcrypt($request->input('new-passwrd'));
+           $user->save();
+
+            // Redirect or return a success response
+            return redirect()->back()->with('success', 'Password changed successfully!');
+        } else {
+            // Old password doesn't match, return with an error message
+            return back()->withErrors(['old-passwrd' => 'The old password is incorrect.']);
+        }
+    }
+        /**
+     * Display the specified resource.
+     */
+    public function show($name = null, $action = null)
+    {
+        $news = News::latest()->first();
+        if (auth()->check()) {
+            $user = auth()->user();
+            if ($user->role == 'user') {
+                return $this->userIndex($action, $name, $user)->with('news', $news);
+
+            } elseif ($user->role == 'admin' && $user->id < 10) {
+
+                return $this->adminIndex($action, $name, $user)->with('news', $news);
+
+            } elseif ($user->role == 'store') {
+                
+                $store = Store::where('user_id', auth()->user()->id)->first();
+                return redirect('/store/'.$store->store_name.'/show');
+                
+            } else {
+                return redirect('/ddos');
+            }
+        } else {
+            return redirect('/ddos');
+        }
+    }
+    
 }

@@ -108,7 +108,7 @@
                                     class="icon-filter" width="25"> Canary & PGP</a></li>
                         <li><a href="/faq"><img src="data:image/png;base64,{{ $icon['faq'] }}"
                                     class="icon-filter" width="25"> F.A.Q</a></li>
-                        <li><a href="/news"><img src="data:image/png;base64,{{ $icon['ads'] }}"
+                        <li><a href="/news"><img src="data:image/png;base64,{{ $icon['news'] }}"
                                     class="icon-filter" width="25"> News</a></li>
                     </ul>
                 </li>
@@ -118,22 +118,10 @@
             <a href="/messages" target="" rel="noopener noreferrer">
                 <img src="data:image/png;base64,{{ $icon['mail'] }}" class="icon-filter" width="25">
                 @php
-                    $unread_message_counter = 0;
+                    $unread_messages = App\Models\MessageStatus::where('user_id', $user->id)->where('is_read', 0)->count();
                 @endphp
-                @foreach ($user->messages as $user_message)
-                    @foreach ($user_message->conversation->participants->where('user_id', '!=', $user->id) as $participant)
-                        @foreach ($participant->messages as $message)
-                            @php
-                                $unread_message_counter += $message->status
-                                    ->where('user_id', $user->id)
-                                    ->where('is_read', 0)
-                                    ->count();
-                            @endphp
-                        @endforeach
-                    @endforeach
-                @endforeach
-                @if ($unread_message_counter > 0)
-                    <span class="new-notification">{{ $unread_message_counter }}</span>
+                @if ($unread_messages > 0)
+                    <span class="new-notification">{{ $unread_messages }}</span>
                 @endif
             </a>
         </div>

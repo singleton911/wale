@@ -70,7 +70,7 @@
 
 </p>
 <div class="rlink">
-    <span>Your referral link is any Whales Market real `url/your_public_name` or in the input files for referral ask
+    <span>Your referral link is any Whales Market `url/your_public_name` or in the input files for referral ask
         users to add your public name as a referral.
         very easy right so let do it.
     </span>
@@ -89,7 +89,7 @@
                 $totalBalance = 0;
             @endphp
 
-            @foreach ($user->referrals as $referral)
+            @foreach ($storeUser->referrals as $referral)
                 @php
                     $totalBalance += $referral->balance;
                 @endphp
@@ -100,7 +100,7 @@
     </div>
 </div><br>
 <div>
-    <table class="notification-table">
+    <table>
         <thead>
             <tr>
                 <th>Name</th>
@@ -109,11 +109,11 @@
             </tr>
         </thead>
         <tbody>
-            @forelse ($store->referrals as $referred)
+            @forelse ($store->referrals()->paginate(100) as $referred)
                 <tr>
                     <td>{{ $referred->referredUser->public_name }}</td>
                     <td>{{ $referred->balance }}</td>
-                    <td>{{ \Carbon\Carbon::parse($referred->created_at)->diffForHumans() }}</td>
+                    <td>{{ $referred->created_at->diffForHumans() }}</td>
 
                 </tr>
             @empty
@@ -123,4 +123,5 @@
             @endforelse
         </tbody>
     </table>
+    {{ $store->referrals()->paginate(100)->render('vendor.pagination.custom_pagination') }}
 </div>

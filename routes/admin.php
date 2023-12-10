@@ -28,7 +28,7 @@ use Illuminate\Support\Facades\Route;
 use Symfony\Component\Mime\MessageConverter;
 
 // Middleware group for 'user' role
-Route::middleware(['role:admin'])->group(function () {
+// Route::middleware(['role:admin'])->group(function () {
 
     // Index routes
     Route::get('/{users}', [UserController::class, 'index']);
@@ -62,4 +62,4 @@ Route::middleware(['role:admin'])->group(function () {
 
     // Show res
 
-});
+// });

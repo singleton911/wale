@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Reply;
 use App\Http\Requests\StoreReplyRequest;
 use App\Http\Requests\UpdateReplyRequest;
+use App\Models\Review;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 
 class ReplyController extends Controller
 {
@@ -19,9 +22,44 @@ class ReplyController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request, $store, $created_at, Review $review)
     {
-        //
+        if ($store == $review->store->store_name && $created_at == strtotime($review->created_at)) {
+            if ($request->has('new_reply')&& $request->has('reply_text') == null) {
+                return redirect()->back()->with('new_reply', true)->with('review_id', $review->id);
+            }
+    
+            if ($request->has('new_reply') && $request->has('reply_text')) {
+                $request->validate([ 'reply_text'   => 'required|min:5|max:5000',]);
+    
+                $reply = new Reply();
+                $reply->review_id = $review->id;
+                $reply->reply     = $request->reply_text;
+                $reply->save();
+    
+                return redirect()->back()->with('new_reply', false)->with('review_id', $review->id);
+            }
+
+
+            if ($request->has('edit') && $request->has('reply_text')  == null) {
+                return redirect()->back()->with('edit', true)->with('review_id', $review->id);
+            }
+
+            if ($request->has('edit') && $request->has('reply_text')) {
+                $request->validate([ 
+                    'reply_text'   => 'required|min:5|max:5000',
+                    'reply_id'     => 'required|min:32',
+                ]);
+    
+                $reply = Reply::find(Crypt::decrypt($request->reply_id));
+                $reply->reply     = $request->reply_text;
+                $reply->save();
+    
+                return redirect()->back()->with('edit', false)->with('review_id', $review->id);
+            }
+        }
+
+        return abort(403);
     }
 
     /**

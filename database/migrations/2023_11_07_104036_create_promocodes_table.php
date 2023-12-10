@@ -14,11 +14,14 @@ return new class extends Migration
         Schema::create('promocodes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained('products')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('store_id')->constrained('stores')->onUpdate('cascade')->onDelete('cascade');
             $table->string('code');
             $table->integer('discount');
-            $table->date('expiration_date')->nullable();
+            $table->enum('type', ['fixed', 'percentage']);
+            $table->timestamp('expiration_date')->nullable();
             $table->integer('usage_limit')->default(null);
-            $table->integer('times_used');
+            $table->integer('times_used')->default(0);
+            $table->enum('status', ['active','paused','expired']);
             $table->timestamps();
         });
     }

@@ -19,6 +19,7 @@
     @else
     
     @include('User.action')
+    
     @endif
 
     @include('User.footer')

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->bigInteger('user_id')->unsigned();
             $table->bigInteger('product_id')->unsigned();
             $table->integer('quantity')->unsigned()->default(1);
+            $table->longText('note')->nullable();
             $table->integer('extra_option_id')->unsigned()->nullable();
             $table->timestamps();
 

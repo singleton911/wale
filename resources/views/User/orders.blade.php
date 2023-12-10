@@ -10,7 +10,7 @@
         </div>
     </div>
     <div class="notific-container">
-        <h1 class="notifications-h1" style="text-transform: capitalize"> {{ $action }} > Orders({{ $user->orders->where('status', $action)->count() }})</h1>
+        <h1 class="notifications-h1" style="text-transform: capitalize"> {{ $action }} > Orders({{ $action != 'all' ? $user->orders->where('status', $action)->count() : $user->orders->count() }})</h1>
         <table>
             <thead>
                 <tr>
@@ -32,7 +32,7 @@
                 @endif --}}
                     <tr>
                         <td><a href="/listing/{{ $order->product->created_at->timestamp }}/{{ $order->product_id }}">#WM{{ $order->product->created_at->timestamp }}</a></td>
-                        <td>{{ $order->product->price }}</td>
+                        <td>${{ $order->product->price }}</td>
                         {{-- <td>647</td> --}}
                         <td>{{ $order->quantity }}</td>
                         <td class="{{ $order->status }}">{{ $order->status }}</td>

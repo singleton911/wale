@@ -14,15 +14,6 @@
     @include('User.navebar')
 
     <div class="container">
-        <div class="dir" style="margin-top: 1em">
-            <div class="dir-div">
-                <a href="{{ url()->previous() }}">Go Back</a>
-            </div>
-            <div class="prices-div">
-                <span>BTC/USD: <span class="usd">0</span></span>
-                <span>XMR/USD: <span class="usd">0</span></span>
-            </div>
-        </div>
         <div class="main-div">
             <div class="notific-container">
                 <p class="message-heading"> Reference:
@@ -54,7 +45,8 @@
                         <textarea name="contents" class="support-msg" placeholder="Write your reply here... max 5K characters!" cols="30"
                             rows="10" required></textarea>
                         <input type="hidden" name="message_type"
-                            value="@foreach ($conversation->messages as $message){{ $message->message_type }} @endforeach">
+                            @php $latestMessage = $conversation->messages()->latest()->first(); @endphp
+                            value="{{ $latestMessage->message_type }}">
                         <input type="submit" class="submit-nxt" value="Send">
                     </form>
                 </div>
@@ -68,42 +60,53 @@
             @endif
 
             <div class="message-div">
+                @foreach ($conversation->messages->sortByDesc('created_at') as $message)
+                    @if ($message->user_id != null)
+                        <div
+                            class="chat-message @if ($message->user->id === $user->id) {{ 'message-right' }} @else {{ 'message-left' }} @endif">
+                            <p>{{ $message->content }}</p>
+                            <p class="owner "> <span
+                                    class="{{ $message->user->role == 'store' ? 'storem' : $message->user->role }}"
+                                    style="margin-right:1em">
+                                    /@if ($message->user->role == 'junior' || $message->user->role == 'senior')
+                                        {{ $message->user->role . ' mod' }}
+                                    @else
+                                        {{ $message->user->role }}
+                                    @endif/{{ $message->user->public_name }} </span>
 
-                @forelse ($conversation->messages->sortByDesc('created_at') as $message)
-                    <div
-                        class="chat-message @if ($message->user->id === $user->id) {{ 'message-right' }} @else {{ 'message-left' }} @endif">
-                        <p>{{ $message->content }}</p>
-                        <p class="owner "> <span
-                                class="{{ $message->user->role == 'store' ? 'storem' : $message->user->role }}"
-                                style="margin-right:1em">
-                                /@if ($message->user->role == 'junior' || $message->user->role == 'senior')
-                                    {{ $message->user->role . ' mod' }}
-                                @else
-                                    {{ $message->user->role }}
-                                @endif/{{ $message->user->public_name }} </span>
-
-                            @foreach ($message->status as $status)
-                                @if ($status->user_id != $user->id && $status->user_id != $message->user->id)
+                                @foreach ($message->status as $status)
+                                    @if ($status->user_id != $user->id && $status->user_id != $message->user->id)
+                                        <span
+                                            class="{{ $status->is_read == 1 ? 'message-read' : 'message-unread' }}">[{{ $status->user->role == 'store' ? $status->user->store->store_name : $status->user->public_name }}
+                                            {{ $status->is_read == 1 ? 'read' : 'unread' }}], </span>
+                                    @elseif ($status->user_id == $user->id && $status->user_id != $message->user->id)
+                                        <span
+                                            class="{{ $status->is_read == 1 ? 'message-read' : 'message-unread' }}">[{{ $status->user->role == 'store' ? $status->user->store->store_name : $status->user->public_name }}
+                                            {{ $status->is_read == 1 ? 'read' : 'unread' }}], </span>
+                                    @endif
+                                @endforeach
+                                sent {{ $message->created_at->diffForHumans() }}
+                            </p>
+                        </div>
+                    @else
+                        <div class="chat-message message-left">
+                            <p>{{ $message->content }}</p>
+                            <p class="owner"> <span class="senior" style="margin-right:1em">/mod/System Mod</span>
+                                @foreach ($message->status as $status)
                                     <span
                                         class="{{ $status->is_read == 1 ? 'message-read' : 'message-unread' }}">[{{ $status->user->role == 'store' ? $status->user->store->store_name : $status->user->public_name }}
                                         {{ $status->is_read == 1 ? 'read' : 'unread' }}], </span>
-                                @elseif ($status->user_id == $user->id && $status->user_id != $message->user->id)
-                                    <span
-                                        class="{{ $status->is_read == 1 ? 'message-read' : 'message-unread' }}">[{{ $status->user->role == 'store' ? $status->user->store->store_name : $status->user->public_name }}
-                                        {{ $status->is_read == 1 ? 'read' : 'unread' }}], </span>
-                                @endif
-                            @endforeach
-                            sent {{ $message->created_at->diffForHumans() }}
-                        </p>
-                    </div>
-                @empty
-                @endforelse
+                                @endforeach
+                                sent {{ $message->created_at->diffForHumans() }}
+                            </p>
+                        </div>
+                    @endif
+                @endforeach
             </div>
         </div>
     </div>
-</div>
 
-@include('User.footer')
+    @include('User.footer')
 </body>
 
 </html>

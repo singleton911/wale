@@ -21,6 +21,10 @@ class Review extends Model
         return $this->belongsTo(Product::class);
     }
     
+    public function store(){
+        return $this->belongsTo(Store::class);
+    }
+    
     public static function claculateStoreRating($store_id){
         $storeReviews = Review::where('store_id', $store_id)->get();
         

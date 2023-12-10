@@ -42,12 +42,20 @@ class Store extends Model
         return $this->hasMany(Support::class, 'user_id');
     }
 
-    public function blockedStores(){
+    public function Storeblocked(){
         return $this->hasMany(BlockStore::class);
     }
 
-    public function favoriteStores(){
+    public function StoreFavorited(){
         return $this->hasMany(FavoriteStore::class);
+    }
+
+    public function storeReports(){
+        return $this->hasMany(Report::class, 'reported_id')->where('is_store', 1);
+    }
+
+    public function coupons(){
+        return $this->hasMany(Promocode::class);
     }
 
 }

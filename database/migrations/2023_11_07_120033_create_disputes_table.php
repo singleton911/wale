@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('disputes', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('escrow_id')->unsigned()->nullable();
-            $table->bigInteger('user_id')->unsigned();
             $table->bigInteger('order_id')->unsigned();
             $table->bigInteger('mediator_id')->unsigned()->nullable();
             $table->bigInteger('conversation_id')->unsigned();
@@ -24,7 +23,6 @@ return new class extends Migration
 
             // Foreign key constraints with cascade on update and restrict on delete
             $table->foreign('escrow_id')->references('id')->on('escrows')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('order_id')->references('id')->on('orders')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('mediator_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('conversation_id')->references('id')->on('conversations')->onUpdate('cascade')->onDelete('cascade');

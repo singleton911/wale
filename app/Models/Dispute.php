@@ -13,4 +13,12 @@ class Dispute extends Model
     public function conversation(){
         return $this->belongsTo(Conversation::class);
     }
+
+    public function escrow(){
+        return $this->belongsTo(Escrow::class);
+    }
+
+    public function order(){
+        return $this->belongsTo(Order::class);
+    }
 }

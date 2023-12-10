@@ -18,7 +18,7 @@
             <div class="notific-container">
                 <h3 style="text-transform: capitalize; text-align: center;">
                     <span style="color:#28a745">
-                       {{ $store->store_name }} > Listing's Reviews
+                        {{ $store->store_name }} > Listing's Reviews
                     </span>
                     <hr>
                 </h3>
@@ -38,26 +38,35 @@
                                 <tr>
                                     <td style="font-size: 1.3rem; text-align:center;">➕</td>
                                     <td style="font-weight: bold; font-size:1.2rem; color:inherit;">Positive</td>
-                                    <td>{{ $store->reviews->where('feedback', 'positive')->whereBetween('created_at', [now()->subMonth(), now()])->count() }}</td>
-                                    <td>{{ $store->reviews->where('feedback', 'positive')->whereBetween('created_at', [now()->subMonths(6), now()])->count() }}</td>
-                                    <td>{{ $store->reviews->where('feedback', 'positive')->whereBetween('created_at', [now()->subYear(), now()])->count() }}</td>
+                                    <td>{{ $store->reviews->where('feedback', 'positive')->whereBetween('created_at', [now()->subMonth(), now()])->count() }}
+                                    </td>
+                                    <td>{{ $store->reviews->where('feedback', 'positive')->whereBetween('created_at', [now()->subMonths(6), now()])->count() }}
+                                    </td>
+                                    <td>{{ $store->reviews->where('feedback', 'positive')->whereBetween('created_at', [now()->subYear(), now()])->count() }}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td style="font-size: 1.3rem; text-align:center;">⏹️</td>
                                     <td style="font-weight: bold; font-size:1.2rem; color:inherit;">Neutral</td>
-                                    <td>{{ $store->reviews->where('feedback', 'neutral')->whereBetween('created_at', [now()->subMonth(), now()])->count() }}</td>
-                                    <td>{{ $store->reviews->where('feedback', 'neutral')->whereBetween('created_at', [now()->subMonths(6), now()])->count() }}</td>
-                                    <td>{{ $store->reviews->where('feedback', 'neutral')->whereBetween('created_at', [now()->subYear(), now()])->count() }}</td>
+                                    <td>{{ $store->reviews->where('feedback', 'neutral')->whereBetween('created_at', [now()->subMonth(), now()])->count() }}
+                                    </td>
+                                    <td>{{ $store->reviews->where('feedback', 'neutral')->whereBetween('created_at', [now()->subMonths(6), now()])->count() }}
+                                    </td>
+                                    <td>{{ $store->reviews->where('feedback', 'neutral')->whereBetween('created_at', [now()->subYear(), now()])->count() }}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td style="font-size: 1.3rem; text-align:center;">⛔</td>
                                     <td style="font-weight: bold; font-size:1.2rem; color:inherit;">Negative</td>
-                                    <td>{{ $store->reviews->where('feedback', 'negative')->whereBetween('created_at', [now()->subMonth(), now()])->count() }}</td>
-                                    <td>{{ $store->reviews->where('feedback', 'negative')->whereBetween('created_at', [now()->subMonths(6), now()])->count() }}</td>
-                                    <td>{{ $store->reviews->where('feedback', 'negative')->whereBetween('created_at', [now()->subYear(), now()])->count() }}</td>
+                                    <td>{{ $store->reviews->where('feedback', 'negative')->whereBetween('created_at', [now()->subMonth(), now()])->count() }}
+                                    </td>
+                                    <td>{{ $store->reviews->where('feedback', 'negative')->whereBetween('created_at', [now()->subMonths(6), now()])->count() }}
+                                    </td>
+                                    <td>{{ $store->reviews->where('feedback', 'negative')->whereBetween('created_at', [now()->subYear(), now()])->count() }}
+                                    </td>
                                 </tr>
                             </tbody>
-                        </table>                        
+                        </table>
 
                         <table style="border: 1px solid gray;">
                             <thead>
@@ -102,7 +111,8 @@
                             <div class="reviewer-info">
                                 <img src="data:image/png;base64,{{ $icon['user'] }}" class="icon-filter"
                                     width="25">
-                                    <p><span>{{ substr($review->user->public_name, 0, 1) . str_repeat('*', max(strlen($review->user->public_name) - 2, 0)) . substr($review->user->public_name, -1) }}</span></p>
+                                <p><span>{{ substr($review->user->public_name, 0, 1) . str_repeat('*', max(strlen($review->user->public_name) - 2, 0)) . substr($review->user->public_name, -1) }}</span>
+                                </p>
                             </div>
                             <div class="reviewer-reviews">
                                 <div class="reviews-rating">
@@ -121,19 +131,51 @@
                                     </div>
                                 </div>
                                 <div class="rating-texts">
-                                    <a href="/listing/{{ $review->product->created_at->timestamp }}/{{ $review->product->id }}">{{ $review->product->product_name }}</a>
+                                    <a
+                                        href="/listing/{{ $review->product->created_at->timestamp }}/{{ $review->product->id }}">{{ $review->product->product_name }}</a>
                                     <p style="margin-top: 5px;"> {{ $review->comment }} <br>
                                     <p style='color: #4682B4; text-align: right;'>
-                                        Price: ${{ $review->product->price }} 
+                                        Price: ${{ $review->product->price }}
                                         Last Updated: {{ $review->updated_at->format('d/m/y') }}</p>
                                     </p>
                                 </div>
                             </div>
                         </div>
+                        {{-- Display here store replies --}}
+                        @if ($review->reply && $review->reply->count() > 0)
+                            <div class="displayed-reviews" style="margin-left: 1em; border: 2px solid #4682B4;">
+                                <div class="reviewer-info">
+                                    <img src="data:image/png;base64,{{ $icon['reply'] }}" class="icon-filter"
+                                        width="25">
+                                    <p><span>{{ $store->store_name }}</span>
+                                    </p>
+                                </div>
+                                <div class="reviewer-reviews">
+                                    <div class="reviews-rating">
+                                        <div>
+                                            <span>{{ $review->created_at->format('d/m/y') }}</span><br>
+                                            <span>Store Reply</span>
+                                        </div>
+                                    </div>
+                                    <div class="rating-texts">
+                                        <p style="margin-top: 5px;"> {{ $review->reply->reply }} <br>
+
+                                        <p style='color: #4682B4; text-align: right; margin:0px; margin-top:12px;'>
+
+                                            Last Updated: {{ $review->reply->updated_at->format('d/m/y') }}
+                                        </p>
+
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     @empty
                         <p>No review found for this store, come back later and check!</p>
                     @endforelse
                 </div>
+                {{-- Custom Pagination Links --}}
+                {{ $store->reviews()->paginate(50)->render('vendor.pagination.custom_pagination') }}
             </div>
         </div>
     </div>

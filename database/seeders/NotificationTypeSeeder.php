@@ -34,7 +34,7 @@ class NotificationTypeSeeder extends Seeder
             ['name' => 'Store Encryption Key Generated', 'content' => 'A new encryption key has been generated for your store.', 'action' => 'key', 'icon' => 'store'],
             ['name' => 'Store Pending Approval', 'content' => 'Your store is pending approval for activation.', 'action' => 'pending', 'icon' => 'store'],
             ['name' => 'Store Approved', 'content' => 'Your store has been approved and is now active.', 'action' => 'approved', 'icon' => 'store'],
-            ['name' => 'Store Rejected', 'content' => 'Your store activation request has been rejected.', 'action' => 'rejected', 'icon' => 'store'],
+            ['name' => 'Store Rejected', 'content' => 'Your store activation request has been rejected, check your details and try again. you only have 5 times to try.', 'action' => 'rejected', 'icon' => 'store'],
         
             // Account
             ['name' => 'PGP Encryption Key Added', 'content' => 'A PGP encryption key has been added to your account.', 'action' => 'pgp', 'icon' => 'account'],

@@ -21,4 +21,8 @@ class Dispute extends Model
     public function order(){
         return $this->belongsTo(Order::class);
     }
+
+    public function moderator(){
+        return $this->belongsTo(User::class, 'mediator_id');
+    }
 }

@@ -13,6 +13,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\Category;
+use App\Models\Dispute;
+use App\Models\Support;
 
 class MessageController extends Controller
 {
@@ -107,6 +109,101 @@ class MessageController extends Controller
         //
     }
 
+    public function showMessages()
+    {
+        $conversations = Conversation::all();
+        $participants = Participant::where('user_id', auth()->user()->id)->get();
+        
+        $user = auth()->user();
+        return view('User.message', [
+            'user' => $user,
+            'parentCategories' => Category::whereNull('parent_category_id')->get(),
+            'subCategories' => Category::whereNotNull('parent_category_id')->get(),
+            'categories' => Category::all(),
+            'icon' => GeneralController::encodeImages(),
+            'userConversations'   => $participants,
+            'conversations'   => $conversations,
+        ]);
+    }
+
+    public function seniorModUser(Request $request, $created_at, Conversation $conversation)
+    {
+        $ticket = Support::where('conversation_id', $conversation->id)->first();
+        if ($ticket->status == 'closed') {
+            return redirect()->back();
+        }
+
+        if ($request->has('new_message')) {
+            return redirect()->back()->with('new_message', true);
+        }
+
+
+        if ($request->has('close_ticket')) {
+            if ($ticket) {
+            $ticket->status = 'closed';
+            $ticket->save();
+
+            return redirect()->back();
+            } else {
+             
+                return redirect()->back();
+            }
+        }
+        
+        if ($created_at == strtotime($conversation->created_at)) {
+            return $this->createMessage($conversation->id, $request);
+        }
+        return abort(401);
+    }
+
+    public function storeUser(Request $request, $name, $created_at, Conversation $conversation)
+    {
+        if ($request->has('new_message')) {
+            return redirect()->back()->with('new_message', true);
+        }
+
+
+        if ($request->has('start_partial_refund_user')) {
+            $request->validate(['order_id' => 'required|min:32',]);
+
+            $order_id = Crypt::decrypt($request->order_id);
+            $dispute  = Dispute::where('order_id', $order_id)->first();
+            if ($dispute) {
+            // $dispute->status = 'Partial Refund';
+            // $dispute->save();
+
+            return redirect()->back()->with('success', 'Please click "New Reply" below in dispute to engage in conversation with the user. The moderation team will facilitate the distribution of funds between you and the user.');
+
+            } else {
+                // Handle case where dispute is not found for the given order ID
+                return redirect()->back()->with('error', 'Invalid request. Dispute not found for the provided order.');
+            }
+        }
+
+        if ($request->has('release_user_fund')) {
+            $request->validate(['order_id' => 'required|min:32']);
+        
+            $order_id = Crypt::decrypt($request->order_id);
+            $dispute = Dispute::where('order_id', $order_id)->first();
+        
+            if ($dispute) {
+                // $dispute->status = 'Full Refund';
+                // $dispute->save();
+        
+                return redirect()->back()->with('success', 'Thank you for your honesty. The user will now have the option to accept or decline the refund.');
+            } else {
+                // Handle case where dispute is not found for the given order ID
+                return redirect()->back()->with('error', 'Invalid request. Dispute not found for the provided order.');
+            }
+        }
+        
+
+        if ($created_at == strtotime($conversation->created_at)) {
+            return $this->createMessage($conversation->id, $request);
+        }
+        return abort(401);
+    }
+
     public function createMessage($conversation_id, $request)
     {
         $user_id  = auth()->user()->id;
@@ -133,34 +230,7 @@ class MessageController extends Controller
             $messageStatus->save();
         }
 
-        return redirect()->back()->with('success', 'Yes, everything created');
+        return redirect()->back()->with('success', 'Message sent successfully.');
     }
 
-    public function showMessages()
-    {
-        $conversations = Conversation::all();
-        $participants = Participant::where('user_id', auth()->user()->id)->get();
-        $user = auth()->user();
-        return view('User.message', [
-            'user' => $user,
-            'parentCategories' => Category::whereNull('parent_category_id')->get(),
-            'subCategories' => Category::whereNotNull('parent_category_id')->get(),
-            'categories' => Category::all(),
-            'icon' => GeneralController::encodeImages(),
-            'userConversations'   => $participants,
-            'conversations'   => $conversations,
-        ]);
-    }
-
-    public function storeUser(Request $request, $name, $created_at, Conversation $conversation)
-    {
-        if ($request->has('new_message')) {
-            return redirect()->back()->with('new_message', true);
-        }
-
-        if ($created_at == strtotime($conversation->created_at)) {
-            return $this->createMessage($conversation->id, $request);
-        }
-        return abort(401);
-    }
 }

@@ -24,12 +24,25 @@
                     For any additional information or inquiries, please don't hesitate to reach out to the user
                     directly.
                     <a style="font-size: 1em;"
-                        href="/store/message/user/{{ $order->user->public_name }}/{{ $order->created_at->timestamp }}/{{ $order->id }}"
-                        >
+                        href="/store/message/user/{{ $order->user->public_name }}/{{ $order->created_at->timestamp }}/{{ $order->id }}">
                         Click here to message the user
                     </a>
                 </p>
+                @if (session('success') != null)
+                    <p
+                        style="text-align: center; background: darkgreen; padding: 5px; border-radius: .5rem; color: #f1f1f1;">
+                        {{ session('success') }}</p>
+                @endif
+                <div>
+                    @if ($errors->any())
+                        <ul style="margin: auto; list-style-type: none; padding: 0; text-align: center;">
+                            @foreach ($errors->all() as $error)
+                                <li style="color: red;">{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    @endif
 
+                </div>
                 <p style="font-size: 1em; font-family: Verdana, Geneva, Tahoma, sans-serif; font-style:oblique;">
                     <span style="color: darkorange;">Initiate a Dispute:</span> This option is available if more than 3
                     days have passed since the order was created, and the status is not "pending." The user will click
@@ -75,7 +88,7 @@
                         </tr>
                         <tr>
                             <th>Payment</th>
-                            <td>{{ $order->product->payment_type }}</td>
+                            <td class="{{ $order->product->payment_type }}">{{ '{'.$order->product->payment_type.'}' }}</td>
                         </tr>
                         <tr>
                             <th>Status</th>
@@ -180,24 +193,47 @@
                                         method="post" class="message-reply-form">
                                         @csrf
                                         <input type="hidden" name="order_id" value="{{ Crypt::encrypt($order->id) }}">
-                                        <textarea name="contents" class="support-msg" placeholder="Write your reply here... max 1K characters!" cols="30"
-                                            rows="10" required></textarea>
-                                        <input type="hidden" name="message_type"
-                                            value="@foreach ($order->dispute->conversation->messages as $message){{ $message->message_type }} @endforeach">
+                                        <textarea name="contents" class="support-msg" placeholder="Write your reply here... max 1K characters!"
+                                            cols="30" rows="10" required></textarea>
+                                        <input type="hidden" name="message_type" value="dispute">
                                         <input type="submit" class="submit-nxt" name="dispute_form" value="Send">
                                     </form>
                                 </div>
+                            @elseif (session('start_partial_refund_user'))
+                               Ok let start this partial.
                             @else
                                 <div style="text-align: center; margin-bottom: 1em;">
                                     <form
                                         action="/store/{{ $store->store_name }}/do/messages/{{ $order->dispute->conversation->created_at->timestamp }}/{{ $order->dispute->conversation->id }}"
                                         method="post">
                                         @csrf
+
+                                        <input type="hidden" name="message_type" value="dispute">
                                         <input type="hidden" name="order_id"
                                             value="{{ Crypt::encrypt($order->id) }}">
+
+
+                                        {{-- Accept user fund release --}}
+                                        {{-- <input type="submit" name="accept_user_fund"
+                                            value="Accept 100% User Fund Released" class="input-listing"
+                                            style="background-color: #2ecc71; color: #fff; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; animation: blink 3s infinite;"> --}}
+
+                                        {{-- Release funds to user --}}
+                                        <input type="submit" name="release_user_fund" value="Release Funds To User"
+                                            class="input-listing"
+                                            style="background-color: #3498db; color: #fff; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">
+
+                                        {{-- Start partial refund for user --}}
+                                        <input type="submit" name="start_partial_refund_user"
+                                            value="Start Partial Refund" class="input-listing"
+                                            style="background-color: #e74c3c; color: #fff; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">
+
+                                        {{-- Add new reply for the dispute --}}
                                         <input type="submit" name="new_message" value="New Reply"
                                             class="input-listing">
+
                                     </form>
+
                                 </div>
                             @endif
                             <p style="text-transform:capitalize; text-align:center; margin: .3em 0px;"

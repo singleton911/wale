@@ -35,10 +35,10 @@
                             <div class="name-status">
                                 <p>Welcome, {{ $store->store_name }}</p>
                                 <p><span>Last Updated: </span>
-                                    <span>{{ \Carbon\Carbon::parse($store->updated_at)->diffForHumans() }}</span>
+                                    <span>{{ $store->updated_at->diffForHumans() }}</span>
                                 </p>
                                 <p><span>Member Since:
-                                    </span><span>{{ \Carbon\Carbon::parse($store->created_at)->format('j F Y') }}</span>
+                                    </span><span>{{ $store->created_at->format('j F Y') }}</span>
                                 </p>
                                 <p class="span3" style="border: 2px solid skyblue; border-radius:.5rem; padding:5px;">
                                     @php

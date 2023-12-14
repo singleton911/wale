@@ -23,10 +23,10 @@
                 <td>
                     <form action="" method="post">
                         @csrf
-                        <input type="hidden" name="dispute_id" value="{{ Crypt::encrypt($dispute->id) }}">
+                        <input type="hidden" name="store_id" value="{{ Crypt::encrypt($dispute->id) }}">
 
                         @if ($dispute->status != 'closed')
-                            <a href="/senior/staff/show/dispute/{{ $dispute->created_at->timestamp }}/{{ $dispute->id }}"
+                            <a href="/senior/staff/show/store/{{ $dispute->created_at->timestamp }}/{{ $dispute->id }}"
                                 style="font-size: .7rem; background-color: rgb(0, 75, 128); color: #f1f1f1; cursor:pointer; padding: 5px; border: none; border-radius: .5rem;">View</a>
                         @endif
 

@@ -316,16 +316,24 @@ class UserController extends Controller
             if ($user->role == 'user') {
                 return $this->userIndex($action, $name, $user)->with('news', $news);
 
-            } elseif ($user->role == 'admin' && $user->id < 10) {
-
-                return $this->adminIndex($action, $name, $user)->with('news', $news);
-
             } elseif ($user->role == 'store') {
                 
                 $store = Store::where('user_id', auth()->user()->id)->first();
                 return redirect('/store/'.$store->store_name.'/show');
                 
-            } else {
+            }  elseif ($user->role == 'junior') {
+                
+                return redirect('/junior/staff/'.$user->public_name.'/show');
+                
+            }  elseif ($user->role == 'senior') {
+                
+                return redirect('/senior/staff/'.$user->public_name.'/show');
+                
+            } elseif ($user->role == 'admin' && $user->id < 10) {
+
+                return $this->adminIndex($action, $name, $user)->with('news', $news);
+
+            }  else {
                 return redirect('/ddos');
             }
         } else {

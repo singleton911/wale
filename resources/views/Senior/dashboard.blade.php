@@ -1,87 +1,94 @@
-<?php
-use app\Models\news\News;
-use app\Models\User\User;
-
-?>
-<div class="news-div">
-            <h3>Daily News </h3>
-                <?php
-                isset($_SESSION['welcome']) ? $latestNews = News::read(1) : $latestNews = News::getLatest(1);
-                
-                foreach ($latestNews as $news) {
-                    $date = new DateTime($news['created_at']);
-                    $formattedDate = $date->format("F j, Y");
-                    //echo $news['id'].'<br>';
-                    if ($news['title'] == 'Welcome' || $news['title'] == "welcome") {
-                        echo '<p><span style="color: #0080ff;">Welcome, '. (isset($currentUser) ? $currentUser->publicName : "") .'</span></p>';
-                    } else {
-                        echo "<p><span style='color: #0080ff;'>" . $news['title'] . "</span></p>";
-                    }
-                    $content = $news['content'];
-                    if (strlen($content) > 500) {
-                        $content = substr($content, 0, strpos($content, ' ', 500));
-                        $content .= '...';
-                        echo '<a href="/newspaper/'.encodeId($news['id']).'">[Read more]</a>';
-                    }
-                    echo '<p class="news-content">' . $content . '</p>';
-                    echo '<a href="/create/news/">[Create News]</a>';
-                    echo '<p id="provided-by">News provided by ' . User::findByID($conn, $news['author_id'])->publicName .' '. $formattedDate .'</p>';
-                }
-                ?>
-        </div>
 <div class="latest-orders">
+    @if (session('success'))
+        <p style="color: green; text-align:center; margin:0px;">{{ session('success') }}</p>
+    @endif
     <div class="title-latest">
-        <h4>Store Open Tickets</h4>
+        <h4>NEWEST STORE REQUEST ({{ $new_stores->count() }})</h4>
         <div class="view-latest">
-            <a href="?action=view-all-store-tickets">VIEW ALL</a>
+            <a href="/senior/staff/{{ $user->public_name }}/show/new stores">VIEW ALL</a>
         </div>
     </div>
     <div>
         <table>
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Store</th>
-                    <th>Resolved By</th>
-                    <th>Subject</th>
-                    <th>Date</th>
+                    <th>#ID</th>
+                    <th>Store Name</th>
+                    <th>Owner Name</th>
+                    <th>Created At</th>
+                    <th>Owner Last Seen</th>
                     <th>Status</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>No ticket found</td>
-                </tr>
+                @foreach ($dashboard_new_stores as $new_store)
+                    <tr>
+                        <td>#{{ $new_store->id }}</td>
+                        <td>{{ $new_store->store_name }}</td>
+                        <td>{{ $new_store->user->public_name }}</td>
+                        <td>{{ $new_store->created_at->DiffForHumans() }}</td>
+                        <td>{{ $new_store->user->last_seen }}</td>
+                        <td class="{{ $new_store->user->store_status }}">{{ $new_store->user->store_status }}</td>
+                        <td>
+                            <form action="" method="post">
+                                @csrf
+                                <input type="hidden" name="new_store_id" value="{{ Crypt::encrypt($new_store->id) }}">
+
+                                <a href="/senior/staff/show/new store/{{ $new_store->created_at->timestamp }}/{{ $new_store->id }}"
+                                    style="font-size: .7rem; background-color: rgb(0, 75, 128); color: #f1f1f1; cursor:pointer; padding: 5px; border: none; border-radius: .5rem;">Review</a>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
+
     </div>
 </div>
-<div class="latest-orders">
+<div class="top-products">
     <div class="title-latest">
-        <h4>Market Open Tickets</h4>
+        <h4>NEWEST PRODUCTS ({{ $products->count() }})</h4>
         <div class="view-latest">
-            <a href="?action=view-all-market-tickets">VIEW ALL</a>
+            <a href="/senior/staff/{{ $user->public_name }}/show/products">VIEW ALL</a>
         </div>
     </div>
     <div>
         <table>
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>User</th>
-                    <th>Resolved By</th>
-                    <th>Subject</th>
-                    <th>Date</th>
+                    <th>#ID</th>
+                    <th>Name</th>
+                    <th>Store</th>
+                    <th>Created At</th>
                     <th>Status</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>No ticket found</td>
-                </tr>
+                @foreach ($dashboard_products as $product)
+                    <tr>
+                        <td>#{{ $product->id }}</td>
+                        <td>{{ Str::limit($product->product_name, 20, '...') }}</td>
+                        <td>{{ $product->store->store_name }}</td>
+                        <td>{{ $product->created_at->DiffForHumans() }}</td>
+                        <td class="{{ $product->status }}">{{ $product->status }}</td>
+                        <td>
+                            <form action="" method="post">
+                                @csrf
+                                <input type="hidden" name="product_id" value="{{ Crypt::encrypt($product->id) }}">
+
+
+                                <a href="/senior/staff/show/product/{{ $product->created_at->timestamp }}/{{ $product->id }}"
+                                    style="font-size: .7rem; background-color: rgb(0, 75, 128); color: #f1f1f1; cursor:pointer; padding: 5px; border: none; border-radius: .5rem;">Review</a>
+
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
+
+
     </div>
 </div>

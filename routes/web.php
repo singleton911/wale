@@ -40,10 +40,20 @@ Route::middleware(['role:store'])->group(function () {
     require_once('store.php');
 });
 
-// Route::middleware(['role:admin'])->group(function () {
-//     // Include admin routes from admin.php
-//     require_once('admin.php');
-// });
+Route::middleware(['role:junior'])->group(function () {
+    // Include store routes from store.php
+    require_once('junior.php');
+});
+
+Route::middleware(['role:senior'])->group(function () {
+    // Include store routes from store.php
+    require_once('senior.php');
+});
+
+Route::middleware(['role:admin'])->group(function () {
+    // Include admin routes from admin.php
+    require_once('admin.php');
+});
 
 
 

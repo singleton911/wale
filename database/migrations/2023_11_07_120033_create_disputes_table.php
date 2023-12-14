@@ -17,8 +17,11 @@ return new class extends Migration
             $table->bigInteger('order_id')->unsigned();
             $table->bigInteger('mediator_id')->unsigned()->nullable();
             $table->bigInteger('conversation_id')->unsigned();
+            $table->integer('partial_amount')->nullable();
             $table->enum('status', ['Awaiting Store Reply', 'Awaiting User Reply', 'Awaiting Moderator Reply', 'Full Refund', 'Partial Refund', 'closed'])->default('Awaiting Store Reply');
             $table->enum('winner', ['none', 'store', 'user', 'both'])->default('none');
+            $table->enum('refund_accept', ['User', 'Store', 'none'])->default('none');
+            $table->enum('refund_initiated', ['User', 'Store', 'none'])->default('none');
             $table->timestamps();
 
             // Foreign key constraints with cascade on update and restrict on delete

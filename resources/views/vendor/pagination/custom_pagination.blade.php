@@ -14,9 +14,7 @@
             @if ($i == $paginator->currentPage())
                 <span class="current">{{ $i }}</span>
             @else
-                @if ($i > 1 && $i < $paginator->lastPage()) {{-- Avoid repeating first and last page links --}}
-                    <a href="{{ $paginator->url($i) }}">{{ $i }}</a>
-                @endif
+                <a href="{{ $paginator->url($i) }}">{{ $i }}</a>
             @endif
         @endfor
 
@@ -28,7 +26,9 @@
             <a href="{{ $paginator->url($paginator->lastPage()) }}">{{ $paginator->lastPage() }}</a>
         @endif
     </div>
-    <div style="color: #4f4b4b; padding: 10px; margin-top: 10px; text-align:center; font-size:1rem;">
-        Total Result Found: {{ $paginator->total() }}
-    </div>
+    @if ($paginator->total() > 0)
+        <div style="color: #4f4b4b; padding: 10px; margin-top: 10px; text-align:center; font-size:1rem;">
+            Total Result Found: {{ $paginator->total() }}
+        </div>
+    @endif
 @endif

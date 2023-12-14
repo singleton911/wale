@@ -67,8 +67,8 @@
                                 <td><a
                                         href="/messages/{{ $ticket->conversation->created_at->timestamp }}/{{ $ticket->conversation_id }}">#TWM_{{ $ticket->created_at->timestamp }}</a>
                                 </td>
-                                <td class="{{ $ticket->staff != 0 ? $ticket->staff->role : '' }}">
-                                    {{ $ticket->staff != 0 ? $ticket->staff->public_name : 'No Staff Yet' }}</td>
+                                <td class="{{ $ticket->staff_id != null ? $ticket->staff->role : '' }}">
+                                    {{ $ticket->staff != null ? $ticket->staff->public_name : 'No Staff Yet' }}</td>
                                 <td class="{{ $ticket->status }}">{{ $ticket->status }}</td>
                                 <td><a
                                         href="/messages/{{ $ticket->conversation->created_at->timestamp }}/{{ $ticket->conversation_id }}">View</a>

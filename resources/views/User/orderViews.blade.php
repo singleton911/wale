@@ -199,15 +199,40 @@
                                         @csrf
                                         <textarea name="contents" class="support-msg" placeholder="Write your reply here... max 1K characters!"
                                             cols="30" rows="10" required></textarea>
-                                        <input type="hidden" name="message_type"
-                                            value="@foreach ($order->dispute->conversation->messages as $message){{ $message->message_type }} @endforeach">
+                                        <input type="hidden" name="message_type" value="dispute">
                                         <input type="submit" class="submit-nxt" name="dispute_form" value="Send">
                                     </form>
                                 </div>
                             @else
                                 <div style="text-align: center; margin-bottom: 1em;">
-                                    <form action="" method="post">
-                                        @csrf
+                                        {{-- Accept funds when the store releases your money --}}
+                                        <input type="submit" name="accept_fund" value="Accept Store Refund"
+                                            class="input-listing"
+                                            style="background-color: #2ecc71; color: #fff; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; animation: blink 1s infinite;">
+
+                                        <style>
+                                            @keyframes blink {
+                                                50% {
+                                                    background-color: #3498db;
+                                                    /* Change to a different color at 50% */
+                                                }
+                                            }
+                                        </style>
+
+
+                                        {{-- Release funds to store --}}
+                                        <input type="submit" name="release_fund" value="Release Fund To Store"
+                                            class="input-listing"
+                                            style="background-color: #3498db; color: #fff; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">
+
+                                        {{-- Ask for a partial refund --}}
+                                        <input type="submit" name="partial_refund" value="Request Partial Refund"
+                                            class="input-listing"
+                                            style="background-color: #e74c3c; color: #fff; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">
+
+
+
+                                        {{-- Add new reply for the dispute --}}
                                         <input type="submit" name="new_message" value="New Reply"
                                             class="input-listing">
                                     </form>

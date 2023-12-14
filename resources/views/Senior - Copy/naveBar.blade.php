@@ -7,7 +7,7 @@
         </div>
         <div class="name">
             <a href="/senior/staff/{{ $user->public_name }}/show"><span class="w">WHALES</span> <span
-                    class="m">/S/MOD</span></a>
+                    class="m">MOD</span></a>
         </div>
     </div>
     <div class="end-menus">

@@ -30,7 +30,6 @@ Route::post('/store/{store}/do/notification/{created_at}/{notification}', [Notif
 
 // add store note to order 
 Route::post('/store/{store}/order/note/{created_at}/{order}', [OrderController::class, 'addStoreNote']);
-// Route::post('/{store}/orders', [StoreController::class, 'storeAction']);
 
 // order info
 Route::get('/store/{store}/show/order/{created_at}/{order}', [OrderController::class, 'showStoreOrder']);

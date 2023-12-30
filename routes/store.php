@@ -7,6 +7,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PromocodeController;
 use App\Http\Controllers\ReplyController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ShareAccessController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\SupportController;
@@ -63,3 +64,6 @@ Route::post('/store/{store}/show/reply/review/{created_at}/{review}', [ReplyCont
 Route::get('/store/message/user/{user}/{timestamp}/{order}', [StoreController::class, 'messageUser']);
 Route::post('/store/message/user/{user}/{timestamp}/{order}', [StoreController::class, 'messageUser']);
 
+// search routes
+Route::get('/store/{actionName}/show/products/search', [SearchController::class, 'storeProductsSearch']);
+Route::get('/store/{actionName}/show/orders/search', [SearchController::class, 'storeOrdersSearch']);

@@ -10,10 +10,10 @@ class Category extends Model
     use HasFactory;
 
     public function parentProducts(){
-        return $this->belongsTo(Product::class, 'parent_category_id');
+        return $this->hasMany(Product::class, 'parent_category_id');
     }
 
     public function subProducts(){
-        return $this->belongsTo(Product::class, 'sub_category_id');
+        return $this->hasMany(Product::class, 'sub_category_id');
     }
 }

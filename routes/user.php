@@ -3,6 +3,7 @@
 use App\Http\Controllers\BlockStoreController;
 use App\Http\Controllers\BugController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\FAQController;
 use App\Http\Controllers\FavoriteListingController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\SupportController;
 use App\Http\Controllers\UserController;
@@ -24,10 +26,18 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['role:user'])->group(function () {
 
     Route::post('/', [UserController::class, 'show']);
+    // search quick and advance
+    Route::get('/search', [SearchController::class, 'quickSearch']);
+    Route::get('/parent/category/{created_at}/{category}', [CategoryController::class, 'parentCategoryProducts']);
+    Route::get('/sub/category/{created_at}/{category}', [CategoryController::class, 'subCategoryProducts']);
+
+    // Get the qrcode
+    Route::get('/account/deposit/qrcode', [GeneralController::class, 'qrcode']);
 
     Route::post('/account/pgp', [GeneralController::class, 'pgpKeySystem']);
     Route::post('/account/changePassword', [UserController::class, 'changePassword']);
     Route::post('/bugs', [BugController::class, 'store']);
+
 
     // Delete methods
     Route::delete('/blocked/b_store/{blockStore}', [BlockStoreController::class, 'destroy']);
@@ -70,8 +80,8 @@ Route::middleware(['role:user'])->group(function () {
 
     // Cart routes
     Route::get('/cart', [CartController::class, 'create']);
-    Route::post('/cart', [CartController::class, 'store']);
-    Route::patch('/cart/{cart}', [CartController::class, 'checkAction']);
+    Route::post('/cart', [CartController::class, 'createOrder']);
+    Route::patch('/cart/{user}/{created_ta}/{cart}', [CartController::class, 'checkAction']);
 
     // Promo code route
     Route::post('/apply/promocode', [CartController::class, 'checkPromoInCart']);
@@ -83,7 +93,6 @@ Route::middleware(['role:user'])->group(function () {
     // Notifications 
     Route::post('/notification/{created_at}/{notification}', [NotificationController::class, 'update']);
     Route::get('/notification', [NotificationController::class, 'showNotifications']);
-    Route::get('/team', [GeneralController::class, 'team']);
     Route::get('/canary', [GeneralController::class, 'canary']);
 
     // Tired Worth 

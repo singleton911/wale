@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('quantity')->unsigned()->default(1);
             $table->longText('note')->nullable();
             $table->integer('extra_option_id')->unsigned()->nullable();
+            $table->decimal('discount', 10,2)->default(0.00);
             $table->timestamps();
 
             // Foreign key constraints with cascade on update and restrict on delete

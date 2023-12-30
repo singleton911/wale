@@ -9,6 +9,8 @@ class Review extends Model
 {
     use HasFactory;
 
+    protected $guarded = ['id'];
+    
     public function reply(){
         return $this->hasOne(Reply::class);
     }

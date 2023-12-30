@@ -70,7 +70,7 @@ class MessageController extends Controller
         $type = null;
 
         if (strtotime($conversation->created_at) == $created_at) {
-            
+
             return view('User.displayMessages', [
                 'user' => $user,
                 'icon'   => GeneralController::encodeImages(),
@@ -113,7 +113,7 @@ class MessageController extends Controller
     {
         $conversations = Conversation::all();
         $participants = Participant::where('user_id', auth()->user()->id)->get();
-        
+
         $user = auth()->user();
         return view('User.message', [
             'user' => $user,
@@ -140,16 +140,16 @@ class MessageController extends Controller
 
         if ($request->has('close_ticket')) {
             if ($ticket) {
-            $ticket->status = 'closed';
-            $ticket->save();
+                $ticket->status = 'closed';
+                $ticket->save();
 
-            return redirect()->back();
+                return redirect()->back();
             } else {
-             
+
                 return redirect()->back();
             }
         }
-        
+
         if ($created_at == strtotime($conversation->created_at)) {
             return $this->createMessage($conversation->id, $request);
         }
@@ -158,64 +158,95 @@ class MessageController extends Controller
 
     public function storeUser(Request $request, $name, $created_at, Conversation $conversation)
     {
+
+
         if ($request->has('new_message')) {
             return redirect()->back()->with('new_message', true);
         }
 
+        if ($request->has('partial_refund')) {
+            return redirect()->back()->with('partial_refund_form', true);
+        }
 
-        if ($request->has('start_partial_refund_user')) {
-            $request->validate(['order_id' => 'required|min:32',]);
+        if ($request->has('contents') && $request->has('message_type')) {
+            $this->createMessage($conversation->id, $request);
+            return redirect()->back();
+        }
 
+        if ($request->has('request_staff')) {
             $order_id = Crypt::decrypt($request->order_id);
             $dispute  = Dispute::where('order_id', $order_id)->first();
-            if ($dispute) {
-            // $dispute->status = 'Partial Refund';
-            // $dispute->save();
+            $dispute->mediator_request = 1;
+            $dispute->save();
 
-            return redirect()->back()->with('success', 'Please click "New Reply" below in dispute to engage in conversation with the user. The moderation team will facilitate the distribution of funds between you and the user.');
-
-            } else {
-                // Handle case where dispute is not found for the given order ID
-                return redirect()->back()->with('error', 'Invalid request. Dispute not found for the provided order.');
-            }
+            return redirect()->back()->with('success', "The staff members has been notified please patient a while let a staff join the dispute process.");
         }
-
-        if ($request->has('release_user_fund')) {
-            $request->validate(['order_id' => 'required|min:32']);
-        
+        if ($request->has('decline')) {
             $order_id = Crypt::decrypt($request->order_id);
-            $dispute = Dispute::where('order_id', $order_id)->first();
-        
-            if ($dispute) {
-                // $dispute->status = 'Full Refund';
-                // $dispute->save();
-        
-                return redirect()->back()->with('success', 'Thank you for your honesty. The user will now have the option to accept or decline the refund.');
+            $dispute  = Dispute::where('order_id', $order_id)->first();
+            $dispute->store_refund_reject = 1;
+            $dispute->save();
+
+            return redirect()->back();
+        }
+
+        if ($request->has('user_partial_percent') && $request->has('store_partial_percent')) {
+            $order_id = Crypt::decrypt($request->order_id);
+            $dispute  = Dispute::where('order_id', $order_id)->first();
+
+            $request->validate(
+                ['user_partial_percent' => 'required|integer|between:1,100'],
+                ['store_partial_percent' => 'required|integer|between:1,100'],
+            );
+
+            if ($dispute->user_refund_accept != 0) {
+                return redirect()->back()->with('percentage_error', 'Partial System Error: Stop Modifiying the dispute!!!');
+            }
+            $total = $request->user_partial_percent + $request->store_partial_percent;
+            if ($total == 100) {
+
+                $dispute->store_partial_percent = $request->store_partial_percent;
+                $dispute->user_partial_percent = $request->user_partial_percent;
+                $dispute->store_refund_accept = 1;
+                $dispute->refund_initiated = 'Store';
+                $dispute->status = 'Partial Refund';
+                $dispute->save();
+
+                return redirect()->back();
             } else {
-                // Handle case where dispute is not found for the given order ID
-                return redirect()->back()->with('error', 'Invalid request. Dispute not found for the provided order.');
+                return redirect()->back()->with('percentage_error', 'Partial System Error: The total percentage for you and the store must be equal to 100%!!!');
             }
         }
-        
 
-        if ($created_at == strtotime($conversation->created_at)) {
-            return $this->createMessage($conversation->id, $request);
-        }
-        return abort(401);
+        return abort(404);
     }
 
     public function createMessage($conversation_id, $request)
     {
-        $user_id  = auth()->user()->id;
+        $user = auth()->user();
         $data   = $request->validate([
             'contents' => 'required|string|min:2|max:5000',
             'message_type' => 'required|in:message,ticket,dispute',
         ]);
 
+        $lastMessage = Message::where('conversation_id', $conversation_id)->first();
+
+        if ($lastMessage) {
+            if ($request->message_type == 'ticket' && $lastMessage['message_type'] == 'ticket') {
+                $support = $user->supports->where('conversation_id', $conversation_id)->first();
+                if ($support != null && $support->status != 'open') {
+                    return redirect()->back();
+                }
+            } elseif ($request->message_type == 'ticket' && $lastMessage['message_type'] == 'ticket') {
+                # code...
+            } elseif ($request->message_type == 'ticket' && $lastMessage['message_type'] == 'ticket') {
+                # code...
+            }
+        }
         //Create message
         $message = new Message();
         $message->content  = $data['contents'];
-        $message->user_id = $user_id;
+        $message->user_id = $user->id;
         $message->conversation_id  = $conversation_id;
         $message->message_type     = $data['message_type'];
         $message->save();
@@ -226,11 +257,10 @@ class MessageController extends Controller
             $messageStatus = new MessageStatus();
             $messageStatus->message_id = $message->id;
             $messageStatus->user_id    = $participant->user_id;
-            $messageStatus->is_read    = $user_id == $participant->user_id ? 1 : 0;
+            $messageStatus->is_read    = $user->id == $participant->user_id ? 1 : 0;
             $messageStatus->save();
         }
 
         return redirect()->back()->with('success', 'Message sent successfully.');
     }
-
 }

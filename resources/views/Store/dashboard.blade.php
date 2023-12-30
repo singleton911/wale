@@ -80,10 +80,7 @@
                                         name="dispute">Dispute</button>
                                 @elseif($order->status == 'dispute')
                                 <a href="/store/{{ $store->store_name }}/show/order/{{ $order->created_at->timestamp }}/{{ $order->id }}"
-                                    style="font-size: .7rem; background-color: rgb(0, 75, 128); color: #f1f1f1; cursor:pointer; padding: 5px; border: none; border-radius: .5rem;">View</a>
-                                    <a href="/store/{{ $store->store_name }}/show/messages/{{ $order->dispute->conversation->created_at->timestamp }}/{{ $order->dispute->conversation->id }}"
-                                        style="font-size: .7rem; background-color: darkorange; color: #f1f1f1; cursor:pointer; padding: 5px; border: none; border-radius: .5rem;">See
-                                        dispute</a>
+                                    style="font-size: .7rem; background-color: darkorange; color: #f1f1f1; cursor:pointer; padding: 5px; border: none; border-radius: .5rem;">See dispute</a>
                                 @elseif($order->status == 'completed')
                                     Order Completed
                                 @elseif($order->status == 'cancelled')
@@ -101,6 +98,29 @@
         </table>
     </div>
 </div>
+
+{{-- when store try to click cancel warn him with this below --}}
+@if (session('cancel'))
+<div class="alert-box-div">
+    <form action="" method="post">
+    <div class="alert-box">
+        
+        <legend>Order Cancellation</legend>
+        <h3 style="font-size: .8rem;"> Are you sure you want to do this?
+            <hr>
+        </h3>
+        <span>The user will get back his/her money 100%.</span>
+       
+            @csrf
+            <input type="hidden" name="user" value="{{ session('user_id') }}">
+            <input type="submit" name="cancel_yes" class="submit-nxt" value="Yes" style="width: max-content;">
+        <input type="submit" name="canacel_no" class="submit-nxt" style="background-color: red; width: max-content;" value="No">
+    
+    </div>
+</form>
+</div>
+@endif
+
 <div class="top-products">
     <div class="title-latest">
         <h4>STORE TOP 10 PRODUCTS</h4>

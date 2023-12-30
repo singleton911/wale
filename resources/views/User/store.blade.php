@@ -49,12 +49,12 @@
                         </div>
                         <div class="div-p">
                             <p>Status: <span class="{{ $store->status }}">{{ $store->status }}</span></p> |
-                            <p>Sales: </p> |
+                            <p>Sales: {{ $store->width_sales }}</p> |
                             <p>Disputes: [<span style="color: #28a745;">Won ({{ $store->disputes_won }})</span>/<span
                                     style="color:#dc3545;">Lost ({{ $store->disputes_lost }})</span>]</p>
                         </div>
                         <div class="div-p">
-                            <p>Listings: {{ $store->products->count() }}</p> |
+                            <p>Listings: {{ $store->products()->where('status', 'Active')->count() }}</p> |
                             <p>Favorited: {{ $store->StoreFavorited->count() }}</p>
                         </div>
                         <div class="div-p">
@@ -128,14 +128,14 @@
                 <h3> {{ $store->store_name }} > Listings</h3>
             </div>
             <div class="products-grid">
-                @forelse ($store->products()->paginate(50) as $product)
+                @forelse ($store->products()->where('status', 'Active')->paginate(30) as $product)
                     @include('User.products')
                 @empty
                     No product found.
                 @endforelse
 
             </div>
-            {{ $store->products()->paginate(50)->render('vendor.pagination.custom_pagination') }}
+            {{ $store->products()->where('status', 'Active')->paginate(30)->render('vendor.pagination.custom_pagination') }}
         </div>
     </div>
 

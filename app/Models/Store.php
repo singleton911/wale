@@ -34,10 +34,6 @@ class Store extends Model
         return $this->hasMany(Notification::class, 'user_id', 'user_id');
     }
 
-    public function referrals(){
-        return $this->hasMany(Referral::class, 'user_id');
-    }
-
     public function supports(){
         return $this->hasMany(Support::class, 'user_id');
     }
@@ -58,4 +54,7 @@ class Store extends Model
         return $this->hasMany(Promocode::class);
     }
 
+    public function share(){
+        return $this->hasMany(ShareAccess::class);
+    }
 }

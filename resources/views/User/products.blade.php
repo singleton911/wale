@@ -37,7 +37,7 @@
     @endphp
     <img src="data:image/png;base64,{{ !empty($upload_image[$avatarKey]) ? $upload_image[$avatarKey] : $icon['default'] }}"
         class="background-img"> |
-        <span class="span1" title="In Stocks" style="display: flex; align-items: center;"><img src="data:image/png;base64,{{ $icon['inventory'] }}" class="icon-filter" width="15"> <span style="margin-left: .2em"> {{ $product->quantity - $product->sold }} |</span></span>
+        <span class="span1" title="In Stocks" style="display: flex; align-items: center;"><img src="data:image/png;base64,{{ $icon['inventory'] }}" class="icon-filter" width="15"> <span style="margin-left: .2em"> {{ $product->quantity }} |</span></span>
         <span class="span1" title="Sold" style="display: flex; align-items: center;"><img src="data:image/png;base64,{{ $icon['shopping-cart'] }}" class="icon-filter" width="15"> <span style="margin-left: .2em"> {{ $product->sold }} |</span></span>
         <span class="span3" style="border: 2px solid skyblue; border-radius:.5rem; padding:5px;">
             @php

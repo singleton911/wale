@@ -13,75 +13,108 @@
 
         </div>
         <div class="top-div">
-            <div style="display: flex; gap:1em;">
-                @include('User.categories')
+            @include('User.categories')
+            <div>
 
-                <div class="news-div">
-                        <h2 class="news-title" style="text-decoration: underline"><img src="data:image/png;base64,{{ $icon['news'] }}"
-                            class="icon-filter" width="25"> {{ $news->title }} <img src="data:image/png;base64,{{ $icon['news'] }}"
-                            class="icon-filter" width="25"></h2>
-                        <p class="news-content">{{ Str::limit($news->content, 150, '...') }} </p>
-                        <div style="text-align:right; margin-right:5px; font-size: .8rem; color: #acacac;">
-                            <a href="/news/"
-                                style="font-size: .8rem; margin-right:1em; text-decoration:underline">Clcik
-                                here to real full news</a>
-                            Author:
-                            <span
-                                class="{{ $news->user->role }}">/{{ $news->user->role }}/{{ $news->user->public_name }}</span>
-                            <span>Date: {{ $news->created_at->diffForHumans() }}</span>
+
+                <div class="categories search-div">
+                    @if (session('advance_search'))
+                        <h3>Advance Search Listings/Stores ℹ️<br>
+                            
+                        </h3>
+                        
+                    @else
+                        <h3>Quick Search Listings
+                            <form action="/search" method="get" class="search-form" style="padding: .5em;">
+                               @csrf
+                                <button type="submit" name="advance-search" style="margin:0px;" class="search-button">Go Advance
+                                    Search</button>
+                            </form>
+                        </h3>
+                    @endif
+
+                    <form action="/search" method="get" class="search-form">
+                      @csrf
+                        <input type="text" class="search_name" name="pn"
+                            placeholder="Quick search with product name..." value="">
+                        <div class="price-range">
+                            Price:
+                            <input type="number" name="pf" min="0" placeholder="min $0.0" id="price-input"
+                                value="">
+                            <input type="number" name="pt" min="0" placeholder="max $0.0" id="price-input"
+                                value="">
                         </div>
+                        @if (session('advance_search'))
+                        {{-- <p>NOTE: search store mean getting only the store and it products (only enter the store name)!</p> --}}
+                            <div class="price-range">
+                                Location:
+                                <input type="text" name="sf" placeholder="Ship from...." id="price-input"
+                                    value="">
+                                <input type="text" name="st" placeholder="Ship to..." id="price-input"
+                                    value="">
+                            </div>
+                            <div>
+                                AutoShop:
+                                <input type="checkbox" name="auto_shop" id="price-input">
+                                <label>Search include descriptions: <input type="checkbox" name="desc"></label>
+                            </div>
+                            <div style="display: flex; gap:1em">
+                                <select name="search_type">
+                                    <option value="product">Search Products</option>
+                                    <option value="store">Search Stores</option>
+                                </select>
+                                <select name="filter-product" id="">
+                                    <option value="">---Sort By---</option>
+                                    <option value="best-match">Best Match</option>
+                                    <option value="newest">Newest listed</option>
+                                    <option value="oldest">Oldest listed</option>
+                                    <option value="Cheapest">price + Shipping: lowest first</option>
+                                    <option value="highest">Price + Shipping: highest first</option>
+                                </select>
+                            </div>
+                            <div style="display: flex; gap:1em;">
+                                <select name="parent_category" id="">
+                                    <option value="">---Select Parent Category---</option>
+                                    @foreach ($categories->where('parent_category_id', null) as $category)
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
+                                <select name="sub_category" id="">
+                                    <option value="">---Select Sub Category---</option>
+                                    @foreach ($categories->where('parent_category_id', '!=', null) as $category)
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div style="display: flex; gap:1em">
+                                <select name="payment_type">
+                                    <option value="">---Payment System---</option>
+                                    <option value="Escrow">Escrow</option>
+                                    <option value="FE">Finalize Early</option>
+                                </select>
+                            </div>
+                        @else
+                            <input type="hidden" name="search_type" value="product">
+                            <select name="filter-product" id="">
+                                <option value="">---Sort By---</option>
+                                <option value="best-match">Best Match</option>
+                                <option value="newest">Newest listed</option>
+                                <option value="oldest">Oldest listed</option>
+                                <option value="Cheapest">price + Shipping: lowest first</option>
+                                <option value="highest">Price + Shipping: highest first</option>
+                            </select>
+                        @endif
+                        <div style="display: flex; gap:1em">
+                            <div class="product-type">
+                                Product type:
+                                <label><input type="radio" name="pt2" value="all" checked>All</label>
+                                <label><input type="radio" name="pt2" value="digital">Digital</label>
+                                <label><input type="radio" name="pt2" value="physical">Physical</label>
+                            </div>
+                            <button type="submit" class="search-button">Search</button>
+                        </div>
+                    </form>
                 </div>
-
-            </div>
-            <div class="search-div">
-                <h3>Quick Search Listings</h3>
-                <form action="/search" method="post" class="search-form">
-                    {{-- @csrf --}}
-                    <input type="text" class="search_name" name="pn"
-                        placeholder="Quick search (product.., store...)" value="">
-                    <div class="price-range">
-                        Price:
-                        <input type="number" name="pf" min="1" placeholder="min $0.0" id="price-input"
-                            value="">
-                        <input type="number" name="pt" min="1" placeholder="max $0.0" id="price-input"
-                            value="">
-                    </div>
-                    <div style="display: flex; gap:1em">
-                        <select name="search_type">
-                            <option value="product">Search Products</option>
-                            <option value="store">Search Stores</option>
-                        </select>
-
-                    </div>
-                    <div style="display: flex; gap:1em">
-                        <select name="filter-product" id="">
-                            <option value="">---Sort By---</option>
-                            <option value="best-match">Best Match</option>
-                            <option value="newest">Newest listed</option>
-                            <option value="oldest">Oldest listed</option>
-                            <option value="Cheapest">price + Shipping: lowest first</option>
-                            <option value="highest">Price + Shipping: highest first</option>
-                        </select>
-                        <select name="category" id="">
-                            <option value="">---Select category---</option>
-                            @foreach ($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
-                            @endforeach
-                        </select>
-
-                        <div class="product-type">
-                            Product type:
-                            <label><input type="radio" name="pt2" value="all">All</label>
-                            <label><input type="radio" name="pt2" value="digital">Digital</label>
-                            <label><input type="radio" name="pt2" value="physical">Physical</label>
-                        </div>
-                        <button type="submit" name="search-button" class="search-button">Search</button>
-                    </div>
-                    <div style="max-width: 50%; text-align:right">
-                        <button type="submit" name="advance-search-disp" class="search-button">Advance
-                            Search</button>
-                    </div>
-                </form>
             </div>
         </div>
         @if ($user->twofa_enable === 'no')
@@ -129,3 +162,4 @@
 
 
     </div>
+</div>

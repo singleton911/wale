@@ -15,8 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_id')->index();
             $table->decimal('fiat_amount', 10, 2); // Assuming Monero uses 8 decimal places.
-            $table->string('address');
-            $table->enum('status', ['pending', 'released', 'dispute'])->default('pending');
+            $table->enum('status', ['pending', 'released', 'dispute', 'cancel'])->default('pending');
             $table->timestamps();
         });
     }

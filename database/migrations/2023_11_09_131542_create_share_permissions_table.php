@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('share_permissions', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('share_access_id')->constrained('share_accesses')->onUpdate('cascade')->onDelete('cascade');
             $table->string('name');
             $table->timestamps();
         });

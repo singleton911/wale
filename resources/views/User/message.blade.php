@@ -20,14 +20,20 @@
             <p class="notifications-p">Read messages older than 10 days will be deleted autmatically!</p>
             @forelse ($userConversations->sortByDesc('updated_at') as $userConversation)
                 @foreach ($conversations->where('id', $userConversation->conversation_id) as $conversation)
-                    <a href="/messages/{{ $conversation->created_at->timestamp }}/{{ $conversation->id }}"
-                        class="notification-container">
                         @php
                             $latestMessage = $conversation
                                 ->messages()
                                 ->latest()
                                 ->first();
                         @endphp
+
+                        @if ($latestMessage && $latestMessage->message_type == 'dispute')
+                        <a href="/order/{{ $conversation->dispute->order->created_at->timestamp }}/{{ $conversation->dispute->order->id }}"
+                            class="notification-container">
+                        @else
+                        <a href="/messages/{{ $conversation->created_at->timestamp }}/{{ $conversation->id }}"
+                            class="notification-container">
+                        @endif
                         @if ($latestMessage)
                             <img src="data:image/jpeg;base64,
                             @if ($latestMessage->message_type == 'dispute') {{ $icon['dispute'] }}

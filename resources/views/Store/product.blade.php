@@ -40,9 +40,6 @@
                         style="background-color: red; color: #f1f1f1; font-size: 1em; padding: 2px; border-radius: 3px; border: none; cursor: pointer;"
                         value="UnPause">
                 @endif |
-                <input type="submit" name="boost"
-                    style="background-color: darkorange; color: #f1f1f1; font-size: 1em; padding: 2px; border-radius: 3px; border: none; cursor: pointer;"
-                    value="Boost"> |
                 <a href="/store/{{ $store->store_name }}/show/view/{{ $product->created_at->timestamp }}/{{ $product->id }}"
                     style="text-decoration: none; background-color: green; color: #f1f1f1; font-size: 1em; padding: 2px; border-radius: 3px; border: none; cursor: pointer;">View</a>
             </form>
@@ -57,7 +54,7 @@
             class="background-img"> |
         <span class="span1" title="In Stocks" style="display: flex; align-items: center;"><img
                 src="data:image/png;base64,{{ $icon['inventory'] }}" class="icon-filter" width="15"> <span
-                style="margin-left: .2em"> {{ $product->quantity - $product->sold }} |</span></span>
+                style="margin-left: .2em"> {{ $product->quantity }} |</span></span>
         <span class="span1" title="Sold" style="display: flex; align-items: center;"><img
                 src="data:image/png;base64,{{ $icon['shopping-cart'] }}" class="icon-filter" width="15"> <span
                 style="margin-left: .2em"> {{ $product->sold }} |</span></span>

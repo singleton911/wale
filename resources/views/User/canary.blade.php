@@ -18,7 +18,8 @@
     <div class="container">
         <div class="main-div">
             <div class="notific-container">
-                <p>No canary set yet... Check back again.</p>
+                <p>{{ $publickey }}</p>
+                <p>{{ $messenc }}</p>
         </div>
     </div>
     </div>

@@ -1,12 +1,36 @@
-<div style="text-align: center;">
-    <a href="/store/{{ $store->store_name }}/add-listings"
-        style="background-color: #0b3996; padding: 5px; text-decoration: none; color: white; border-radius: 5px;">+ add
-        listing</a><br><br>
-</div>
-<div class="products-grid">
-    @if (!empty($store->products))
-        @include('Store.product')
-    @else
-      <P>Your have no product listed yet. -_-</P>
-    @endif
-</div>
+<p style="text-align: center">Market Products ({{ $products->count() }})</p>
+<table>
+    <thead>
+        <tr>
+            <th>#ID</th>
+            <th>Name</th>
+            <th>Store</th>
+            <th>Created At</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach ($products->sortBy('created_at') as $product)
+            <tr>
+                <td>#{{ $product->id }}</td>
+                <td>{{ Str::limit($product->product_name, 20, '...') }}</td>
+                <td>{{ $product->store->store_name }}</td>
+                <td>{{ $product->created_at->DiffForHumans() }}</td>
+                <td class="{{ $product->status }}">{{ $product->status }}</td>
+                <td>
+                    <form action="" method="post">
+                        @csrf
+                        <input type="hidden" name="product_id" value="{{ Crypt::encrypt($product->id) }}">
+
+
+                        <a href="/senior/staff/show/product/{{ $product->created_at->timestamp }}/{{ $product->id }}"
+                            style="font-size: .7rem; background-color: rgb(0, 75, 128); color: #f1f1f1; cursor:pointer; padding: 5px; border: none; border-radius: .5rem;">View</a>
+
+                    </form>
+                </td>
+            </tr>
+        @endforeach
+    </tbody>
+</table>
+

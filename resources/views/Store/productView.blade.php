@@ -60,7 +60,7 @@
                 <h3>Listing Informatain</h3>
                 <div style="margin: 1px;">
                     <p class="cls3" style="text-decoration: underline">Sold <span>
-                            {{ $product->sold }}</span> <span>
+                            ({{ $product->sold }})</span> <span>
                             Since {{ $product->created_at->format('d F, Y') }}</span>
                     <div class="div-p">
                         <p>Product Type: <span style="color: #28a745">{{ $product->product_type }}</span>
@@ -138,10 +138,7 @@
                                     <input type="submit" name="statusChange"
                                         style="background-color: red; color: #f1f1f1; font-size: 1em; padding: 2px; border-radius: 3px; border: none; cursor: pointer;"
                                         value="UnPause">
-                                @endif |
-                                <input type="submit" name="boost"
-                                    style="background-color: darkorange; color: #f1f1f1; font-size: 1em; padding: 2px; border-radius: 3px; border: none; cursor: pointer;"
-                                    value="Boost">
+                                @endif
                             </form>
                         </div>
                     </div>

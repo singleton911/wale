@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('store_id')->constrained('stores')->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreignId('permission_id')->constrained('share_permissions')->onUpdate('cascade')->onDelete('cascade');
             $table->enum('status', ['active', 'revoked'])->default('active');
             $table->timestamps();
         });

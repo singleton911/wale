@@ -1,33 +1,4 @@
-/* nave bar css */
-/* Customize the scroll bar */
-body::-webkit-scrollbar {
-    width: 5px; /* set the width of the scrollbar */
-  }
-  
-  body::-webkit-scrollbar-thumb {
-    background-color: #0b3996; /* set the color of the thumb */
-    border-radius: .5rem; /* set the border radius of the thumb */
-  }
-  
-  body::-webkit-scrollbar-track {
-    background-color: #f0f0f0; /* set the color of the track */
-    border-radius: .5rem; /* set the border radius of the track */
-  }
-  
-  /* Hide the scrollbar border */
-  body::-webkit-scrollbar {
-    border: none;
-  }
-  /* Customize the scroll bar in Firefox and Tor */
-  body {
-    scrollbar-width: thin; /* set the width of the scrollbar */
-  }
-  
-  body::-moz-scrollbar-thumb {
-    background-color: #0b3996; /* set the color of the thumb */
-    border-radius: .5rem; /* set the border radius of the thumb */
-  }
-  
+
   .nav-bar {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -297,11 +268,23 @@ body::-webkit-scrollbar {
     font-size: .8rem;
 }
 
-/* create a listings  */
-.listing-type{
+/*  alert box  */
+.alert-box-div {
+  background-color: rgba(68, 68, 75, 0.5);
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.alert-box {
   display: flex;
   flex-direction: column;
-  flex-wrap: wrap;
   position: absolute;
   left: 50%;
   top: 50%;
@@ -317,6 +300,26 @@ body::-webkit-scrollbar {
   padding: 10px;
 }
 
+/* create a listings  */
+.listing-type{
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  height: fit-content;
+  width: calc(100vw - 70%);
+  background: #f8f8f8;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+  border-radius: 0.5rem;
+  box-sizing: border-box;
+  padding: 10px;
+}
+.alert-box a,
+.alert-box h3,
 .listing-type a, 
 .listing-type h3{
   text-decoration: none;
@@ -327,15 +330,20 @@ body::-webkit-scrollbar {
   border-radius: .5rem;
   color: #0080ff;
 }
+.alert-box a,
 .listing-type a{
   margin-bottom: 20px;
 }
+.alert-box a:visited,
 .listing-type a:visited{
   color: #0b3996;
 }
+
+.alert-box h3,
 .listing-type h3{
   border: none;
 }
+
 
 .form-container {
   font-family: 'Arial', sans-serif;

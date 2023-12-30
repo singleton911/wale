@@ -14,6 +14,7 @@ use App\Models\FavoriteListing;
 use App\Models\FavoriteStore;
 use App\Models\NotificationType;
 use App\Models\Order;
+use App\Models\Referral;
 use App\Models\Review;
 use App\Models\User;
 use App\Models\Wallet;
@@ -134,53 +135,45 @@ class ProductController extends Controller
 
     public function checkAction(Request $request, $created_at, Product $product)
     {
-        $timestamp = strtotime($product->created_at);
-        $user_id  = auth()->user()->id;
-        $extra = $request->extra_shipping_option != 1 ? ExtraOption::where('id', $request->extra_shipping_option)->first()['cost'] : 0;
-        if ($timestamp !== false && $timestamp == $created_at) {
+        $user = auth()->user();
+        $extra = $request->extra_shipping_option  != null ? ExtraOption::findOrFail($request->extra_shipping_option)['cost'] : NULL;
+        $listingFavorited = $user->favoriteListings->where('product_id', $product->id)->first();
+        $storeFavorited   = $user->favoriteStores->where('store_id', $product->store_id)->first();
+        $blockedStore     = $user->blockedStores->where('store_id', $product->store_id)->first();
+
+        if (strtotime($product->created_at) == $created_at) {
+           // .. (add this product to cart)
             if ($request->has('add_to_cart')) {
                 return $this->addToCart($request, $product);
-            } elseif ($request->has('buy_now')) {
-                // Check user's wallet balance before initiating the order
-                if ($this->checkUserWalletBalance($user_id, ($product->price + $extra))) {
-                    return redirect()->back()->with([
-                        'enter_adderss' => true,
-                        'extra_shipping_option' => $request->extra_shipping_option,
-                        'items' => $request->items,
-                    ]);
-                } else {
-                    // Insufficient balance, handle accordingly
-                    return redirect()->back()->with('error', 'Insufficient balance to place the order.');
+
+            } elseif ($request->has('buy_now') || $request->has('complete_order')) {
+                $balanceCheck = $user->wallet->balance >= ($product->price + $extra);
+
+                if ($request->has('buy_now')) {
+                    $redirectData = $balanceCheck ? ['enter_adderss' => true, 'extra_shipping_option' => $request->extra_shipping_option, 'items' => $request->items] : ['error' => 'Insufficient funds! Please add more funds to order this product. ^.^'];
+                } elseif ($request->has('complete_order')) {
+                    if ($balanceCheck) {
+
+                        $this->initiateOrder($request, $product);
+                        $redirectData = ['success' => 'Order created successfully. Check your order status in settings or notifications!'];
+                    } else {
+                        $redirectData = ['error' => 'Insufficient funds! Please add more funds to order this product. ^.^'];
+                    }
                 }
-            } elseif ($request->has('complete_order')) {
-                // Check user's wallet balance before initiating the order
-                if ($this->checkUserWalletBalance($user_id, ($product->price + $extra))) {
-                    // User has sufficient balance, proceed with order initiation
-                    $this->initiateOrder($request, $product);
-                    return redirect()->back()->with('success', 'Order created successfully please see your order status in setting or notification!');
-                } else {
-                    // Insufficient balance, handle accordingly
-                    return redirect()->back()->with('error', 'Insufficient balance to place the order.');
-                }
-            } elseif ($request->has('favorite_listing')) {
-                $favoriteListing = new FavoriteListing();
-                $favoriteListing->user_id = $user_id;
-                $favoriteListing->product_id = $product->id;
-                $favoriteListing->save();
-                return redirect()->back();
-            } elseif ($request->has('favorite_store')) {
-                $favoriteStore  = new FavoriteStore();
-                $favoriteStore->user_id = $user_id;
-                $favoriteStore->store_id = $product->store->id;
-                $favoriteStore->save();
-                return redirect()->back();
-            } elseif ($request->has('block_store')) {
-                $blockStore  = new BlockStore();
-                $blockStore->user_id = $user_id;
-                $blockStore->store_id = $product->store->id;
-                $blockStore->save();
-                return redirect()->back();
+
+                return redirect()->back()->with($redirectData);
+
+            } elseif ($request->has('favorite_listing') && $listingFavorited == null) {
+                FavoriteListing::create(['user_id' => $user->id, 'product_id' => $product->id]);
+
+            } elseif ($request->has('favorite_store') && $storeFavorited == null) {
+                FavoriteStore::create(['user_id' => $user->id, 'store_id' => $product->store->id]);
+
+            } elseif ($request->has('block_store') && $blockedStore == null) {
+                BlockStore::create(['user_id' => $user->id, 'store_id' => $product->store->id]);
+
             }
+
             return redirect()->back();
         }
 
@@ -191,79 +184,88 @@ class ProductController extends Controller
     private function initiateOrder(Request $request, Product $product)
     {
         // Your existing logic for initiating an order
-        $user_id = auth()->user()->id;
+        $user = auth()->user();
+
         $sendData = $request->validate([
             'items' => 'required|integer|min:1|max:100000',
-            'extra_shipping_option' => 'required|integer|min:1',
-            'address_text' => 'sometimes|nullable|string|max:100000',
+            'extra_shipping_option' => 'sometimes|nullable|integer',
+            'address_text' => 'sometimes|nullable|string',
         ]);
 
         $notificationType = NotificationType::where('action', 'created')->where('icon', 'order')->first();
+        $extra = $sendData['extra_shipping_option'] != null ? $sendData['extra_shipping_option'] : null;
 
         $order                    = new Order();
-        $order->user_id           = $user_id;
+        $order->user_id           = $user->id;
         $order->product_id        = $product->id;
         $order->store_id          = $product->store_id;
         $order->quantity          = $sendData['items'];
-        $order->extra_id          = $sendData['extra_shipping_option'];
-        $order->shipping_address  = $sendData['address_text'];
+        $order->extra_id          = $extra;
+        $order->shipping_address  = $request->has('encrypt_for_me') ? $this->encryptUserInfo($sendData['address_text']) : $sendData['address_text'];
         $order->save();
 
-        NotificationController::create($user_id, null, $notificationType->id, $order->id);
+        if ($extra != null) {
+            $extra_cost = ExtraOption::where('id',$extra)->first();
+            $amount = $product->price + $extra_cost->cost;
+        }else{
+            $amount = $product->price;
+        }
+
+        // deduct the amount from the user balance and add it to escrow...
+        $user->wallet->balance -= $amount;
+        $user->wallet->save();
+
+        if ($product->payment_type == 'FE' && $product->store->is_fe_enable === 1) {
+            $product->store->user->wallet->balance += $amount;
+            $product->store->user->wallet->save();
+
+        }else{
+            // add funds to escrow
+            $this->makeEscrow($order->id, $amount);
+        }
+
+        NotificationController::create($user->id, null, $notificationType->id, $order->id);
         NotificationController::create($product->store->user_id, null, $notificationType->id, $order->id);
 
         return $order;
     }
 
-    private function checkUserWalletBalance($userId, $requiredBalance)
-    {
-        // Retrieve the user's wallet balance from the database
-        $userWallet = Wallet::where('user_id', $userId)->first();
-
-        if ($userWallet && $userWallet->balance >= $requiredBalance) {
-            // User has sufficient balance
-            return true;
-        }
-
-        // Insufficient balance
-        return false;
-    }
-
     // add the order to escrow
-    public function makeEscrow($order, $amount, $adderss){
+    private function makeEscrow($order, $amount)
+    {
         $new_eascrow = new Escrow();
         $new_eascrow->order_id = $order;
-        $new_eascrow->amount   = $amount;
-        $new_eascrow->address = $adderss;
+        $new_eascrow->fiat_amount   = $amount;
         $new_eascrow->save();
     }
+
 
     // Add to cart
     private function addToCart($request, $product)
     {
         // Check if the product is already in the cart for the current user
-        $existingCartItem = Cart::where('user_id', auth()->user()->id)
-            ->where('product_id', $product->id)
-            ->first();
+        $user = auth()->user();
+        $existingCartItem = $user->carts->where('product_id', $product->id)->first();
+
         $sendData = $request->validate([
             'items'                 => 'required|integer|min:1|max:100000',
-            'extra_shipping_option' => 'required|integer|min:1',
+            'extra_shipping_option' => 'sometimes|nullable|integer',
         ]);
 
         if ($existingCartItem) {
             // If the product is already in the cart, update the quantity
             $existingCartItem->quantity +=  $sendData['items'];
-            $existingCartItem->extra_option_id =  $sendData['extra_shipping_option'];
+            $existingCartItem->extra_option_id =  $sendData['extra_shipping_option'] ?? NULL;
             $existingCartItem->save();
 
             return redirect('/cart')->with('success', 'Product quantity updated in cart');
         } else {
             // If the product is not in the cart, create a new cart item
             $cart = new Cart();
-            $cart->user_id = auth()->user()->id;
+            $cart->user_id = $user->id;
             $cart->product_id = $product->id;
             $cart->quantity = $sendData['items'];
-            $cart->extra_option_id = $sendData['extra_shipping_option'];
+            $cart->extra_option_id = $sendData['extra_shipping_option'] ?? null;
             $cart->save();
 
             return redirect('/cart')->with('success', 'New product added to cart');
@@ -502,7 +504,7 @@ class ProductController extends Controller
                     $product->status = 'Active';
                     $product->save();
                 }
-            }elseif ($request->boost == 'Boost') {
+            } elseif ($request->boost == 'Boost') {
                 return "Still under developement... sorry :xD";
             } else {
                 return redirect()->back()->with('error', 'Product is still pending or rejected or Invalid product ID.');
@@ -513,5 +515,10 @@ class ProductController extends Controller
 
         // Flash success message if no exception is thrown
         return redirect()->back()->with('success', 'Product status updated successfully');
+    }
+
+    // encrypt user info
+    public function encryptUserInfo($address){
+        return $address;
     }
 }

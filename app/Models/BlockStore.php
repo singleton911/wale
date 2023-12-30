@@ -9,6 +9,7 @@ class BlockStore extends Model
 {
     use HasFactory;
 
+    protected $guarded = ['id'];
     public function store(){
         return $this->belongsTo(Store::class);
     }

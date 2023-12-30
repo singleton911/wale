@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->foreignId('store_id')->constrained('stores')->onUpdate('cascade')->onDelete('cascade');
-            $table->integer('quantity')->default(-1);
-            $table->integer('in_stocks')->default(-1);
+            $table->integer('quantity');
             $table->integer('sold')->default(0);
             $table->string('product_name');
             $table->text('product_description')->nullable();
@@ -30,6 +29,8 @@ return new class extends Migration
             $table->text('auto_delivery_content')->nullable();
             $table->integer('disputes_lost')->default(0);
             $table->integer('disputes_won')->default(0);
+            $table->enum('category_promote', ['yes', 'no'])->default('no');
+            $table->enum('search_promote', ['yes', 'no'])->default('no');
             $table->enum('status', ['Active', 'Pending', 'Rejected', 'Paused'])->default('Pending');
             $table->string('image_path1')->nullable();
             $table->string('image_path2')->nullable();

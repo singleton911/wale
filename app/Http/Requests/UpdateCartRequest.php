@@ -22,10 +22,10 @@ class UpdateCartRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'product_id' => 'required|integer',
-            'quantity' => 'required|integer|min:1',
-            'extra_option_id' => 'sometimes|integer|min:1',
-            'note'     => 'sometimes|nullable',
+            // 'product_id' => 'required|integer',
+            // 'quantity' => 'required|integer|min:1',
+            // 'extra_option_id' => 'sometimes|integer|min:1',
+            // 'note'     => 'sometimes|nullable',
         ];
     }
 }

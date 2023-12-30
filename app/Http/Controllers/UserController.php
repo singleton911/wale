@@ -9,7 +9,9 @@ use App\Models\Category;
 use App\Models\MessageStatus;
 use App\Models\News;
 use App\Models\NewStore;
+use App\Models\NotificationType;
 use App\Models\Product;
+use App\Models\Referral;
 use App\Models\Store;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
@@ -71,10 +73,22 @@ class UserController extends Controller
             'store_key'         => $storeKey,
             'login_passphrase'  => $request->login_passphrase,
             'pin_code'          => $request->pin_code,
-            'referral_link'     => $request->filled('referral_link') ? $request->referral_link : null,
+            'referral_link'     => $request->public_name,
             'password'          => bcrypt($request->password),
         ]);
 
+        if (!empty($request->referred_link) && $request->referred_link != null) {
+            $referred_by = User::where('public_name', $request->referred_link)->first();
+            $new_referral = new Referral();
+            $new_referral->user_id = $referred_by->id;
+            $new_referral->referred_user_id = $user->id;
+            $rs = $new_referral->save();
+            $notificationType = NotificationType::where('action', 'used')->where('icon', 'referral')->first();
+            
+            if ($rs && $notificationType) {
+                NotificationController::create($referred_by->id,null,$notificationType->id);
+            }
+        }
         // Create a new wallet for the user
         $newWallet = new Wallet([
             'user_id'       => $user->id,
@@ -129,12 +143,12 @@ class UserController extends Controller
     {
         // Validate the login data
         $data = $request->validate([
-            'private_name' => 'required|string|min:3|max:20',
+            'private_name' => 'required|string|min:3|max:80',
             'password' => 'required|string|min:8|max:128',
         ]);
 
         // Check if the user exists
-        $user = \App\Models\User::where('private_name', $data['private_name'])->first();
+        $user = User::where('private_name', $data['private_name'])->first();
 
         // Check if the user is banned
         if ($user && $user->status == 'banned') {
@@ -144,27 +158,14 @@ class UserController extends Controller
         // Check if the user exists and the password is correct
         if (Auth::attempt($data)) {
             $request->session()->regenerate();
+            $user->last_seen = now();
+            $user->save();
             // Redirect to the desired location after successful login
             return redirect('/');
         }
 
         // Authentication failed
         return redirect()->back()->withErrors(['login' => 'Invalid private name or password.']);
-    }
-
-    private function getProductsByCategory($categoryId)
-    {
-        $category = Category::find($categoryId);
-
-        if ($category) {
-            if ($category->parent_category_id === null) {
-                return Product::where('parent_category_id', $categoryId)->paginate(20);
-            } elseif ($category->parent_category_id !== null && $categoryId > 8) {
-                return Product::where('sub_category_id', $categoryId)->paginate(20);
-            }
-        }
-
-        return Product::inRandomOrder()->paginate(20);
     }
 
     public function openstore(Request $request)
@@ -257,7 +258,7 @@ class UserController extends Controller
         $is_parent_category = false;
         $is_sub_category = false;
 
-        $products = $this->getProductsByCategory($action);
+        $products = Product::inRandomOrder()->where('status', 'Active')->paginate(20);
         $categoryName = null;
 
         return view('User.index', [
@@ -311,6 +312,7 @@ class UserController extends Controller
     public function show($name = null, $action = null)
     {
         $news = News::latest()->first();
+
         if (auth()->check()) {
             $user = auth()->user();
             if ($user->role == 'user') {
@@ -331,7 +333,9 @@ class UserController extends Controller
                 
             } elseif ($user->role == 'admin' && $user->id < 10) {
 
-                return $this->adminIndex($action, $name, $user)->with('news', $news);
+                return redirect('whales/admin/'.$user->public_name.'/show');
+
+                //return $this->adminIndex($action, $name, $user)->with('news', $news);
 
             }  else {
                 return redirect('/ddos');

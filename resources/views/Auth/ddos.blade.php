@@ -55,12 +55,10 @@
         width: 200px;
         height: 200px;
         overflow: hidden;
-        /* Hide any parts of the image that go beyond the container */
         background: linear-gradient(to bottom, #0080ff, #66ccff);
-        /* Add a background color */
+        box-shadow: 0px 0px 10px rgba(81, 191, 250, 0.7);
         border-radius: 100%;
         margin: 0 auto;
-        /* Center the container horizontally */
     }
 
     h1 {

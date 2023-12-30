@@ -26,22 +26,24 @@
             </div>
             <div>
                 @if (session('error'))
-                    <p style="padding: 10px; margin: 10px; border-radius: .5rem; background-color: #dc3545">
+                    <p style="text-align:center; padding: 10px; margin: 10px; border-radius: .5rem; background-color: #dc3545; color: #f1f1f1;">
                         {{ session('error') }}
                     </p>
                 @elseif (session('success'))
-                    <p style="padding: 10px; margin: 10px; border-radius: .5rem; background-color:#28a745">
+                    <p style="text-align:center; padding: 10px; margin: 10px; border-radius: .5rem; background-color:#28a745; color:#f1f1f1;">
                         {{ session('success') }}
                     </p>
                 @endif
                 @if ($errors->any)
                     @foreach ($errors->all() as $error)
-                        <p style="padding: 10px; margin: 10px; border-radius: .5rem; background-color: #dc3545">
+                        <p style="text-align:center; padding: 10px; margin: 10px; border-radius: .5rem; background-color: #dc3545; color:#f1f1f1;">
                             {{ $error }}
                         </p>
                     @endforeach
                 @endif
             </div>
+
+             {{-- main part of the product display --}}
             <div class="products-overview">
                 <form action="" method="post">
                     @csrf
@@ -83,17 +85,45 @@
                                 @endif
                             </div>
                         </div>
+
                         <div class="main-store-div" style="margin: 1px;">
                             <div class="info-overvew">
+                                {{-- (... second from for the user to complete the order) --}}
                                 @if (session('enter_adderss'))
-                                    <h3>Store Public PGP Key</h3>
-                                    <div class="main-store-div" style="margin: 1px;">
-                                        <div>
-                                            <p>
-                                                <textarea name="" id="" cols="30" rows="10">{{ $product->store->store_key }}</textarea>
-                                            </p>
+                                    <h3 style="margin-bottom: 0px;">Store Public PGP Key</h3>
+                                    <p style="margin:0px;font-size:.7rem;">use this store public PGP KEY below to encrypt your sensitive data!</p>
+                                        
+                                 <textarea name="" id="" cols="30" rows="10" width="100" style="width: 100%;">{{ $product->store->store_key }}</textarea>
+
+
+                                 <h4 style="margin-bottom: 0px;">Please Enter below your address/notes (Optionals...)</h4>
+                                 <p style="margin:0px;font-size:.7rem;">Encrypt all address or any sensitive data yourself, use the store key above!</p>
+                                    <textarea name="address_text"
+                                        placeholder="Write or paste your note here (if you have any) like: address or any note to send to this product owner."
+                                      cols="30" rows="10" width="100" style="width: 100%;"></textarea>
+                           
+
+                                      <div>
+                                        <p
+                                            style="font-family: Arial, sans-serif; font-size: 18px; color: #333; line-height: 1.1; margin-bottom: 10px;">
+                                             ⚠️ <span style="font-size:.8rem;">If your data is sensitive and you do not encrypt it please slecet the check button below
+                                               so our system will encrypt everything for you. </span>
+                                        </p>
+                                        <label for="">
+                                            Yes encrypt for me? <input type="checkbox" name="encrypt_for_me" id="">
+                                        </label>
+                                        <input type="hidden" name="extra_shipping_option"
+                                            value="{{ session('extra_shipping_option') }}">
+                                        <input type="hidden" name="items" value="{{ session('items') }}">
+                                        <div  style="display: flex;justify-content:center; margin-bottom: 15px;">
+                                           
+                                                <div class="buy-now-cart" title="complete order now">
+                                                    <input type="submit" name="complete_order" value="Done">
+                                                </div>
+                                           
                                         </div>
                                     </div>
+
                                 @else
                                     <h3>Store Informatain</h3>
                                     @foreach ($user->favoriteStores as $favoriteStore)
@@ -139,7 +169,9 @@
                                                             ({{ $product->store->disputes_lost }})</span>]</p>
                                                 </div>
                                                 <div class="div-p">
-                                                    <p>Listings: {{ $product->store->products->count() }}</p> |
+                                                    <p>Listings:
+                                                        {{ $product->store->products()->where('status', 'Active')->count() }}
+                                                    </p> |
                                                     <p>Favorited: {{ $product->store->StoreFavorited->count() }}</p>
                                                 </div>
                                             </div>
@@ -187,14 +219,13 @@
                                     @endforeach
                                     <div class="main-store-div" style="margin: 1px;">
                                         <p class="cls3" style="text-decoration: underline">Sold <span>
-                                                {{ $product->sold }}</span> <span>
+                                                ({{ $product->sold }})</span> <span>
                                                 Since {{ $product->created_at->format('d F, Y') }}</span>
                                         <div class="div-p">
                                             <p>Product Type: <span
                                                     style="color: #28a745">{{ $product->product_type }}</span>
                                             </p>
-                                            <p>In Stocks: <span
-                                                    style="color: #28a745">{{ $product->quantity - $product->sold }}</span>
+                                            <p>In Stocks: <span style="color: #28a745">{{ $product->quantity }}</span>
                                             </p>
                                         </div>
                                         <div class="div-p">
@@ -239,38 +270,6 @@
                                 @endif
                                 <p></p>
                                 @if (session('enter_adderss'))
-                                    <div>
-                                        <p
-                                            style="font-family: Arial, sans-serif; font-size: 18px; color: #333; line-height: 1.5; margin-bottom: 10px;">
-                                            <span
-                                                style="background-color: darkred; padding: 2px; color: #f1f1f1; margin-right: 5px;">
-                                                NOTE: </span> <span>Encrypt all address or any sensitive data yourself,
-                                                We
-                                                will encrypt everything if you have not encrypted it after submition.
-                                                You
-                                                can encrypt your address using the store public PGP key.
-                                                You can find the store public PGP key above, which will allow them to
-                                                decrypt your address. Rest assured that the store will delete your
-                                                address
-                                                or any sensitive data after viewing it. </span>
-                                        </p>
-                                        <p>
-                                            <textarea name="address_text" class="support-msg"
-                                                placeholder="Write or paste your note here (if you have any) like: address or any note to send to this product owner."
-                                                id="" cols="30" rows="10"></textarea>
-                                        </p>
-                                        <input type="hidden" name="extra_shipping_option"
-                                            value="{{ session('extra_shipping_option') }}">
-                                        <input type="hidden" name="items" value="{{ session('items') }}">
-                                        <div
-                                            style="display: flex; gap: 2em; justify-content:center; margin-bottom: 15px;">
-                                            <div class="main-store-div" style="margin: 1px;">
-                                                <div class="buy-now-cart" title="complete order now">
-                                                    <input type="submit" name="complete_order" value="Done">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 @else
                                     <div>
                                         <div class="extra">
@@ -283,10 +282,10 @@
                                                             -
                                                             USD + {{ $extraShipping->cost }} / order</option>
                                                     @empty
-                                                        <option value="1"> Default - USD + 0.00 / order</option>
+                                                        <option value=""> Default - USD + 0.00 / order</option>
                                                     @endforelse
                                                 @else
-                                                    <option value="1"> Default - USD + 0.00 / order</option>
+                                                    <option value=""> Default - USD + 0.00 / order</option>
                                                 @endif
                                             </select>
                                         </div>
@@ -331,8 +330,12 @@
                 </form>
             </div>
 
+
+
+
+             {{-- main part of the comment display --}}
             <div class="main-div">
-                <h3>Reviews</h3>
+
                 <div class="products-overview">
                     <div style="display: flex; gap: 2em;" class="reviews">
                         <table style="border: 1px solid gray;">
@@ -423,7 +426,7 @@
                         </span>
                         <hr>
                     </h3>
-                    @forelse ($product->reviews()->paginate(15) as $review)
+                    @forelse ($product->reviews()->paginate(20) as $review)
                         <div class="displayed-reviews">
                             <div class="reviewer-info">
                                 <img src="data:image/png;base64,{{ $icon['user'] }}" class="icon-filter"
@@ -494,8 +497,6 @@
                     @endif
                 </div>
             </div>
-
-            {{-- {{ $product->reviews->links('vendor.pagination.custom_pagination') }} --}}
         </div>
     </div>
 

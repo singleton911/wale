@@ -22,4 +22,8 @@ class Conversation extends Model
     public function participants(){
         return $this->hasMany(Participant::class);
     }
+
+    public function dispute(){
+        return $this->hasOne(Dispute::class);
+    }
 }

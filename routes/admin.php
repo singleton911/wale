@@ -1,65 +1,31 @@
 <?php
 
-use App\Http\Controllers\BugController;
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\DisputeController;
-use App\Http\Controllers\EscrowController;
-use App\Http\Controllers\FAQController;
-use App\Http\Controllers\FeaturedController;
-use App\Http\Controllers\MarketKeyController;
-use App\Http\Controllers\NewsController;
-use App\Http\Controllers\NewStoreController;
-use App\Http\Controllers\NotificationTypeController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\PromocodeController;
-use App\Http\Controllers\ReferralController;
-use App\Http\Controllers\ReplyController;
-use App\Http\Controllers\ReportController;
-use App\Http\Controllers\ReviewController;
-use App\Http\Controllers\ServerController;
-use App\Http\Controllers\StoreController;
-use App\Http\Controllers\SupportController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\WalletController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
-use Symfony\Component\Mime\MessageConverter;
 
-// Middleware group for 'user' role
-// Route::middleware(['role:admin'])->group(function () {
 
-    // Index routes
-    Route::get('/{users}', [UserController::class, 'index']);
-    Route::get('/{stores}', [StoreController::class, 'index']);
-    Route::get('/{products}', [ProductController::class, 'index']);
-    Route::get('/{reviews}', [ReviewController::class, 'index']);
-    Route::get('/{promotion}', [PromocodeController::class, 'index']);
-    Route::get('/{featured}', [FeaturedController::class, 'index']);
-    Route::get('/{orders}', [OrderController::class, 'index']);
-    Route::get('/{servers}', [ServerController::class, 'index']);
-    Route::get('/{wallets}', [WalletController::class, 'index']);
-    Route::get('/{supports}', [SupportController::class, 'index']);
-    Route::get('/{news}', [NewsController::class, 'index']);
-    Route::get('/{affiliates}', [ReferralController::class, 'index']);
-    Route::get('/{messages}', [MessageConverter::class, 'index']);
-    Route::get('/{carts}', [CartController::class, 'index']);
-    Route::get('/{categories}', [CategoryController::class, 'index']);
-    Route::get('/{disputes}', [DisputeController::class, 'index']);
-    Route::get('/{escrows}', [EscrowController::class, 'index']);
-    Route::get('/{new_stores}', [NewStoreController::class, 'index']);
-    Route::get('/{reports}', [ReportController::class, 'index']);
-    Route::get('/{replies}', [ReplyController::class, 'index']);
-    Route::get('/{faqs}', [FAQController::class, 'index']);
-    Route::get('/{bugs}', [BugController::class, 'index']);
-    Route::get('/{conversations}', [ConversationController::class, 'index']);
-    Route::get('/{market_keys}', [MarketKeyController::class, 'index']);
-    Route::get('/{notification_types}', [NotificationTypeController::class, 'index']);
 
-    // Create new resource routes
-    Route::get('/user/{name}/{user}',[UserController::class, 'showUser']);
 
-    // Show res
+Route::get('/whales/admin/{user}/show/{action?}', [AdminController::class, 'index']);
 
-// });
+// User Users
+Route::get('/whales/admin/show/user/{created_at}/{user}', [AdminController::class, 'user']);
+Route::post('/whales/admin/show/user/{created_at}/{user}', [AdminController::class, 'banUnbanUser']);
+
+// Store Stores
+Route::get('/whales/admin/show/new store/{created_at}/{new_store}', [AdminController::class, 'new_store']);
+Route::post('/whales/admin/show/new store/{created_at}/{new_store}', [AdminController::class, 'approveDeclineStore']);
+
+Route::get('/whales/admin/show/product/{created_at}/{product}', [AdminController::class, 'product']);
+
+// Support ticket
+Route::post('/whales/admin/{user}/show/support', [AdminController::class, 'joinSupport']);
+Route::get('/whales/admin/show/ticket/{created_at}/{conversation}', [AdminController::class, 'supportTicket']);
+Route::post('/whales/admin/show/ticket/{created_at}/{conversation}', [AdminController::class, 'seniorModUser']);
+
+
+// Disputes
+Route::get('/whales/admin/{user}/show/dispute/{created_at}/{dispute}', [DisputeController::class, 'disputeShow']);
+Route::post('/whales/admin/{user}/do/dispute/{created_at}/{dispute}', [DisputeController::class, 'disputeDo']);

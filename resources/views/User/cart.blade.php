@@ -20,7 +20,7 @@
             <p class="notifications-p">For any change made to the cart please try to update it, else changes will not
                 take
                 effect! <br>
-                Please encrypt all your address or any note for your own security, we check if you note is not encrypted
+                Please encrypt all your address or any note for your own security, we check if your note is not encrypted
                 and we do it for you but still please do it your self which is <span
                     style="background-color: yellow">highly
                     recommended!!!</span>
@@ -51,23 +51,25 @@
                 </thead>
                 <tbody style="font-family: Helvetica, sans-serif;">
                     @forelse ($user->carts as $cart)
-                        <form action="/cart/{{ $cart->id }}" method="post">
+                        <form action="/cart/{{ $user->public_name }}/{{ $cart->created_at->timestamp }}/{{ $cart->id }}" method="post">
                             @csrf
                             @method('patch')
                             <tr class="self-container">
                                 <td>
-                                    <img src="data:image/png;base64,{{ $icon['osint'] }}" width="70">
+                                    @php
+                                    $img1 = $cart->product->image_path1;
+                                @endphp
+                                <img
+                                    src="data:image/png;base64,{{ !empty($product_image[$img1]) ? $product_image[$img1] : $icon['default'] }}" width="50">
                                 </td>
-                                <input type="hidden" name="cart_id" value="{{ $cart->id }}">
-                                <input type="hidden" name="product_id" value="{{ $cart->product_id }}">
                                 <td><a
                                         href="/listing/{{ $cart->product->created_at->timestamp }}/{{ $cart->product->id }}">{{ Str::limit($cart->product->product_name, 3, '...') }}</a>
                                 </td>
                                 <td><input type="number" name="quantity" id="" min="1"
                                         value="{{ $cart->quantity }}"></td>
-                                <td>+{{ $cart->extraShipping->cost ?? '$0.00' }}</td>
+                                <td>+${{ $cart->extraShipping->cost ?? '0.00' }}</td>
                                 <td>${{ $cart->product->price }}</td>
-                                <td>$0.00
+                                <td>${{ $cart->discount }}
                                 </td>
                                 <td>
                                     <textarea name="note" id="" style="width:100%;"
@@ -84,8 +86,10 @@
                     @empty
 
                         <tr>
-                            <td colspan="5">
-                                <p class="no-notification">Cart is empty.</p>
+                            <td colspan="8">
+                                <span class="no-notification">
+                                    Your cart is currently empty. Explore our products and add items to enjoy a delightful shopping experience.
+                                </span>
                             </td>
                         </tr>
                     @endforelse
@@ -119,22 +123,14 @@
                             <td>${{ $user->carts->sum('extraShipping.cost') }}</td>
                         </tr>
                         <tr style="font-size: 0.8rem;">
-                            {{-- @php
-                                $discount_total = $user->usedPromocodes->where('cart_id', $cart->id)->first();
-                            @endphp
-                            @foreach ($discount_total->count as $discount)
-                                @if ($discount)
-                                    @php
-                                        $discount_total += $discount;
-                                    @endphp
-                                @endif
-                            @endforeach --}}
                             <td><strong>Discounts: </strong></td>
-                            <td>${{ $discount_total = 0 }}</td>
+                            <td>${{ $user->carts->sum('discount') }}</td>
+
                         </tr>
                         <tr style="font-size: 0.8rem;">
                             <td><strong>Total Cost USD: </strong></td>
-                            <td>${{ $user->carts->sum('extraShipping.cost') + $total }}</td>
+                            <td>${{ $user->carts->sum('extraShipping.cost') + ($total - $user->carts->sum('discount')) }}
+                            </td>
                         </tr>
                         <tr style="font-size: 0.8rem;">
                             <td><strong>Total Cost Monro: </strong></td>
@@ -144,25 +140,46 @@
                 </table>
                 <hr>
                 <form action="/apply/promocode" method="post">
-                    @if (session('validPromo'))
-                        <p style="color:green">{{ session('validPromo') }}</p>
+                    @if (session('promoSuccess'))
+                        <p style="color:green">
+                            {{ session('promoSuccess') }}
+                            <br>
+
+                        </p>
                     @endif
-                    @if (session('emptycart'))
-                        <p style="color:red">{{ session('emptycart') }}</p>
+
+                    @if (session('promoErrors'))
+                        <p style="color:red">
+                            {{ session('promoErrors') }}<br>
+                        </p>
                     @endif
-                    @if (session('alreadyused'))
-                        <p style="color:red">{{ session('alreadyused') }}</p>
-                    @endif
+
                     @if (session('invalidPromo'))
-                        <p style="color:red">{{ session('invalidPromo') }}</p>
+                        <p style="color:red">
+                            {{ session('invalidPromo') }}<br>
+                        </p>
                     @endif
+
+                    @if (session('emptycart'))
+                        <p style="color:red">
+                            {{ session('emptycart') }}<br>
+                        </p>
+                    @endif
+
                     @csrf
 
                     <div class="coupon-code" style="margin: 2em;">
-                        <input type="text" name="promocode" placeholder="Enter code: " pattern="[A-Za-z0-9]+"
-                            class="apply_now_copons_text" style="margin-bottom: 2em;">
-                        <input type="submit" name="action" class="apply_now_copons_btn" value="Apply Now">
+                        <input type="text" name="promocode" placeholder="Enter code: E.g., WHALESDAY" pattern="[A-Za-z0-9]+"
+                            class="apply_now_copons_text" style="margin-bottom: 1em;">
+                        <input type="submit" name="action" class="apply_now_copons_btn" value="Apply Now"> <br>
+                        <span style="font-size: 0.9rem; color: #4CAF50;">Important: Please ensure your cart is up to
+                            date before applying promo codes. Promo codes discount will be based on the current cart
+                            information.</span>
+
                     </div>
+                </form>
+                <form action="" method="post">
+                    @csrf
                     <div class="proceed-now">
                         <img src="data:image/png;base64,{{ $icon['xmr'] }}" width="20">
                         <input type="submit" name="checkout_cart" value="CheckOut Cart">

@@ -21,6 +21,6 @@ class CheckUserRole
         }
 
         // Redirect or respond with an error if the user doesn't have the required role
-        return abort(403);
+        return abort(404);
     }
 }

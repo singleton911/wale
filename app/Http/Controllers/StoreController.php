@@ -187,18 +187,20 @@ class StoreController extends Controller
     // Users actions on store dashboard in market
     public function checkAction(Request $request, $name, Store $store)
     {
-        $user_id  = auth()->user()->id;
+        $user  = auth()->user();
+        $storeFavorited   = $user->favoriteStores->where('store_id', $store->id)->first();
+        $blockedStore     = $user->blockedStores->where('store_id', $store->id)->first();
 
         if ($name === $store->store_name) {
-            if ($request->has('favorite_store')) {
+            if ($request->has('favorite_store') &&  $storeFavorited == null) {
                 $favoriteStore  = new FavoriteStore();
-                $favoriteStore->user_id = $user_id;
+                $favoriteStore->user_id = $user->id;
                 $favoriteStore->store_id = $store->id;
                 $favoriteStore->save();
                 return redirect('/favorite/f_store')->with('success', 'You have add a store to your favorite stores!');;
-            } elseif ($request->has('block_store')) {
+            } elseif ($request->has('block_store') &&  $blockedStore  == null) {
                 $blockStore  = new BlockStore();
-                $blockStore->user_id = $user_id;
+                $blockStore->user_id = $user->id;
                 $blockStore->store_id = $store->id;
                 $blockStore->save();
                 return redirect('/blocked/b_store')->with('success', 'You have add a store to your blocked stores!');
@@ -363,7 +365,6 @@ class StoreController extends Controller
         $dispute->escrow_id = $escrow_id;
         $dispute->order_id  = $order_id;
         $dispute->conversation_id = $conversation_id;
-        $dispute->status    = 'Awaiting User Reply';
         $dispute->save();
     }
 

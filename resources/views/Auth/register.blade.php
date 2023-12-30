@@ -44,7 +44,7 @@
                     pattern="[1-9]*" minlength="6" maxlength="6" required><br>
                 <span class="cls-1 secretCode-spn">Your secret code must <br> be between 6 and 6 digits in
                     length.</span><br>
-                <input type="text" name="referral_link" class="secretCode"
+                <input type="text" name="referred_link" class="secretCode"
                     placeholder="Referral Public Name (If you have)"><br><br>
                 <input type="password" class="password" name="password" placeholder="Password*" required><br>
                 <span class="cls-1 password-spn">Your Password must be at least 8 characters long and contain at least

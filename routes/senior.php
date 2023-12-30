@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DisputeController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\SeniorController;
 use Illuminate\Support\Facades\Route;
@@ -20,8 +21,11 @@ Route::post('/senior/staff/show/new store/{created_at}/{new_store}', [SeniorCont
 Route::get('/senior/staff/show/product/{created_at}/{product}', [SeniorController::class, 'product']);
 
 // Support ticket
-Route::post('/senior/staff/chernoh/show/support', [SeniorController::class, 'joinSupport']);
+Route::post('/senior/staff/{user}/show/support', [SeniorController::class, 'joinSupport']);
 Route::get('/senior/staff/show/ticket/{created_at}/{conversation}', [SeniorController::class, 'supportTicket']);
 Route::post('/senior/staff/show/ticket/{created_at}/{conversation}', [MessageController::class, 'seniorModUser']);
 
 
+// Disputes
+Route::get('/senior/staff/{user}/show/dispute/{created_at}/{dispute}', [DisputeController::class, 'disputeShow']);
+Route::post('/senior/staff/{user}/do/dispute/{created_at}/{dispute}', [DisputeController::class, 'disputeDo']);

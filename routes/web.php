@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\GeneralController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WalletController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+//Route::get('/monero/wallet/test/rpc', [WalletController::class, 'create']);
 
 // Other routes...
 Route::get('/ddos', function () {
@@ -39,6 +41,12 @@ Route::middleware(['role:store'])->group(function () {
     // Include store routes from store.php
     require_once('store.php');
 });
+
+Route::middleware(['role:share'])->group(function () {
+    // Include store routes from store.php
+    require_once('share.php');
+});
+
 
 Route::middleware(['role:junior'])->group(function () {
     // Include store routes from store.php

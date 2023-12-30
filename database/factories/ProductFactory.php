@@ -27,8 +27,6 @@ class ProductFactory extends Factory
         return [
             'store_id' => $storeId,
             'quantity' => $this->faker->numberBetween(1, 100),
-            'in_stocks' => $this->faker->numberBetween(0, 100),
-            'sold' => $this->faker->numberBetween(0, 50),
             'product_name' => $this->faker->sentence($this->faker->numberBetween(1, 8)),
             'product_description' => $this->faker->paragraph,
             'price' => $this->faker->randomFloat(2, 5, 500),

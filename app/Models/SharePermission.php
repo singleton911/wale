@@ -9,7 +9,9 @@ class SharePermission extends Model
 {
     use HasFactory;
 
+    protected $guarded = ['id'];
+
     public function shareAccess(){
-        return $this->belongsTo(ShareAccess::class);
+        return $this->hasOne(ShareAccess::class, 'share_access_id');
     }
 }

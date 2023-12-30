@@ -23,4 +23,12 @@ class Cart extends Model
     public function extraShipping(){
         return $this->belongsTo(ExtraOption::class, 'extra_option_id');
     }
+
+    public function cartUsedPromo(){
+        return $this->hasOne(UserPromos::class);
+    }
+
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
 }

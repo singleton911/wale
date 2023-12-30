@@ -9,7 +9,7 @@ class FavoriteListing extends Model
 {
     use HasFactory;
 
-    protected $guraded = ['id'];
+    protected $guarded = ['id'];
     
     public function product(){
         return $this->belongsTo(Product::class);

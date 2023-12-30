@@ -79,7 +79,7 @@
     <div class="ru">
         <span>Referred Users</span>
         <p>
-            {{ count($store->referrals) }}
+            {{ count($store->user->referrals) }}
         </p>
     </div>
     <div class="re">
@@ -109,7 +109,7 @@
             </tr>
         </thead>
         <tbody>
-            @forelse ($store->referrals()->paginate(100) as $referred)
+            @forelse ($store->user->referrals()->paginate(50) as $referred)
                 <tr>
                     <td>{{ $referred->referredUser->public_name }}</td>
                     <td>{{ $referred->balance }}</td>
@@ -123,5 +123,5 @@
             @endforelse
         </tbody>
     </table>
-    {{ $store->referrals()->paginate(100)->render('vendor.pagination.custom_pagination') }}
+    {{ $store->user->referrals()->paginate(50)->render('vendor.pagination.custom_pagination') }}
 </div>

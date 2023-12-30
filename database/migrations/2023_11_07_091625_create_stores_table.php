@@ -22,7 +22,6 @@ return new class extends Migration
             $table->integer('disputes_lost')->default(0);
             $table->integer('disputes_won')->default(0);
             $table->integer('products_count')->default(0);
-            $table->tinyInteger('trust_level')->unsigned()->default(1);
             $table->enum('status', ['active', 'vacation', 'banned', 'escalated'])->default('active');
             $table->text('selling');
             $table->text('ship_from');

@@ -102,8 +102,6 @@
                     <ul>
                         <li><a href="/open-store"><img src="data:image/png;base64,{{ $icon['add-store'] }}"
                                     class="icon-filter" width="25"> Open store</a></li>
-                        <li><a href="/team"><img src="data:image/png;base64,{{ $icon['group'] }}"
-                                    class="icon-filter" width="25"> Meet The Team</a></li>
                         <li><a href="/canary"> <img src="data:image/png;base64,{{ $icon['document'] }}"
                                     class="icon-filter" width="25"> Canary & PGP</a></li>
                         <li><a href="/faq"><img src="data:image/png;base64,{{ $icon['faq'] }}"

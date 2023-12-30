@@ -1,80 +1,94 @@
-{{-- @include('Store.news')
 <div class="latest-orders">
+    @if (session('success'))
+        <p style="color: green; text-align:center; margin:0px;">{{ session('success') }}</p>
+    @endif
     <div class="title-latest">
-        <h4>LATEST ORDERs</h4>
+        <h4>NEWEST STORE REQUEST ({{ $new_stores->count() }})</h4>
         <div class="view-latest">
-            <a href="/orders">VIEW ALL</a>
+            <a href="/senior/staff/{{ $user->public_name }}/show/new stores">VIEW ALL</a>
         </div>
     </div>
     <div>
         <table>
             <thead>
                 <tr>
-                    <th>Listing</th>
-                    <th>Buyer</th>
-                    <th>No. Items</th>
-                    <th>Time</th>
+                    <th>#ID</th>
+                    <th>Store Name</th>
+                    <th>Owner Name</th>
+                    <th>Created At</th>
+                    <th>Owner Last Seen</th>
                     <th>Status</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse ($store->orders()->orderBy('updated_at', 'desc')->paginate(5) as  $order)
-                <tr>
-
-                    <td>{{ $order->product->product_name }}</td>
-                    <td>{{ $order->user->public_name }}</td>
-                    <td>{{ $order->quantity }}</td>
-                    <td>{{ \Carbon\Carbon::parse($order->created_at)->diffForHumans() }}</td>
-                    <td class="order-status-cls">{{ $order->status }}</td>
-                    <td>
-                        <a href="/store/order/{{ $order->id }}" style="background-color: rgb(0, 75, 128); color: #f1f1f1; cursor:pointer; padding: 5px; border: none; border-radius: .5rem;">View</a>
-                    </td>
-
-                </tr>
-                @empty
+                @foreach ($dashboard_new_stores as $new_store)
                     <tr>
-                        <td colspan="6">Looks like you don't have any order yet.</td>
+                        <td>#{{ $new_store->id }}</td>
+                        <td>{{ $new_store->store_name }}</td>
+                        <td>{{ $new_store->user->public_name }}</td>
+                        <td>{{ $new_store->created_at->DiffForHumans() }}</td>
+                        <td>{{ $new_store->user->last_seen }}</td>
+                        <td class="{{ $new_store->user->store_status }}">{{ $new_store->user->store_status }}</td>
+                        <td>
+                            <form action="" method="post">
+                                @csrf
+                                <input type="hidden" name="new_store_id" value="{{ Crypt::encrypt($new_store->id) }}">
+
+                                <a href="/senior/staff/show/new store/{{ $new_store->created_at->timestamp }}/{{ $new_store->id }}"
+                                    style="font-size: .7rem; background-color: rgb(0, 75, 128); color: #f1f1f1; cursor:pointer; padding: 5px; border: none; border-radius: .5rem;">Review</a>
+                            </form>
+                        </td>
                     </tr>
-                @endforelse
+                @endforeach
             </tbody>
         </table>
+
     </div>
 </div>
 <div class="top-products">
     <div class="title-latest">
-        <h4>STORE TOP 5 PRODUCTS</h4>
+        <h4>NEWEST PRODUCTS ({{ $products->count() }})</h4>
         <div class="view-latest">
-            <a href="/store/{{ $store->store_name }}/products">VIEW ALL</a>
+            <a href="/senior/staff/{{ $user->public_name }}/show/products">VIEW ALL</a>
         </div>
     </div>
     <div>
         <table>
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Image</th>
+                    <th>#ID</th>
                     <th>Name</th>
-                    <th>Price</th>
-                    <th>Sales</th>
+                    <th>Store</th>
+                    <th>Created At</th>
+                    <th>Status</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse ($store->products()->orderBy('sold', 'desc')->paginate(5) as $product)
-                <tr>
-                    <td style="text-transform: uppercase;">#WM{{ strtotime($product->created_at) }}</td>
-                    <td class="product-img"><img src="'" alt="" srcset=""></td>
-                    <td>{{ $product->product_name }}</td>
-                    <td> {{ '$'.$product->price }}</td>
-                    <td>{{ $product->sold }}</td>
-                </tr>
-                @empty
+                @foreach ($dashboard_products as $product)
                     <tr>
-                        <td colspan="5">Looks like you don't have any active listings yet.</td>
+                        <td>#{{ $product->id }}</td>
+                        <td>{{ Str::limit($product->product_name, 20, '...') }}</td>
+                        <td>{{ $product->store->store_name }}</td>
+                        <td>{{ $product->created_at->DiffForHumans() }}</td>
+                        <td class="{{ $product->status }}">{{ $product->status }}</td>
+                        <td>
+                            <form action="" method="post">
+                                @csrf
+                                <input type="hidden" name="product_id" value="{{ Crypt::encrypt($product->id) }}">
+
+
+                                <a href="/senior/staff/show/product/{{ $product->created_at->timestamp }}/{{ $product->id }}"
+                                    style="font-size: .7rem; background-color: rgb(0, 75, 128); color: #f1f1f1; cursor:pointer; padding: 5px; border: none; border-radius: .5rem;">Review</a>
+
+                            </form>
+                        </td>
                     </tr>
-                @endforelse
+                @endforeach
             </tbody>
         </table>
+
+
     </div>
 </div>
-</div> --}}

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->integer('shipping_speed_rating'); // Rating for shipping speed (1 to 5)
             $table->integer('price_rating'); // Rating for price (1 to 5)
             $table->enum('feedback', ['positive', 'neutral', 'negative']); // Feedback type
+            $table->integer('order_id')->nullable();
             $table->text('comment')->nullable();
             $table->timestamps();
         

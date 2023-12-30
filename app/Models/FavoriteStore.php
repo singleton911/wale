@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class FavoriteStore extends Model
 {
     use HasFactory;
-
+    protected $guarded = ['id'];
     public function store(){
         return $this->belongsTo(Store::class);
     }

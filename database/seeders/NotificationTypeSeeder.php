@@ -46,7 +46,7 @@ class NotificationTypeSeeder extends Seeder
             ['name' => 'Private Mirror Added to Account', 'content' => 'A private mirror has been added to your account.', 'action' => 'added', 'icon' => 'mirror'],
         
             // Referral
-            ['name' => 'Referral Link Added to Account', 'content' => 'A referral link has been added to your account.', 'action' => 'added', 'icon' => 'referral'],
+            ['name' => 'Your Referral Link Used', 'content' => 'Your referral link has been used by a new user, thank you!.', 'action' => 'used', 'icon' => 'referral'],
             ['name' => 'Referral Payment Received', 'content' => 'You have received payment for a referral.', 'action' => 'received', 'icon' => 'referral'],
         
             // Listings

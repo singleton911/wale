@@ -2,6 +2,67 @@
 @if (session('success'))
     <p style="color: green; text-align:center; margin:0px;">{{ session('success') }}</p>
 @endif
+
+
+<table>
+    <thead>
+        <tr>
+            <th>Sort By</th>
+            <th>Number Of Rows</th>
+            <th>Status</th>
+            <th>Payment Type</th>
+            <th>Action Button</th>
+        </tr>
+    </thead>
+    <tbody>
+        <form action="/store/{{ $store->store_name }}/show/orders/search" method="get" style="text-align: center">
+            <tr>
+                <td>
+                    <select name="sort_by" id="sort_by">
+                        <option value="newest" {{ old('sort_by') == 'newest' ? 'selected' : '' }}>Newest</option>
+                        <option value="highest_quantity" {{ old('sort_by') == 'highest_quantity' ? 'selected' : '' }}>Highest Quantities</option>
+                        <option value="lowest_quantity" {{ old('sort_by') == 'lowest_quantity' ? 'selected' : '' }}>Lowest Quantities</option>
+                        <option value="oldest" {{ old('sort_by') == 'oldest' ? 'selected' : '' }}>Oldest</option>
+                    </select>
+                </td>
+                <td>
+                    <select name="number_of_rows" id="number_of_rows">
+                        <option value="50" {{ old('number_of_rows') == '50' ? 'selected' : '' }}>50</option>
+                        <option value="100" {{ old('number_of_rows') == '100' ? 'selected' : '' }}>100</option>
+                        <option value="150" {{ old('number_of_rows') == '150' ? 'selected' : '' }}>150</option>
+                        <option value="250" {{ old('number_of_rows') == '250' ? 'selected' : '' }}>250</option>
+                    </select>
+                </td>
+                <td>
+                    <select name="status" id="status">
+                        <option value="all" {{ old('status') == 'all' ? 'selected' : '' }}>All</option>
+                        <option value="pending" {{ old('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                        <option value="processing" {{ old('status') == 'processing' ? 'selected' : '' }}>Processing</option>
+                        <option value="shipped" {{ old('status') == 'shipped' ? 'selected' : '' }}>Shipped</option>
+                        <option value="delivered" {{ old('status') == 'delivered' ? 'selected' : '' }}>Delivered</option>
+                        <option value="dispute" {{ old('status') == 'dispute' ? 'selected' : '' }}>Dispute</option>
+                        <option value="sent" {{ old('status') == 'sent' ? 'selected' : '' }}>Sent</option>
+                        <option value="dispatched" {{ old('status') == 'dispatched' ? 'selected' : '' }}>Dispatched</option>
+                        <option value="cancelled" {{ old('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                        <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Completed</option>
+                    </select>
+                </td>                
+                <td>
+                    <select name="payment_type" id="">
+                        <option value="all" {{ old('payment_type') == 'all' ? 'selected' : '' }}>All</option>
+                        <option value="Escrow" {{ old('payment_type') == 'Escrow' ? 'selected' : '' }}>Escrow</option>
+                        <option value="FE" {{ old('payment_type') == 'FE' ? 'selected' : '' }}>FE</option>
+                    </select>
+                </td>
+                <td style="text-align: center; margin:0px; padding:0px;">
+                    <input type="submit" class="submit-nxt" style="width: max-content; margin:0px; padding:.5em;"
+                        value="Search">
+                </td>
+            </tr>
+        </form>
+    </tbody>
+</table>
+
 <div class="latest-orders">
     <div>
         <table>
@@ -17,7 +78,17 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse ($store->orders()->paginate(100)->sortByDesc('created_at') as  $order)
+                @php
+                    if (session()->has('orders')) {
+                        $orders = session('orders');
+                        $pag = false;
+                    } else {
+                        $orders = $store->orders()->paginate(50)->sortByDesc('updated_at');
+                        $pag = true;
+                    }
+                    
+                @endphp
+                @forelse ($orders as  $order)
                     <tr>
 
                         <td>{{ Str::limit($order->product->product_name, 30, '...') }}</td>
@@ -89,7 +160,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6">Looks like you don't have any order yet.</td>
+                        <td colspan="6">Looks like you don't have any order yet or the search you provided.</td>
                     </tr>
                 @endforelse
             </tbody>
@@ -97,5 +168,7 @@
     </div>
 </div>
 
-{{ $store->orders()->paginate(100)->render('vendor.pagination.custom_pagination') }}
+@if ($pag)
+{{ $store->orders()->paginate(50)->render('vendor.pagination.custom_pagination') }}
+@endif
 

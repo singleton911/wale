@@ -35,10 +35,6 @@ class User extends Model implements Authenticatable
         return $this->hasMany(Notification::class);
     }
 
-    public function userPromos(){
-        return $this->hasMany(UserPromos::class);
-    }
-
     public function blockedStores(){
         return $this->hasMany(BlockStore::class);
     }

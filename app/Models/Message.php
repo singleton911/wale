@@ -14,7 +14,7 @@ class Message extends Model
         return $this->belongsTo(Conversation::class);
     }
     public function status(){
-        return $this->hasMany(MessageStatus::class);
+        return $this->hasMany(MessageStatus::class, 'message_id');
     }
 
     public function user(){

@@ -30,4 +30,12 @@ class Order extends Model
     public function store(){
         return $this->belongsTo(Store::class);
     }
+
+    public function escrow(){
+        return $this->hasOne(Escrow::class);
+    }
+
+    public function review(){
+        return $this->hasOne(Review::class);
+    }
 }

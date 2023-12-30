@@ -7,7 +7,7 @@
         </div>
         <div class="name">
             <a href="/store/{{ $store->store_name }}/show"><span class="w">WHALES</span> <span
-                    class="m">STORE</span></a>
+                    class="m">/STORE</span></a>
         </div>
     </div>
     <div class="end-menus">

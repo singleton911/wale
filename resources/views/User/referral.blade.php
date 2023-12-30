@@ -73,7 +73,7 @@
 
         </p>
         <div class="rlink">
-            <span>Your Referral Link: </span>
+            <span>Your Referral code is your public name: <input type="text" name="" id="" value="{{ $user->public_name }}"></span>
         </div><br>
         <div class="rure">
             <div class="ru">

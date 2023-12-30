@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
+use App\Models\Product;
 
 class CategoryController extends Controller
 {
@@ -62,5 +63,47 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         //
+    }
+
+    public function parentCategoryProducts($created_at, Category $category){
+        if ($created_at == strtotime($category->created_at)) {
+            return view('User.category', [
+                'products' => Product::where('parent_category_id', $category->id)->where('status', 'Active')->paginate(20),
+                'user'  => auth()->user(),
+                'icon' => GeneralController::encodeImages(),
+                'product_image' => GeneralController::encodeImages('Product_Images'),
+                'upload_image' => GeneralController::encodeImages('Upload_Images'),
+                'action' => 'users',
+                'name' => 'Users',
+                'parentCategories' => Category::whereNull('parent_category_id')->get(),
+                'subCategories' => Category::whereNotNull('parent_category_id')->get(),
+                'categories' => Category::all(),
+                'is_parent_category' => true,
+                'is_sub_category' => false,
+                'categoryName' => $category->name,
+            ]);
+        }
+    }
+
+
+
+    public function subCategoryProducts($created_at, Category $category){
+        if ($created_at == strtotime($category->created_at)) {
+            return view('User.category', [
+                'products' => Product::where('sub_category_id', $category->id)->where('status', 'Active')->paginate(20),
+                'user'  => auth()->user(),
+                'icon' => GeneralController::encodeImages(),
+                'product_image' => GeneralController::encodeImages('Product_Images'),
+                'upload_image' => GeneralController::encodeImages('Upload_Images'),
+                'action' => 'users',
+                'name' => 'Users',
+                'parentCategories' => Category::whereNull('parent_category_id')->get(),
+                'subCategories' => Category::whereNotNull('parent_category_id')->get(),
+                'categories' => Category::all(),
+                'is_parent_category' => false,
+                'is_sub_category' => true,
+                'categoryName' => $category->name,
+            ]);
+        }
     }
 }

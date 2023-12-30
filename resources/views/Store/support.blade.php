@@ -44,13 +44,13 @@
   </thead>
   <tbody>
 
-      @forelse ($storeUser->supports as $ticket)
+      @forelse ($storeUser->supports()->paginate(50)->sortByDesc('updated_at'); as $ticket)
           <tr>
               <td><a
                       href="/store/{{ $store->store_name }}/show/messages/{{ $ticket->conversation->created_at->timestamp }}/{{ $ticket->conversation_id }}">#TWM_{{ $ticket->created_at->timestamp }}</a>
               </td>
-              <td class="{{ $ticket->staff != 0 ? $ticket->staff->role : '' }}">
-                  {{ $ticket->staff != 0 ? $ticket->staff->public_name : 'No Staff Yet' }}</td>
+              <td class="{{ $ticket->staff_id != 0 ? $ticket->staff->role : '' }}">
+                  {{ $ticket->staff_id != 0 ? $ticket->staff->public_name : 'No Staff Yet' }}</td>
               <td class="{{ $ticket->status }}">{{ $ticket->status }}</td>
               <td><a
                       href="/store/{{ $store->store_name }}/show/messages/{{ $ticket->conversation->created_at->timestamp }}/{{ $ticket->conversation_id }}">View</a>
@@ -64,3 +64,4 @@
       @endforelse
   </tbody>
 </table>
+{{ $store->supports()->paginate(50)->render('vendor.pagination.custom_pagination') }}

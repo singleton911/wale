@@ -12,7 +12,7 @@
 </head>
 
 <body>
-    @include('Store.navebar')
+    @include('Store.naveBar')
 
     <div class="container">
         <div class="main-div">

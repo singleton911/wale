@@ -65,7 +65,13 @@ class CategoryController extends Controller
         //
     }
 
-    public function parentCategoryProducts($created_at, Category $category){
+    public function parentCategoryProducts($created_at, Category $category)
+    {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/pgp/verify');
+        }
+
         if ($created_at == strtotime($category->created_at)) {
             return view('User.category', [
                 'products' => Product::where('parent_category_id', $category->id)->where('status', 'Active')->paginate(20),
@@ -87,7 +93,13 @@ class CategoryController extends Controller
 
 
 
-    public function subCategoryProducts($created_at, Category $category){
+    public function subCategoryProducts($created_at, Category $category)
+    {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/pgp/verify');
+        }
+
         if ($created_at == strtotime($category->created_at)) {
             return view('User.category', [
                 'products' => Product::where('sub_category_id', $category->id)->where('status', 'Active')->paginate(20),

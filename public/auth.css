@@ -1,6 +1,4 @@
-html {
-    background-color: rgb(239, 242, 245);
-  }
+
   .container {
     height: fit-content;
     display: block;
@@ -14,7 +12,7 @@ html {
     position: relative;
     height: fit-content;
     width: calc(100vw - 65%);
-    background-color: white;
+    background-color: rgb(2, 21, 40);
     justify-content: center;
     align-items: center;
     margin: auto;
@@ -95,13 +93,17 @@ html {
     width: 100%;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 20px;
-    color: #444;
+    color: #cdcbcb;
     outline: none;
-    background-color: white;
+    background-color: rgb(43, 43, 64);
     border: none;
     border-radius: 0.5rem;
-    border: 1px solid darkgray;
     box-sizing: border-box;
+    border: none;
+    box-shadow: 0 1px 1px 0 rgba(48, 48, 48, 0.3),
+    0 1px 3px 1px rgba(48, 48, 48, 0.15);
+    offset: none;
+    outline: none;
   }
   #capatcha-code-img {
     display: flex;
@@ -136,11 +138,9 @@ html {
   input[type="number"]:hover,
   input[type="password"]:hover,
   #captcha:hover {
-    border: none;
-    box-shadow: 0 1px 1px 0 rgba(48, 48, 48, 0.3),
-    0 1px 3px 1px rgba(48, 48, 48, 0.15);
     offset: none;
     outline: none;
+    border: 1px solid darkgray;
   }
   input[type="text"]:focus,
   input[type="number"]:focus,
@@ -154,7 +154,7 @@ html {
   button{
       outline: none;
       border: none;
-      background-color: white;
+      background-color: rgb(2, 21, 40);
       margin-top: .5em;
       justify-content: center;
       align-items: center;
@@ -180,6 +180,7 @@ html {
     text-align: center;
     font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
       "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+      color: #666;
   }
   .no-account > a {
     font-size: 18px;
@@ -239,3 +240,165 @@ html {
       width: 95%;
     }
   }
+
+ 
+
+
+
+
+  .countdown {
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    counter-reset: my-count 30; 
+    animation: countdown 60s linear 1;
+    overflow: hidden;
+    margin: 0px .4em;
+    &::after {
+      content: counter(my-count);
+      font-size: 1.3rem; 
+    }
+  }
+  
+  @keyframes countdown {
+    0% {
+      color: hsl(90, 100%, 20%);
+    }
+    3.3% {
+      counter-increment: my-count -1;
+      color: hsl(90, 100%, 20%);
+    }
+    6.6% {
+      counter-increment: my-count -2;
+      color: hsl(90, 100%, 20%);
+    }
+    9.9% {
+      counter-increment: my-count -3;
+      color: hsl(90, 100%, 20%);
+    }
+    13.2% {
+      counter-increment: my-count -4;
+      color: hsl(90, 100%, 20%);
+    }
+    16.5% {
+      counter-increment: my-count -5;
+      color: hsl(90, 100%, 20%);
+    }
+    19.8% {
+      counter-increment: my-count -6;
+      color: hsl(90, 100%, 20%);
+    }
+    23.1% {
+      counter-increment: my-count -7;
+      color: hsl(90, 100%, 20%);
+    }
+    26.4% {
+      counter-increment: my-count -8;
+      color: hsl(90, 100%, 20%);
+    }
+    29.7% {
+      counter-increment: my-count -9;
+      color: hsl(90, 100%, 20%);
+    }
+    33% {
+      counter-increment: my-count -10;
+      color: hsl(90, 100%, 20%);
+    }
+
+
+
+    36.3% {
+      counter-increment: my-count -11;
+      color: hsl(90, 100%, 20%);
+    }
+    39.6% {
+      counter-increment: my-count -12;
+      color: hsl(90, 100%, 20%);
+    }
+    42.9% {
+      counter-increment: my-count -13;
+      color: hsl(90, 100%, 20%);
+    }
+    46.2% {
+      counter-increment: my-count -14;
+      color: hsl(90, 100%, 20%);
+    }
+    49.5% {
+      counter-increment: my-count -15;
+      color: hsl(90, 100%, 20%);
+    }
+    52.8% {
+      counter-increment: my-count -16;
+      color: hsl(90, 100%, 20%);
+    }
+    56.1% {
+      counter-increment: my-count -17;
+      color: hsl(90, 100%, 20%);
+    }
+    59.4% {
+      counter-increment: my-count -18;
+      color: hsl(90, 100%, 20%);
+    }
+    62.7% {
+      counter-increment: my-count -19;
+      color: hsl(90, 100%, 20%);
+    }
+    66% {
+      counter-increment: my-count -20;
+      color: hsl(90, 100%, 20%);
+    }
+
+
+
+
+
+    69.3% {
+      counter-increment: my-count -21;
+      color: hsl(0, 98%, 51%);
+    }
+    72.6% {
+      counter-increment: my-count -22;
+      color: hsl(0, 98%, 51%);
+    }
+    75.9% {
+      counter-increment: my-count -23;
+      color: hsl(0, 98%, 51%);
+    }
+    79.2% {
+      counter-increment: my-count -24;
+      color: hsl(0, 98%, 51%);
+    }
+    82.5% {
+      counter-increment: my-count -25;
+      color: hsl(0, 98%, 51%);
+    }
+    85.8% {
+      counter-increment: my-count -26;
+      color: hsl(0, 98%, 51%);
+    }
+    89.1% {
+      counter-increment: my-count -27;
+      color: hsl(0, 98%, 51%);
+    }
+    92.4% {
+      counter-increment: my-count -28;
+      color: hsl(0, 98%, 51%);
+    }
+    95.7% {
+      counter-increment: my-count -29;
+      color: hsl(0, 98%, 51%);
+    }
+    99% {
+      counter-increment: my-count -30;
+      color: hsl(0, 98%, 51%);
+    }
+    100% {
+      content: 'Page Expired';
+      color: hsl(0, 98%, 51%);
+      animation: none;
+    }
+  }
+  
+  
+  

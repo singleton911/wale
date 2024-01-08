@@ -10,33 +10,45 @@
                 <span>BTC/USD: <span class="usd">$0.00</span></span>
                 <span>XMR/USD: <span class="usd">$0.00</span></span>
             </div>
-
         </div>
+
+        @if ($errors->any())
+            @foreach ($errors->all() as $error)
+                <p style="color: red; text-align:center;">{{ $error }}</p>
+            @endforeach
+        @endif
+
+        @if (session('success'))
+            <p style="color: green; text-align: center;">{{ session('success') }}</p>
+        @endif
+
         <div class="top-div">
             @include('User.categories')
+
+
+
+
             <div>
-
-
                 <div class="categories search-div">
                     @if (session('advance_search'))
                         <h3>Advance Search Listings/Stores ℹ️<br>
-                            
+
                         </h3>
-                        
                     @else
                         <h3>Quick Search Listings
                             <form action="/search" method="get" class="search-form" style="padding: .5em;">
-                               @csrf
-                                <button type="submit" name="advance-search" style="margin:0px;" class="search-button">Go Advance
+                                @csrf
+                                <button type="submit" name="advance-search" style="margin:0px;"
+                                    class="search-button">Go Advance
                                     Search</button>
                             </form>
                         </h3>
                     @endif
 
                     <form action="/search" method="get" class="search-form">
-                      @csrf
+                        @csrf
                         <input type="text" class="search_name" name="pn"
-                            placeholder="Quick search with product name..." value="">
+                            placeholder="Quick search with product name...">
                         <div class="price-range">
                             Price:
                             <input type="number" name="pf" min="0" placeholder="min $0.0" id="price-input"
@@ -45,7 +57,7 @@
                                 value="">
                         </div>
                         @if (session('advance_search'))
-                        {{-- <p>NOTE: search store mean getting only the store and it products (only enter the store name)!</p> --}}
+                            {{-- <p>NOTE: search store mean getting only the store and it products (only enter the store name)!</p> --}}
                             <div class="price-range">
                                 Location:
                                 <input type="text" name="sf" placeholder="Ship from...." id="price-input"
@@ -128,13 +140,13 @@
             </div>
         @endif
 
-        <div class="listing-name">
+        {{-- <div class="listing-name">
             <h3 style="color: #f5a623;">Sticky Listings</h3>
         </div>
 
         <div class="products-grid">
             <p style="padding:0px; margin:0px;">No sticky listing yet...</p>
-        </div>
+        </div> --}}
 
 
         <div class="listing-name">

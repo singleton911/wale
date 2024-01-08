@@ -22,6 +22,10 @@ class BugController extends Controller
      */
     public function create()
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/pgp/verify');
+        }
         $user = auth()->user();
         return view('User.bugs', [
             'user' => $user,
@@ -37,6 +41,11 @@ class BugController extends Controller
      */
     public function store(StoreBugRequest $request)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/store/pgp/verify');
+        }
+
         $newBug = new Bug();
         $newBug->user_id  = auth()->user()->id;
         $newBug->type = $request->type;

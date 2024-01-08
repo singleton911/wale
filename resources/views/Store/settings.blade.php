@@ -18,9 +18,6 @@
          <label for="store_description" class="form-label">Store Description (Bio):</label>
          <textarea id="store_description" class="form-textarea" name="store_description" required placeholder="Store bio...">{{ $store->store_description }}</textarea>
      
-         <label for="store_description" class="form-label">Store PGP key:</label>
-         <textarea id="store_pgp" name="store_pgp"  class="form-textarea" required placeholder="-----BEGIN PGP PUBLIC KEY BLOCK-----        -----END PGP PUBLIC KEY BLOCK-----">{{ $store->store_pgp }}</textarea>
-     
          <label for="store_description" class="form-label">Selling:</label>
          <textarea id="store_pgp" name="selling"  class="form-textarea" required placeholder="Selling">{{ $store->selling }}</textarea>
      

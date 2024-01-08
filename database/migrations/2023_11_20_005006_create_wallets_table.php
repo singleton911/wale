@@ -14,17 +14,16 @@ return new class extends Migration
         Schema::create('wallets', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onUpdate('cascade')->onDelete('cascade');
-            $table->string('address')->unique();
             $table->text('seed');
-            $table->decimal('balance', 18, 12)->default(0); 
+            $table->decimal('balance', 18, 2)->default(0); 
             $table->string('private_key');
             $table->string('public_key');
+            $table->string('type')->default('user');
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
 
             // Indexes
             $table->index('user_id');
-            $table->index('address');
         });
     }
 

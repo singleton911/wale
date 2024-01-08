@@ -50,6 +50,10 @@ class OrderController extends Controller
      */
     public function show($created_at, Order $order)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/pgp/verify');
+        }
         $user   = auth()->user();
         if (strtotime($order->created_at) == $created_at) {
             return view('User.orderViews', [
@@ -72,6 +76,11 @@ class OrderController extends Controller
 
     public function showStoreOrder($store, $created_at, Order $order)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/store/pgp/verify');
+        }
+
         $store = auth()->user()->store;
         if (strtotime($order->created_at) == $created_at) {
             return view('Store.orderView', [
@@ -172,82 +181,10 @@ class OrderController extends Controller
 
     //         return redirect()->back()->with('success', 'Order completed successfully!');
     //     } elseif ($request->has('partial_refund')) {
-    //         return redirect()->back()->with('partial_refund_form', true);
-    //     } elseif ($request->has('review_form')) {
 
-    //         $request->validate([
-    //             'review_type' => 'required|in:positive,neutral,negative',
-    //             'comment'    => 'required|string|min:3|max:2000',
-    //             'communication_rating' => 'required|between:1,5|integer',
-    //             'product_rating'  => 'required|between:1,5|integer',
-    //             'shipping_speed_rating'  => 'required|between:1,5|integer',
-    //             'price_rating'  => 'required|between:1,5|integer'
-    //         ]);
 
-    //         if ($order->review == null) {
-    //             $review = new Review();
-    //         } else if ($order->review != null && now()->diffInDays($order->updated_at) <= 5) {
-    //             $review = Review::where('order_id', $order->id)->first();
-    //         }
-    //         $review->user_id = $user->id;
-    //         $review->product_id = $order->product_id;
-    //         $review->store_id = $order->store_id;
-    //         $review->communication_rating = $request->communication_rating;
-    //         $review->product_rating = $request->product_rating;
-    //         $review->shipping_speed_rating = $request->shipping_speed_rating;
-    //         $review->price_rating = $request->price_rating;
-    //         $review->feedback = $request->review_type;
-    //         $review->comment  = $request->comment;
-    //         $review->order_id = $order->id;
-    //         $review->save();
 
-    //         return redirect()->back();
-    //     } elseif ($request->has('user_partial_percent') && $request->has('store_partial_percent')) {
-    //         $request->validate(
-    //             ['user_partial_percent' => 'required|integer|between:1,100'],
-    //             ['store_partial_percent' => 'required|integer|between:1,100'],
-    //         );
-    //         if ($order->dispute->store_refund_accept != 0) {
-    //             return redirect()->back()->with('percentage_error', 'Partial System Error: Stop Modifiying the dispute!!!');
-    //         }
-    //         $total = $request->user_partial_percent + $request->store_partial_percent;
-    //         if ($total == 100) {
 
-    //             $order->dispute->store_partial_percent = $request->store_partial_percent;
-    //             $order->dispute->user_partial_percent = $request->user_partial_percent;
-    //             $order->dispute->user_refund_accept = 1;
-    //             $order->dispute->refund_initiated = 'User';
-    //             $order->dispute->status = 'Partial Refund';
-    //             $order->dispute->save();
-
-    //             return redirect()->back();
-    //         } else {
-    //             return redirect()->back()->with('percentage_error', 'Partial System Error: The total percentage for you and the store must be equal to 100%!!!');
-    //         }
-    //     }elseif ($request->has('request_staff')) {
-    //         $order->dispute->mediator_request = 1;
-    //         $order->dispute->save();
-
-    //         return redirect()->back()->with('success', "The staff members has been notified please patient a while let a staff join the dispute process.");
-    //     }elseif ($request->has('accept_store_fund')) {
-
-    //         if ($order->dispute->user_partial_percent < 50) {
-    //             $order->dispute->winner = 'store';
-
-    //         } elseif ($order->dispute->store_partial_percent < 50) {
-    //             $order->dispute->winner = 'user';
-
-    //         } elseif ($order->dispute->store_partial_percent == 50){
-    //             $order->dispute->winner = 'both';
-
-    //         }
-
-    //         $order->dispute->user_refund_accept = 1;
-    //         $order->dispute->status = 'closed';
-    //         $order->dispute->save();
-
-    //         return redirect()->back()->with('success', "The staff members has been notified please patient a while let a staff join the dispute process.");
-    //     }
 
     //     return abort(404);
     // }
@@ -291,6 +228,11 @@ class OrderController extends Controller
 
     public function addStoreNote(Request $request, $store, $created_at, Order $order)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/store/pgp/verify');
+        }
+
         if ($store == $order->store->store_name  && $created_at == strtotime($order->created_at)) {
             $request->validate(['store_note' => 'required|min:3|max:5000']);
             $order->store_notes = $request->store_note;
@@ -346,8 +288,7 @@ class OrderController extends Controller
                 return redirect()->back();
             }
 
-            $this->cancelOrder($request, $order);
-
+            return $this->cancelOrder($request, $order);
         } elseif ($request->has('dispute')) {
             if ($order->status == 'pending' || $order->status == 'completed' || $order->status == 'dispute') {
                 $this->logUnauthorizedAttempt($request, 'order is completed, disputed or pending and try to dispute.');
@@ -355,7 +296,6 @@ class OrderController extends Controller
             }
 
             return $this->disputeOrder($request, $order);
-
         } elseif ($request->has('dispute_form')) {
             if ($order->dispute == null) {
                 $this->logUnauthorizedAttempt($request, 'order dispute doesnt exist and try to submit form.');
@@ -368,23 +308,20 @@ class OrderController extends Controller
             }
 
             return $this->createDisputeMessage($request, $order);
-
         } elseif ($request->has('release')) {
             if ($order->status == 'dispute' || $order->status == 'completed') {
                 $this->logUnauthorizedAttempt($request, 'order try to release funds for disputed or completed order.');
                 return redirect()->back();
             }
 
-           return $this->releaseOrderFunds($request, $order);
-
+            return $this->releaseOrderFunds($request, $order);
         } elseif ($request->has('new_message')) {
             if ($order->status != 'dispute' || $order->dispute->status == 'closed') {
                 $this->logUnauthorizedAttempt($request, 'Order dispute closed or there is no dispute but try to send message.');
             }
 
             return redirect()->back()->with('new_message', true);
-
-        }  elseif ($request->has('partial_refund')) {
+        } elseif ($request->has('partial_refund')) {
             if ($order->dispute === null || $order->dispute->status == 'Partial Refund') {
                 $this->logUnauthorizedAttempt($request, 'order try to start a Partial Refund while dispute is in Partial Refund.');
                 return redirect()->back();
@@ -395,40 +332,50 @@ class OrderController extends Controller
                 return redirect()->back();
             }
 
-            $this->PartialRefundRequest($request, $order);
-
+            return $this->PartialRefundRequest($request, $order);
         } elseif ($request->has('review_form')) {
 
-            if ($order->status == 'completed') {
+            if ($order->status != 'completed' || $order->product->payment_type != "FE") {
+                $this->logUnauthorizedAttempt($request, 'order review not valid order not completed or fe.');
                 return redirect()->back();
             }
-            $this->createReview($request, $order);
 
+            if (now()->diffInDays($order->updated_at) > 5) {
+                $this->logUnauthorizedAttempt($request, 'order review not valid order updated more than 5 days a go.');
+                return redirect()->back();
+            }
+
+            return $this->createReview($request, $order);
         } elseif ($request->has('request_staff')) {
 
             if ($order->dispute === null || $order->dispute->mediator_request == 1) {
-            $this->logUnauthorizedAttempt($request, 'order try to request mode while mod has been requested.');
+                $this->logUnauthorizedAttempt($request, 'order try to request mode while mod has been requested.');
                 return redirect()->back();
             }
-            $this->requestStaffMediation($request, $order);
 
+            return $this->requestStaffMediation($request, $order);
         } elseif ($request->has('accept_store_fund')) {
 
             if (($order->dispute->refund_initiated == 'User' || $order->dispute->refund_initiated == 'none')) {
-            $this->logUnauthorizedAttempt($request, 'order try to accept store funds while refund initiated by user or none.');
+                $this->logUnauthorizedAttempt($request, 'order try to accept store funds while refund initiated by user or none.');
                 return redirect()->back();
             }
-            $this->acceptStoreFunds($request, $order);
-        }elseif ($request->has('user_partial_percent') && $request->has('store_partial_percent')){
+
+            return $this->acceptStoreFunds($request, $order);
+        } elseif ($request->has('user_partial_percent') && $request->has('store_partial_percent')) {
 
             if (($order->dispute->refund_initiated != 'none')) {
                 $this->logUnauthorizedAttempt($request, 'order try to initiate partial percentage while it been iniataited.');
-                    return redirect()->back();
-                }
+                return redirect()->back();
+            }
 
-            $this->partialPercentage($request, $order);
+            $request->validate(
+                ['user_partial_percent' => 'required|integer|between:1,100'],
+                ['store_partial_percent' => 'required|integer|between:1,100'],
+            );
 
-        }else {
+            return $this->partialPercentage($request, $order);
+        } else {
             $this->logUnauthorizedAttempt($request, 'order 404 something went wrong.');
             return abort(404);
         }
@@ -440,64 +387,63 @@ class OrderController extends Controller
     private function cancelOrder(UpdateOrderRequest $request, Order $order)
     {
         // ... (Logic for canceling the order)
-            $notificationType = NotificationType::where('action', 'cancelled')->where('icon', 'order')->first();
+        $notificationType = NotificationType::where('action', 'cancelled')->where('icon', 'order')->first();
 
-            if ($notificationType) {
-                NotificationController::create(null, null, $notificationType->id, $order->id);
-                NotificationController::create($order->product->store->user_id, null, $notificationType->id, $order->id);
-            }
-            $order->status = 'cancelled';
-            $order->save();
-            return redirect()->back();
+        if ($notificationType) {
+            NotificationController::create(null, null, $notificationType->id, $order->id);
+            NotificationController::create($order->product->store->user_id, null, $notificationType->id, $order->id);
+        }
+        $order->status = 'cancelled';
+        $order->save();
+        return redirect()->back();
     }
 
     private function disputeOrder(UpdateOrderRequest $request, Order $order)
     {
         $user = auth()->user();
         // ... (Logic for disputing the order)
-            $notificationType = NotificationType::where('action', 'dispute')->where('icon', 'order')->first();
+        $notificationType = NotificationType::where('action', 'dispute')->where('icon', 'order')->first();
 
-            if ($notificationType) {
-                NotificationController::create(null, null, $notificationType->id, $order->id);
-                NotificationController::create($order->product->store->user_id, null, $notificationType->id, $order->id);
-            }
+        if ($notificationType) {
+            NotificationController::create(null, null, $notificationType->id, $order->id);
+            NotificationController::create($order->product->store->user_id, null, $notificationType->id, $order->id);
+        }
 
-            $order->status = 'dispute';
-            $order->save();
-            // create conversation for dispute
-            $conversation = new Conversation();
-            $conversation->topic = "New dispute created";
-            $conversation->save();
+        $order->status = 'dispute';
+        $order->save();
+        // create conversation for dispute
+        $conversation = new Conversation();
+        $conversation->topic = "New dispute created";
+        $conversation->save();
 
-            // Particippants
-            $participants = new Participant();
-            $participants->user_id = $user->id;
-            $participants->conversation_id = $conversation->id;
-            $participants->save();
+        // Particippants
+        $participants = new Participant();
+        $participants->user_id = $user->id;
+        $participants->conversation_id = $conversation->id;
+        $participants->save();
 
-            $participants = new Participant();
-            $participants->user_id = $order->product->store->user_id;
-            $participants->conversation_id = $conversation->id;
-            $participants->save();
+        $participants = new Participant();
+        $participants->user_id = $order->product->store->user_id;
+        $participants->conversation_id = $conversation->id;
+        $participants->save();
 
-            // create the dispute now
-            $dispute = new Dispute();
-            $dispute->order_id = $order->id;
-            $dispute->escrow_id = $order->escrow != null ? $order->escrow->id : null;
-            $dispute->conversation_id = $conversation->id;
-            $dispute->save();
+        // create the dispute now
+        $dispute = new Dispute();
+        $dispute->order_id = $order->id;
+        $dispute->escrow_id = $order->escrow != null ? $order->escrow->id : null;
+        $dispute->conversation_id = $conversation->id;
+        $dispute->save();
 
-            return redirect()->back();
+        return redirect()->back();
     }
 
     private function createDisputeMessage(UpdateOrderRequest $request, Order $order)
     {
         // ... (Logic for creating a dispute message)
-            $data = $request->validate(['contents' => 'required|string|min:2|max:1000']);
-            $dispute = Dispute::where('order_id', $order->id)->first();
-            $this->createMessage($data, $dispute->conversation_id);
-            return redirect()->back();
-
+        $data = $request->validate(['contents' => 'required|string|min:2|max:1000']);
+        $dispute = Dispute::where('order_id', $order->id)->first();
+        $this->createMessage($data, $dispute->conversation_id);
+        return redirect()->back();
     }
 
     // private function releaseOrderFunds(UpdateOrderRequest $request, Order $order)
@@ -588,145 +534,203 @@ class OrderController extends Controller
     private function PartialRefundRequest(UpdateOrderRequest $request, Order $order)
     {
         // ... (Logic for handling partial refund request)
-
+        return redirect()->back()->with('partial_refund_form', true);
     }
 
     private function createReview(UpdateOrderRequest $request, Order $order)
     {
         // ... (Logic for creating a review)
+        $user = auth()->user();
+
+        $request->validate([
+            'review_type' => 'required|in:positive,neutral,negative',
+            'comment'    => 'required|string|min:3|max:2000',
+            'communication_rating' => 'required|between:1,5|integer',
+            'product_rating'  => 'required|between:1,5|integer',
+            'shipping_speed_rating'  => 'required|between:1,5|integer',
+            'price_rating'  => 'required|between:1,5|integer'
+        ]);
+
+        if ($order->review == null) {
+            $review = new Review();
+        } else if ($order->review != null && now()->diffInDays($order->updated_at) <= 5) {
+            $review = Review::where('order_id', $order->id)->first();
+        }
+        $review->user_id = $user->id;
+        $review->product_id = $order->product_id;
+        $review->store_id = $order->store_id;
+        $review->communication_rating = $request->communication_rating;
+        $review->product_rating = $request->product_rating;
+        $review->shipping_speed_rating = $request->shipping_speed_rating;
+        $review->price_rating = $request->price_rating;
+        $review->feedback = $request->review_type;
+        $review->comment  = $request->comment;
+        $review->order_id = $order->id;
+        $review->save();
+
+        return redirect()->back();
     }
 
     private function requestStaffMediation(UpdateOrderRequest $request, Order $order)
     {
         // ... (Logic for requesting staff mediation)
+        $order->dispute->mediator_request = 1;
+        $order->dispute->save();
+
+        return redirect()->back()->with('success', "The staff members has been notified please patient a while let a staff join the dispute process.");
     }
 
     private function acceptStoreFunds(UpdateOrderRequest $request, Order $order)
     {
         // ... (Logic for accepting store funds in a dispute)
+        if ($order->dispute->user_partial_percent < 50) {
+            $order->dispute->winner = 'store';
+        } elseif ($order->dispute->store_partial_percent < 50) {
+            $order->dispute->winner = 'user';
+        } elseif ($order->dispute->store_partial_percent == 50) {
+            $order->dispute->winner = 'both';
+        }
+
+        $order->dispute->user_refund_accept = 1;
+        $order->dispute->status = 'closed';
+        $order->dispute->save();
+
+        return redirect()->back()->with('success', "The staff members has been notified please patient a while let a staff join the dispute process.");
     }
 
 
     private function partialPercentage(UpdateOrderRequest $request, Order $order)
     {
         // ... (Logic for accepting store funds in a dispute)
+        $total = $request->user_partial_percent + $request->store_partial_percent;
+        if ($total == 100) {
+
+            $order->dispute->store_partial_percent = $request->store_partial_percent;
+            $order->dispute->user_partial_percent = $request->user_partial_percent;
+            $order->dispute->user_refund_accept = 1;
+            $order->dispute->refund_initiated = 'User';
+            $order->dispute->status = 'Partial Refund';
+            $order->dispute->save();
+
+            return redirect()->back();
+        } else {
+            return redirect()->back()->with('percentage_error', 'Partial System Error: The total percentage for you and the store must be equal to 100%!!!');
+        }
     }
 
     private function logUnauthorizedAttempt(Request $request, $title)
     {
         // Log unauthorized attempt if 'completed' action is present
-            $unauthorize = new Unauthorize();
-            $unauthorize->user_id = auth()->user()->id;
-            $unauthorize->title = $title;
-            $unauthorize->content = "Your request has been sent to admin to violate the website rules by editing the form to complete the order!";
-            $unauthorize->url = $request->path();
-            $unauthorize->role = auth()->user()->role;
-            $unauthorize->save();
+        $unauthorize = new Unauthorize();
+        $unauthorize->user_id = auth()->user()->id;
+        $unauthorize->title = $title;
+        $unauthorize->content = "Your request has been sent to admin to violate the website rules by editing the form to complete the order!";
+        $unauthorize->url = $request->path();
+        $unauthorize->role = auth()->user()->role;
+        $unauthorize->save();
     }
 
     private function releaseOrderFunds(UpdateOrderRequest $request, Order $order)
-{
-    $this->updateOrderStatus($order);
-    $this->sendNotifications($order);
-    $this->updateProductSales($order);
-    $this->updateUserDetails($order);
-    $this->handleReferrals($order);
-    $this->releaseEscrowFunds($order);
-    $this->updateStoreBalance($order);
-    $this->updateStoreSales($order);
-    $this->handleDisputeIfAny($order);
+    {
+        $this->updateOrderStatus($order);
+        $this->sendNotifications($order);
+        $this->updateProductSales($order);
+        $this->updateUserDetails($order);
+        $this->handleReferrals($order);
+        $this->releaseEscrowFunds($order);
+        $this->updateStoreBalance($order);
+        $this->updateStoreSales($order);
+        $this->handleDisputeIfAny($order);
 
-    return redirect()->back()->with('success', 'Order completed successfully!');
-}
-
-// ... (Define the new smaller methods below)
-
-// Updates the order status to 'completed'
-private function updateOrderStatus(Order $order)
-{
-    $order->status = 'completed';
-    $order->save();
-}
-
-// Sends notifications to the user and store owner
-private function sendNotifications(Order $order)
-{
-    $notificationType = NotificationType::where('action', 'completed')->where('icon', 'order')->first();
-
-    if ($notificationType) {
-        NotificationController::create($order->user_id, null, $notificationType->id, $order->id);
-        NotificationController::create($order->product->store->user_id, null, $notificationType->id, $order->id);
+        return redirect()->back()->with('success', 'Order completed successfully!');
     }
-}
 
-// Updates product sales information
-private function updateProductSales(Order $order)
-{
-    $order->product->sold += $order->quantity;
-    $order->product->quantity -= $order->quantity;
-    $order->product->save();
-}
+    // ... (Define the new smaller methods below)
 
-// Updates user details related to the order
-private function updateUserDetails(Order $order)
-{
-    $order->user->total_orders += $order->quantity;
-    $order->user->spent += $order->escrow->fiat_amount;
-    $order->user->save();
-    // wallet update
-    $order->user->wallet->balance -= $order->escrow->fiat_amount;
-    $order->user->wallet->save();
-}
-
-// Handles referral logic and updates balances
-private function handleReferrals(Order $order)
-{
-    $referred = Referral::where('referred_user_id', $order->user->id)->first();
-
-    if ($referred) {
-        $referralAmount = ($order->escrow->fiat_amount * 0.05) * 0.5; // 5% of escrow, 50% to referrer
-        $referred->balance += $referralAmount;
-        $referred->save();
-    } else {
-        // Add the balance to the market wallet (logic not provided)
+    // Updates the order status to 'completed'
+    private function updateOrderStatus(Order $order)
+    {
+        $order->status = 'completed';
+        $order->save();
     }
-}
 
-// Releases escrow funds to the store owner
-private function releaseEscrowFunds(Order $order)
-{
-    if ($order->escrow) {
-        $order->escrow->status = 'released';
-        $order->escrow->save();
+    // Sends notifications to the user and store owner
+    private function sendNotifications(Order $order)
+    {
+        $notificationType = NotificationType::where('action', 'completed')->where('icon', 'order')->first();
+
+        if ($notificationType) {
+            NotificationController::create($order->user_id, null, $notificationType->id, $order->id);
+            NotificationController::create($order->product->store->user_id, null, $notificationType->id, $order->id);
+        }
     }
-}
 
-// Updates the store balance
-private function updateStoreBalance(Order $order)
-{
-    $storeBalance = $order->escrow->fiat_amount - ($order->escrow->fiat_amount * 0.05); // Deduct 5% fee
-    $order->store->user->wallet->balance += $storeBalance;
-    $order->store->user->wallet->save();
-}
-
-// Updates store sales information
-private function updateStoreSales(Order $order)
-{
-    $order->store->width_sales += $order->quantity;
-    $order->store->save();
-}
-
-// Handles dispute resolution if applicable
-private function handleDisputeIfAny(Order $order)
-{
-    if ($order->dispute && $order->dispute->status != 'closed') {
-        $order->dispute->status = 'closed';
-        $order->dispute->winner = 'Store';
-        $order->dispute->save();
-
-        // Update user, store, and product stats for lost/won dispute (logic remains the same)
+    // Updates product sales information
+    private function updateProductSales(Order $order)
+    {
+        $order->product->sold += $order->quantity;
+        $order->product->quantity -= $order->quantity;
+        $order->product->save();
     }
-}
 
+    // Updates user details related to the order
+    private function updateUserDetails(Order $order)
+    {
+        $order->user->total_orders += $order->quantity;
+        $order->user->spent += $order->escrow->fiat_amount;
+        $order->user->save();
+        // wallet update
+        $order->user->wallet->balance -= $order->escrow->fiat_amount;
+        $order->user->wallet->save();
+    }
 
+    // Handles referral logic and updates balances
+    private function handleReferrals(Order $order)
+    {
+        $referred = Referral::where('referred_user_id', $order->user->id)->first();
+
+        if ($referred) {
+            $referralAmount = ($order->escrow->fiat_amount * 0.05) * 0.5; // 5% of escrow, 50% to referrer
+            $referred->balance += $referralAmount;
+            $referred->save();
+        } else {
+            // Add the balance to the market wallet (logic not provided)
+        }
+    }
+
+    // Releases escrow funds to the store owner
+    private function releaseEscrowFunds(Order $order)
+    {
+        if ($order->escrow) {
+            $order->escrow->status = 'released';
+            $order->escrow->save();
+        }
+    }
+
+    // Updates the store balance
+    private function updateStoreBalance(Order $order)
+    {
+        $storeBalance = $order->escrow->fiat_amount - ($order->escrow->fiat_amount * 0.05); // Deduct 5% fee
+        $order->store->user->wallet->balance += $storeBalance;
+        $order->store->user->wallet->save();
+    }
+
+    // Updates store sales information
+    private function updateStoreSales(Order $order)
+    {
+        $order->store->width_sales += $order->quantity;
+        $order->store->save();
+    }
+
+    // Handles dispute resolution if applicable
+    private function handleDisputeIfAny(Order $order)
+    {
+        if ($order->dispute && $order->dispute->status != 'closed') {
+            $order->dispute->status = 'closed';
+            $order->dispute->winner = 'Store';
+            $order->dispute->save();
+
+            // Update user, store, and product stats for lost/won dispute (logic remains the same)
+        }
+    }
 }

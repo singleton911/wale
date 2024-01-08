@@ -1,7 +1,7 @@
 
 <legend style="text-align: center;">{{ $store->store_name }} > Promotions  </legend>
-<div style="text-align: center; margin: 1em;">
-  There is no available spot yet... hop back again later.
+<div>
+  <p style="color: red; text-align:center;">You do not have required permission to access this feature! <br> Your store needs to be verified by admin or mods, <br> You must have recoded sales, <br> You must be active for atlease 3 to 6 months.</p>
 </div>
 <table>
     <thead>

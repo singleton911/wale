@@ -25,7 +25,6 @@ class WalletFactory extends Factory
 
         return [
             'user_id' => $userId,
-            'address' => $this->faker->unique()->uuid,
             'seed' => $this->faker->text,
             'balance' => $this->faker->numberBetween(500, 1000),
             'private_key' => $this->faker->uuid,

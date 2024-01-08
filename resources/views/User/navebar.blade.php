@@ -36,15 +36,22 @@
                                 password</a></li>
                         <li><a href="/account/referral"><img src="data:image/png;base64,{{ $icon['bonus'] }}"
                                     class="icon-filter" width="25"> Referral Program</a></li>
-                        <li><a href="/account/stats"><img src="data:image/png;base64,{{ $icon['monitoring'] }}"
-                                    class="icon-filter" width="25"> Stats</a></li>
-                        <li><a href="/account/mirror">Private Mirror</a></li>
+                        <li><a href="/account/mirror">
+                            <img src="" alt="🖇️" style="font-size:2em; margin-right:0px;" class="icon-filter"> Private URL Link</a></li>
                         <li>
                             <a href="/account/theme">
+                                @if ($user->theme == 'white')
                                 <img src="data:image/png;base64,{{ $icon['night-mode'] }}" class="icon-filter"
-                                    width="25">
+                                width="25">
 
-                                Dark Mode
+                            Dark Mode
+
+                            @else
+                            <img src="data:image/png;base64,{{ $icon['brightness'] }}" class="icon-filter"
+                            width="25">
+
+                        Light Mode
+                                @endif
                             </a>
                         </li>
                     </ul>

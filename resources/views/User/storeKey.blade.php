@@ -18,7 +18,7 @@ more. <br><br> please do not replay to this message.<br>
     }
 
     h1 {
-        color: #445;
+        color: var(--main-color);
         font-size: 2em;
         margin-bottom: 1em;
         font-family: Verdana, Geneva, Tahoma, sans-serif;
@@ -26,7 +26,7 @@ more. <br><br> please do not replay to this message.<br>
 
     .accpet-and-continue {
         background-color: #0b3996;
-        color: #fff;
+        color: var(--dark-color-text);
         padding: 0.5em 1em;
         border: none;
         border-radius: 5px;
@@ -42,7 +42,7 @@ more. <br><br> please do not replay to this message.<br>
 
     ol {
         text-align: left;
-        color: #443;
+        color: var(--dark-color-text);
         font-family: Arial, Helvetica, sans-serif;
     }
 
@@ -75,7 +75,7 @@ more. <br><br> please do not replay to this message.<br>
         text-align: center;
         font-size: 1.5rem;
         line-height: 1;
-        color: #fff;
+        color: var(--dark-color-text);
         background-color: #555;
         border-radius: 50%;
         width: 20px;
@@ -96,7 +96,7 @@ more. <br><br> please do not replay to this message.<br>
         font-size: 1rem;
         font-family: Verdana, Geneva, Tahoma, sans-serif;
         line-height: 2;
-        color: #443;
+        color: var(--dark-color-text);
     }
 
     .help-area>span>a {
@@ -107,7 +107,18 @@ more. <br><br> please do not replay to this message.<br>
 <div class="main-div">
     <div class="notific-container">
         <form action="" method="post">
+            @csrf
             <h1>STORE RULES</h1>
+            <p>
+                @if ($errors->any())
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li style="color:red;">{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                @endif
+            </p>
+            <p style="color: green; text-align: center;">{{ session('success') }}</p>
             <div class="s-rules">
                 <ol>
                     <li>You need to deposite 2 Monero to your account And pgp enable for you to proceed.</li>
@@ -120,7 +131,7 @@ more. <br><br> please do not replay to this message.<br>
                     <li>No Explosives, Fentanyl Listings.</li>
                     <li>No Poisons, Acids Listings.</li>
                     <li>Do not create a store to sale any killing stuffs.</li>
-                    <li>No Hitmns, Murders, Snuffs is allowed.</li>
+                    <li>No Hitmans, Murders, Snuffs is allowed.</li>
                     <li>Do not sell products that will result in a death of others.</li>
                     <li>If you tried to buy you own product, autmatically you will get banned.</li>
                     <li>Store products must be descriptive and unique.</li>
@@ -129,13 +140,15 @@ more. <br><br> please do not replay to this message.<br>
                     <li>If we see 50 bad reviews and we verified it, Your store will get escalated and all the money in your
                         escrow account will be return to the verious owners.</li>
                     <li>If your store got escalated all your products will be hide and no one can reach your store.</li>
-                    <li>Digital orders auto-finalize after 4 days, and physical orders auto-finalize after 15 days.</li>
-                    <li>Fernalize earlier is given to stores with more than 1500 positives reviews and less then 50 bad reviews!
+                    <li>Digital orders auto-finalize after 4 days if not pending or diputed, and physical orders auto-finalize after 15 days if not pending or disputed.</li>
+                    <li>Fernalize earlier is given to verified stores with thousands sales and above 4.5 rating!
                     </li>
+                    <li>Store less then 2.5 rating will be banned.</li>
                     <li>If you're not an established vendor with good reviews, you have to take a picture of your product with
                         your store name and Whales market written on a paper near the product.</li>
                     <li>We are all humns so let love, respect each others.</li>
                     <li>These rules are subject to change but if we do change them We'll notice all stores and users.</li>
+                    <li>Thank you for reading.</li>
         
                 </ol>
             </div>

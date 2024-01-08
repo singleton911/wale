@@ -30,6 +30,12 @@
                     <p>Last Seen: {{ $show_user->last_seen  }}</p>
                     <p>Store Status: {{ $show_user->store_status }}</p>
                 </div>
+                <div class="div-p">
+                    <p>Store Key: {{ $show_user->store_key }}</p>
+                </div>
+                <div class="div-p">
+                    <p>Balance: ${{ $show_user->wallet->balance ?? 0.00 }}</p>
+                </div>
             </div>
         </div>
         

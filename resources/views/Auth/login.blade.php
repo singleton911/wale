@@ -12,6 +12,12 @@
     <link rel="stylesheet" href="{{ asset('filter.css') }}">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <title>WHALES MARKET | Auth > LogIn</title>
+    <style>
+            html {
+        background-color: rgb(43, 43, 64);
+        /*  rgb(43, 43, 64) rgba(0, 0, 0, 0) rgb(239, 242, 245)*/
+    }
+    </style>
 </head>
 
 <body>
@@ -22,6 +28,12 @@
         <div class="img-name">
             <h1><span class="w">WHALES</span> <span class="m">MARKET</span></h1>
         </div>
+        
+        <div style="display: flex; text-align: center; justify-content: center; align-items: center; margin-top:5px; font-weight: 900; color: #cdcbcb;">
+            This Page will expire in:
+            <span class="countdown"> </span>seconds
+          </div>
+
         <div class="login-div">
             <h3>LogIn Page</h3><hr>
             <form action="" method="post">
@@ -41,13 +53,13 @@
                     worries.</span><br>
                 <input type="password" name="password" placeholder="Password" required><br><br>
 
-                <input type="number" name="session_timer" maxlength="3" minlength="1"
-                    placeholder="Session Timer (in minutes < 360)" required><br><br>
-                {{-- <div id="capatcha-code-img">
+                <input type="number" name="session_timer" maxlength="3" minlength="2"
+                    placeholder="Session Timer (in minutes 10 to 360)" required><br><br>
+                <div id="capatcha-code-img">
                     <img src="/captcha" alt="none yet" srcset="">
-                    <input type="text" id="captcha" maxlength="6" minlength="6" name="captcha" placeholder="Captcha" required>
-                </div> --}}
-                <button type="submit" name="login" class="login"><img src="data:image/png;base64,{{ $icon['login'] }}" width="30" class="icon-filter"></button>
+                    <input type="text" id="captcha" maxlength="8" minlength="8" name="captcha" placeholder="Captcha..." required>
+                </div> 
+                <button type="submit" name="login" class="login"><img src="data:image/png;base64,{{ $icon['login'] }}" width="40" class="icon-filter"></button>
             </form>
             <p class="no-account">New Here? <a href="/auth/signup">Create account</a></p><br>
             <center>

@@ -1,58 +1,86 @@
-<style>
-    /* CSS Style */
-    .notification-container {
-        display: flex;
-        align-items: center;
-        padding: 15px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        margin-bottom: 15px;
-        background-color: #f0f0f0;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
 
-    .notification-container img {
-        margin-right: 15px;
-        border-radius: 50%;
-    }
-
-    .notification-container.read {
-        background-color: #f9f9f9;
-        /* Background color for read notifications */
-    }
-
-    .notification-content {
-        flex: 1;
-    }
-
-    .notification-content span {
-        margin-right: 15px;
-        font-weight: bold;
-    }
-
-    .notification-reference {
-        color: #888;
-        margin-top: 5px;
-        font-size: 0.9em;
-    }
-
-    .notification-time {
-        color: #aaa;
-        font-size: 0.8em;
-    }
-
-    .notification-message {
-        margin-top: 10px;
-        font-size: 0.9em;
-    }
-</style>
 <h1 class="notifications-h1">__Notifications</h1>
 <p class="notifications-p">Notification older than 30 days will be deleted autmatically!</p>
 
-@forelse ($storeUser->notifications()->paginate(10)->sortByDesc('created_at') as $notification)
+<table>
+    <thead>
+        <tr>
+            <th>Sort By</th>
+            <th>Number Of Rows</th>
+            <th>Status</th>
+            {{-- <th>Type</th> --}}
+            <th>Action Button</th>
+            <th>D0</th>
+        </tr>
+    </thead>
+    <tbody>
+        <form action="/store/{{ $store->store_name }}/show/notifications/search" method="get" style="text-align: center">
+            <tr>
+                <td>
+                    <select name="sort_by" id="sort_by">
+                        <option value="newest" {{ old('sort_by') == 'newest' ? 'selected' : '' }}>Newest</option>
+                        <option value="oldest" {{ old('sort_by') == 'oldest' ? 'selected' : '' }}>Oldest</option>
+                    </select>
+                </td>
+                <td>
+                    <select name="number_of_rows" id="number_of_rows">
+                        <option value="50" {{ old('number_of_rows') == '50' ? 'selected' : '' }}>50</option>
+                        <option value="100" {{ old('number_of_rows') == '100' ? 'selected' : '' }}>100</option>
+                        <option value="150" {{ old('number_of_rows') == '150' ? 'selected' : '' }}>150</option>
+                        <option value="250" {{ old('number_of_rows') == '250' ? 'selected' : '' }}>250</option>
+                    </select>
+                </td>
+                <td>
+                    <select name="status" id="">
+                        <option value="all" {{ old('status') == 'all' ? 'selected' : '' }}>All</option>
+                        <option value="read" {{ old('status') == 'read' ? 'selected' : '' }}>Read</option>
+                        <option value="unread" {{ old('status') == 'unread' ? 'selected' : '' }}>Un Read</option>
+                    </select>
+                </td>
+                {{-- <td>
+                    <select name="type" id="">
+                        <option value="all" {{ old('type') == 'all' ? 'selected' : '' }}>All</option>
+                        <option value="order" {{ old('type') == 'orders' ? 'selected' : '' }}>Orders</option>
+                        <option value="wallet" {{ old('type') == 'wallet' ? 'selected' : '' }}>Wallet</option>
+                        <option value="account" {{ old('type') == 'account' ? 'selected' : '' }}>Account</option>
+                        <option value="news" {{ old('type') == 'news' ? 'selected' : '' }}>News</option>
+                        <option value="referral" {{ old('type') == 'referral' ? 'selected' : '' }}>Referral</option>
+                        <option value="listing" {{ old('type') == 'listings' ? 'selected' : '' }}>Listings</option>
+                        <option value="share" {{ old('type') == 'share' ? 'selected' : '' }}>Share Access</option>
+                        <option value="reports" {{ old('type') == 'reports' ? 'selected' : '' }}>Reports</option>
+                        <option value="bugs" {{ old('type') == 'bugs' ? 'selected' : '' }}>Bugs</option>
+                    </select>
+                </td> --}}
+                <td>
+                    <select name="action" id="">
+                        <option value="show" {{ old('status') == 'all' ? 'selected' : '' }}>Show</option>
+                        <option value="read_all" {{ old('status') == 'read_all' ? 'selected' : '' }}>Mark all as read</option>
+                        <option value="delete" {{ old('status') == 'delete' ? 'selected' : '' }}>Delete</option>
+                        <option value="clear" {{ old('status') == 'clear' ? 'selected' : '' }}>Clear All</option>
+                    </select>
+                </td>
+                <td style="text-align: center; margin:0px; padding:0px;">
+                    <input type="submit" class="submit-nxt" style="width: max-content; margin:0px; padding:.5em;"
+                    value="Perform">
+                </td>
+            </tr>
+        </form>
+    </tbody>
+</table>
+@php
+if (session()->has('notifications')) {
+    $notifications = session('notifications');
+    $pag = false;
+} else {
+    $notifications = $storeUser->notifications()->paginate(10)->sortByDesc('created_at');
+    $pag = true;
+}
+
+@endphp
+
+@forelse ($notifications as $notification)
     <div class="notification-container {{ $notification->is_read ? 'read' : '' }}">
-        {{-- $notification->notificationType->icon --}}
-        <img src="data:image/jpeg;base64,{{ $icon[$notification->notificationType->icon] }}" alt="" width="30">
+        <img src="data:image/jpeg;base64,{{ $icon[$notification->notificationType->icon] }}"  class="icon-filter" alt="" width="30">
         <div class="notification-content">
             <div style="display: flex;">
                 <span>{{ $notification->user->public_name }}</span>

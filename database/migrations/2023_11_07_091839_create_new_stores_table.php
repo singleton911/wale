@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('proof2', 255)->nullable();
             $table->string('proof3', 255)->nullable();
             $table->enum('store_type', ['paid', 'waiver'])->default('waiver');
+            $table->text('avater');
             $table->timestamps();
         });
     }

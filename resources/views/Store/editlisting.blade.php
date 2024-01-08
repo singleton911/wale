@@ -29,28 +29,26 @@
 
 <table>
     <tr>
-        <th>Shipping Extra/Options (Blank is free)</th>
+        <th>Shipping Extra/Options</th>
         <th>Cost</th>
     </tr>
 
     @for ($i = 0; $i < 10; $i++)
         @if ($i < $extraOption_counts)
             @php
-                $extraOption = $product->extraShipping[$i]; // Assuming extraShipping is a collection
+                $extraOption = $product->extraShipping[$i];
             @endphp
             <tr>
-                <td><input type="text" class="form-input" name="shipping_method{{ $i }}" placeholder="Shipping Option/Extra Option" value="{{ $extraOption->name }}"></td>
-                <td><input type="number" class="form-input" name="shipping_cost{{ $i }}" min="0" placeholder="Price" value="{{ $extraOption->cost }}"></td>
+                <td><input type="text" class="form-input" name="shipping_old_method{{ $extraOption->id }}" placeholder="Shipping Option/Extra Option" value="{{ $extraOption->name }}"></td>
+                <td><input type="number" class="form-input" name="shipping_old_cost{{ $extraOption->id }}" min="0.00" placeholder="Price" value="{{ $extraOption->cost }}"></td>
             </tr>
         @else
             <tr>
-                <td><input type="text" class="form-input" name="shipping_method{{ $i }}" placeholder="Shipping Option/Extra Option"></td>
-                <td><input type="number" class="form-input" name="shipping_cost{{ $i }}" min="0" placeholder="Price"></td>
+                <td><input type="text" class="form-input" name="shipping_new_method{{ $i+1 }}" placeholder="Shipping Option/Extra Option"></td>
+                <td><input type="number" class="form-input" name="shipping_new_cost{{ $i+1 }}" min="0.00" placeholder="Price"></td>
             </tr>
         @endif
     @endfor
-
-    <input type="hidden" name="product_id" value="{{ session('product_id') }}">
 </table>
 
         <div style="display: flex; justify-content:space-between;">

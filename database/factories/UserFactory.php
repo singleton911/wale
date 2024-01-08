@@ -27,7 +27,6 @@ class UserFactory extends Factory
             'password' => $commonPassword,
             'store_key' => Str::random(64),
             'login_passphrase' => Str::random(5),
-            'balance' => 1000,
             'role' => $this->faker->randomElement(['user', 'store', 'admin']),
             'status' => $this->faker->randomElement(['active']),
             'store_status' => $this->faker->randomElement(['active', 'in_active', 'pending', 'suspended', 'banned']),

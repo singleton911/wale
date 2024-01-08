@@ -38,12 +38,12 @@ class NotificationTypeSeeder extends Seeder
         
             // Account
             ['name' => 'PGP Encryption Key Added', 'content' => 'A PGP encryption key has been added to your account.', 'action' => 'pgp', 'icon' => 'account'],
-            ['name' => 'Account Trust Level Upgraded', 'content' => 'Your account trust level has been upgraded.', 'action' => 'upgraded', 'icon' => 'trust'],
+            ['name' => 'Account Trust Level Upgraded', 'content' => 'Your account trust level has been upgraded.', 'action' => 'upgraded', 'icon' => 'account'],
             ['name' => 'Account Issue Escalated', 'content' => 'Your account issue has been escalated for review.', 'action' => 'escalated', 'icon' => 'account'],
             ['name' => 'Account on Vacation', 'content' => 'Your account is on vacation mode.', 'action' => 'vacation', 'icon' => 'account'],
             ['name' => 'Account Warned', 'content' => 'A warning has been issued for your account.', 'action' => 'warning', 'icon' => 'account'],
             ['name' => 'Account Password Changed', 'content' => 'Your account password has been changed.', 'action' => 'changed', 'icon' => 'account'],
-            ['name' => 'Private Mirror Added to Account', 'content' => 'A private mirror has been added to your account.', 'action' => 'added', 'icon' => 'mirror'],
+            ['name' => 'Private Mirror Added to Account', 'content' => 'A private mirror has been added to your account.', 'action' => 'added', 'icon' => 'account'],
         
             // Referral
             ['name' => 'Your Referral Link Used', 'content' => 'Your referral link has been used by a new user, thank you!.', 'action' => 'used', 'icon' => 'referral'],

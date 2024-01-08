@@ -20,7 +20,7 @@ class NotificationController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public static function create($user_id = null, $actor_id = null, $type_id, $option_id = null, )
+    public static function create($user_id = null, $actor_id = null, $type_id, $option_id = null,)
     {
         $notification                       = new Notification();
         $notification->user_id              = $user_id == null ? auth()->user()->id : $user_id;
@@ -64,7 +64,7 @@ class NotificationController extends Controller
                 $notification->is_read = 1;
                 $notification->save();
                 return redirect()->back();
-            }elseif ($request->delete == 'Delete' && auth()->user()->id == $notification->user_id) {
+            } elseif ($request->delete == 'Delete' && auth()->user()->id == $notification->user_id) {
                 $notification->id;
                 $notification->delete();
                 return redirect()->back();
@@ -76,12 +76,17 @@ class NotificationController extends Controller
 
     public function updateStore(UpdateNotificationRequest $request, $store, $created_at, Notification $notification)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/store/pgp/verify');
+        }
+
         if ($created_at == strtotime($notification->created_at)) {
             if ($request->read == 'Mark as read' && auth()->user()->id == $notification->user_id) {
                 $notification->is_read = 1;
                 $notification->save();
                 return redirect()->back();
-            }elseif ($request->delete == 'Delete' && auth()->user()->id == $notification->user_id) {
+            } elseif ($request->delete == 'Delete' && auth()->user()->id == $notification->user_id) {
                 $notification->id;
                 $notification->delete();
                 return redirect()->back();
@@ -98,7 +103,13 @@ class NotificationController extends Controller
         //
     }
 
-    public function showNotifications(){
+    public function showNotifications()
+    {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/pgp/verify');
+        }
+
         $user = auth()->user();
         return view('User.notification', [
             'user' => $user,

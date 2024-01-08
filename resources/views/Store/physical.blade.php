@@ -25,11 +25,16 @@
 
     <table>
         <tr>
-            <th>Shipping Extra/Options (Blank is free)</th>
+            <th>Shipping Extra/Options (You can edit the first one the change the default price or name)</th>
             <th>Cost</th>
         </tr>
     
-        @for ($i = 1; $i <= 10; $i++)
+        <tr>
+            <td><input type="text" class="form-input" name="shipping_method1" placeholder="Shipping Option/Extra Option" value="Default"></td>
+            <td><input type="number" class="form-input" name="shipping_cost1" min="0.00" placeholder="Price" value="0.00"></td>
+        </tr>
+        
+        @for ($i = 2; $i <= 10; $i++)
             <tr>
                 <td><input type="text" class="form-input" name="shipping_method{{ $i }}" placeholder="Shipping Option/Extra Option"></td>
                 <td><input type="number" class="form-input" name="shipping_cost{{ $i }}" min="0" placeholder="Price"></td>
@@ -41,7 +46,6 @@
     
         <div style="display: flex; justify-content:space-between;">
             <input type="submit" name="extra_set" class="submit-nxt" value="Save">
-            <input type="submit" name="skip" class="submit-nxt" value="Skip">
             <span>Page 2/2</span>
         </div>
     @else

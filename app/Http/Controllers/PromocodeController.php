@@ -23,6 +23,11 @@ class PromocodeController extends Controller
      */
     public function create(Request $request)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/store/pgp/verify');
+        }
+
         if ($request->has('new_coupon')) {
             return redirect()->back()->with('new_coupon', true);
         }
@@ -35,7 +40,7 @@ class PromocodeController extends Controller
                 'discount' => 'required|numeric',
                 'expired_date' => 'required|date',
                 'usage_limit'  => 'required|numeric|nullable',
-            ]); 
+            ]);
 
             $coupon = new Promocode();
             $coupon->product_id      = Crypt::decrypt($request->product);
@@ -54,7 +59,7 @@ class PromocodeController extends Controller
         if ($request->has('delete')) {
             $request->validate([
                 'promo_id' => 'required|string|min:32',
-            ]); 
+            ]);
 
             $coupon = Promocode::find(Crypt::decrypt($request->promo_id));
             $coupon->delete();

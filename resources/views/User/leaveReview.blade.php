@@ -1,15 +1,16 @@
 @php
     $daysSinceOrderCompletion = now()->diffInDays($order->updated_at);
     $editWindowOpen = $order->status == 'completed' || $order->product->payment_type == "FE";
-    $review = $order->reviews;
+    $review = $order->review;
     $disableFields = $editWindowOpen && $daysSinceOrderCompletion > 5 ? 'disabled' : '';
 @endphp
+
 
 @if ($editWindowOpen)
     <p style="text-align: center; text-decoration: underline; color: red;">Leave a review for this product below. You can
         edit it within 5 days!</p>
     @php
-        $review = $order->reviews;
+        $review = $order->review;
     @endphp
     <form action="" method="post" style="text-align: center">
         @csrf

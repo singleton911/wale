@@ -5,7 +5,7 @@
     }
 
     h1 {
-        color: #445;
+        color: var(--mian-color);
         font-size: 2em;
         margin-bottom: 1em;
         font-family: Verdana, Geneva, Tahoma, sans-serif;
@@ -29,7 +29,7 @@
 
     ol {
         text-align: left;
-        color: #443;
+        color: var(--dark-color-text);
         font-family: Arial, Helvetica, sans-serif;
     }
 
@@ -83,7 +83,7 @@
         font-size: 1rem;
         font-family: Verdana, Geneva, Tahoma, sans-serif;
         line-height: 2;
-        color: #443;
+        color: var(--dark-color-text);
     }
 
     .help-area>span>a {

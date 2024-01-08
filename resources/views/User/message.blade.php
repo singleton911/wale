@@ -6,7 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Whales Market | {{ $user->public_name }} > Messages</title>
-    <link rel="stylesheet" href="{{ asset('market.white.css') }}">
+    @if ($user->theme == 'dark')
+    <link rel="stylesheet" href="{{ asset('dark.theme.css') }}">
+@else
+    <link rel="stylesheet" href="{{ asset('white.theme.css') }}">
+@endif
+<meta http-equiv="refresh" content="{{ session('session_timer') }};url=/kick/{{ $user->public_name }}/out">
+
+<link rel="stylesheet" href="{{ asset('market.white.css') }}">
     <link rel="stylesheet" href="{{ asset('filter.css') }}">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
 </head>

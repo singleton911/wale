@@ -28,6 +28,10 @@ class StoreController extends Controller
      */
     public function index($actionName)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/store/pgp/verify');
+        }
         $store = auth()->user()->store;
         $unread_message_count = MessageStatus::where('user_id', auth()->user()->id)->where('is_read', 0)->count();
         if ($actionName == $store->store_name) {
@@ -49,6 +53,11 @@ class StoreController extends Controller
 
     public function ShowAction($actionName, $action)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/store/pgp/verify');
+        }
+
         $conversations = Conversation::all();
         $participants = Participant::where('user_id', auth()->user()->id)->get();
 
@@ -86,6 +95,11 @@ class StoreController extends Controller
      */
     public function show($name = null, Store $store)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/pgp/verify');
+        }
+
         return View('User.store', [
             'store' => $store,
             'name' => $name . ' Store',
@@ -112,10 +126,13 @@ class StoreController extends Controller
      */
     public function update(Request $request)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/store/pgp/verify');
+        }
         // Validate the request data
         $request->validate([
             'store_description'     => 'required|string|max:5000',
-            'store_pgp'             => 'required|string|min:50|',
             'selling'               => 'required|string|min:1|max:3000',
             'ship_from'             => 'required|string|max:50',
             'ship_to'               => 'required|string|max:250',
@@ -161,6 +178,11 @@ class StoreController extends Controller
 
     public function pgp($name, Store $store)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/pgp/verify');
+        }
+
         if ($name == $store->store_name) {
             return redirect()->back()->with('showpgp', true);
         }
@@ -170,6 +192,11 @@ class StoreController extends Controller
 
     public function reviews($name, Store $store)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/pgp/verify');
+        }
+
         if ($name == $store->store_name) {
             return view('User.storeReviews', [
                 'name' => $name . ' Store',
@@ -215,45 +242,55 @@ class StoreController extends Controller
     // store actions on orders
     public function storeAction(Request $request)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/store/pgp/verify');
+        }
         // Decrypt order ID
         $order_id = $request->order_id ? Crypt::decrypt($request->order_id) : null;
-    
+
 
         // Check for a valid order ID
         if ($order_id === null) {
             return "Invalid order ID!";
         }
-    
-        if ($request->has('new_message')) {
-           return redirect()->back()->with('new_message', true);
-        }
+
         // Find the order
         $order = Order::find($order_id);
-    
+
+        // if ($request->has('new_message') && $order->status = 'dispute') {
+        //     if ($order->dispute->status == 'closed') {
+        //         $this->logUnauthorizedAttempt($request);
+        //         return redirect()->back();
+        //     }
+
+        //     return redirect()->back()->with('new_message', true);
+        // }
+
         // Check if the order exists
         if ($order === null) {
             return "Order not found!";
         }
-    
+
         // Update order status based on the request
         $this->updateOrderStatus($order, $request);
-    
+
         // Log unauthorized attempt if the 'completed' action is present
         $this->logUnauthorizedAttempt($request);
-    
+
         // Notify user and store about the order status change
         $this->notifyOrderStatusChange($order);
-    
+
         // Save the updated order
         $order->save();
-    
+
         // Redirect back with a success message
         return redirect()->back()->with(
             'success',
             "You have successfully updated #" . strtotime($order->created_at) . " order status to " . $order->status
         );
     }
-    
+
     private function updateOrderStatus(Order $order, Request $request)
     {
         // Update order status based on the current status and request
@@ -266,7 +303,7 @@ class StoreController extends Controller
                 break;
         }
     }
-    
+
     private function updatePendingOrderStatus(Order $order, Request $request)
     {
         // Update order status for pending orders
@@ -279,7 +316,7 @@ class StoreController extends Controller
                 break;
         }
     }
-    
+
     private function updateNonPendingOrderStatus(Order $order, Request $request)
     {
         // Update order status for non-pending orders
@@ -299,7 +336,7 @@ class StoreController extends Controller
                 break;
         }
     }
-    
+
     private function logUnauthorizedAttempt(Request $request)
     {
         // Log unauthorized attempt if 'completed' action is present
@@ -313,19 +350,19 @@ class StoreController extends Controller
             $unauthorize->save();
         }
     }
-    
+
     private function notifyOrderStatusChange(Order $order)
     {
         // Notify user and store about the order status change
         $notificationType = NotificationType::where('action', $order->status == 'processing' ? 'accepted' : $order->status)->where('icon', 'order')->first();
-        
+
         // Notify the user who placed the order
         NotificationController::create($order->user_id, null, $notificationType->id, $order->id);
-    
+
         // Notify the store
         NotificationController::create(auth()->user()->id, null, $notificationType->id, $order->id);
     }
-    
+
     private function createDisputeConversation($order_id, $escrow_id = null, $user_id,  $store_user_id)
     {
 
@@ -360,7 +397,8 @@ class StoreController extends Controller
         // return redirect()->back()->with('success', 'Your message has been successfully sent to the store.');
     }
 
-    private function disputeOrder($order_id, $escrow_id = null, $conversation_id){
+    private function disputeOrder($order_id, $escrow_id = null, $conversation_id)
+    {
         $dispute = new Dispute();
         $dispute->escrow_id = $escrow_id;
         $dispute->order_id  = $order_id;
@@ -368,7 +406,12 @@ class StoreController extends Controller
         $dispute->save();
     }
 
-    public function messageUser(Request $request, $user, $created_at, Order $order){
+    public function messageUser(Request $request, $user, $created_at, Order $order)
+    {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/store/pgp/verify');
+        }
 
         if ($request->has('subject')) {
             // $request->validate([
@@ -398,6 +441,28 @@ class StoreController extends Controller
 
 
 
+        return abort(404);
+    }
+
+
+    public function theme($store = null)
+    {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/store/pgp/verify');
+        }
+
+        $user = auth()->user();
+
+        if ($user->theme == 'white') {
+            $user->theme = 'dark';
+            $user->save();
+            return redirect()->back();
+        } elseif ($user->theme == 'dark') {
+            $user->theme = 'white';
+            $user->save();
+            return redirect()->back();
+        }
         return abort(404);
     }
 }

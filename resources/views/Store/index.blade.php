@@ -5,7 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="{{ @asset('market.white.css') }}">
+    @if ($store->user->theme == 'dark')
+        <link rel="stylesheet" href="{{ asset('dark.theme.css') }}">
+    @else
+        <link rel="stylesheet" href="{{ asset('white.theme.css') }}">
+    @endif
+    <link rel="stylesheet" href="{{ asset('market.white.css') }}">
+
     <link rel="stylesheet" href="{{ @asset('store.white.css') }}">
     <link rel="stylesheet" href="{{ @asset('filter.css') }}">
     <title>Whales Market | {{ $action != null ? $action : $store->store_name . ' Store' }}</title>
@@ -114,11 +120,56 @@
                                     width="25">
                                 <a href="/store/{{ $store->store_name }}/show/coupons">Coupons</a>
                             </div>
+
+
+                            <hr>Supports, reports, settings...
+                            <hr>
                             <div class="wallet">
-                                <img src="data:image/png;base64,{{ $icon['faq'] }}" class="icon-filter"
+                                <img src="data:image/png;base64,{{ $icon['shield'] }}" class="icon-filter"
+                                    width="25">
+                                <a href="/store/{{ $store->store_name }}/show/pgp">2FA PGP KEY</a>
+                            </div>
+
+                            <div class="settings">
+                                <img alt="🖇️" style="font-size:1.5em; margin-right: .5em;" class="icon-filter"
+                                    width="25">
+                                <a href="/store/{{ $store->store_name }}/show/url">Private URL Link</a>
+                            </div>
+
+                            <div class="settings">
+                                @if ($store->user->theme == 'white')
+                                    <img src="data:image/png;base64,{{ $icon['night-mode'] }}" class="icon-filter"
+                                        width="25">
+                                    <a href="/store/{{ $store->store_name }}/show/theme">Dark Mode</a>
+                                @else
+                                    <img src="data:image/png;base64,{{ $icon['brightness'] }}" class="icon-filter"
+                                        width="25">
+                                    <a href="/store/{{ $store->store_name }}/show/theme">Light Mode</a>
+                                @endif
+
+                            </div>
+
+                            <div class="wallet">
+                                <img src="data:image/png;base64,{{ $icon['plane-tickets'] }}" class="icon-filter"
                                     width="25">
                                 <a href="/store/{{ $store->store_name }}/show/support">Support</a>
                             </div>
+                            <div class="wallet">
+                                <img src="data:image/png;base64,{{ $icon['faq'] }}" class="icon-filter"
+                                    width="25">
+                                <a href="/store/{{ $store->store_name }}/show/faq">FAQ</a>
+                            </div>
+                            <div class="wallet">
+                                <img src="data:image/png;base64,{{ $icon['web-coding'] }}" class="icon-filter"
+                                    width="25">
+                                <a href="/store/{{ $store->store_name }}/show/bugs">Bugs</a>
+                            </div>
+                            <div class="wallet">
+                                <img src="data:image/png;base64,{{ $icon['document'] }}" class="icon-filter"
+                                    width="25">
+                                <a href="/store/{{ $store->store_name }}/show/canary">Canary</a>
+                            </div>
+
                             <div class="settings">
                                 <img src="data:image/png;base64,{{ $icon['news'] }}" class="icon-filter"
                                     width="25">
@@ -176,9 +227,19 @@
                             @include('Store.share')
                         @elseif($action === 'news')
                             @include('Store.news')
+                        @elseif($action === 'url')
+                            @include('Store.mirror')
+                        @elseif($action === 'canary')
+                            @include('Store.canary')
+                        @elseif($action === 'pgp')
+                            @include('Store.twofa')
+                        @elseif($action === 'faq')
+                            @include('Store.faq')
+                        @elseif($action === 'bugs')
+                            @include('Store.bugs')
                         @elseif($action === 'rules')
                             @include('Store.rules')
-                            @elseif($action === 'messageUser')
+                        @elseif($action === 'messageUser')
                             @include('Store.messageUser')
                         @else
                             @include('Store.dashboard')

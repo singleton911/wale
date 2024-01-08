@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('market_keys', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->longText('message_sign_text');
-            $table->longText('message_sign_pgp');
+            $table->longText('message_sign');
             $table->longText('public_key')->charset('utf8mb4')->collation('utf8mb4_general_ci');
             $table->timestamps();
         });

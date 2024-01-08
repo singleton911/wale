@@ -92,4 +92,8 @@ class User extends Model implements Authenticatable
     public function waiver(){
         return $this->hasOne(Waiver::class);
     }
+
+    public function newsStatuses(){
+       return $this->hasMany(NewsStatus::class, 'user_id');
+    }
 }

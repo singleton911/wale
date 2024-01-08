@@ -24,15 +24,18 @@ class WalletController extends Controller
      */
     public function create()
     {
+        $monero_rpc_url = env('MONERO_RPC_URL');
+        $monero_rpc_port = env('MONERO_RPC_PORT');
+        
         try {
-            $monero = new walletRPC('24.144.81.25', 18082, false);
+            $monero_rpc  = new daemonRPC($monero_rpc_url, $monero_rpc_port, false);
     
             // Additional operations or queries to verify the connection
-            $result = $monero->open_wallet();
+            $result = $monero_rpc->getbans();
     
-            return ['status' => $result];
+            return $result;
         } catch (\Exception $e) {
-            return ['error' => $e->getMessage()];
+            return $e->getMessage();
         }
     }
     

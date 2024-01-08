@@ -23,11 +23,12 @@ return new class extends Migration
             $table->integer('disputes_lost')->default(0);
             $table->integer('disputes_won')->default(0);
             $table->enum('twofa_enable', ['yes', 'no'])->default('no');
-            $table->integer('balance')->default(1000);
             $table->enum('role', ['user', 'store', 'junior', 'senior', 'admin'])->default('user');
             $table->enum('status', ['active', 'banned', 'escalated', 'vacation'])->default('active');
             $table->enum('store_status', ['active', 'in_active', 'pending', 'suspended', 'banned'])->default('in_active');
-            $table->text('pgp_key')->nullable();
+            $table->longText('pgp_key')->nullable();
+            $table->boolean('show_key')->default(0);
+            $table->string('private_url')->nullable();
             $table->integer('total_orders')->default(0);
             $table->enum('theme', ['white', 'dark'])->default('white');
             $table->string('referral_link')->nullable();

@@ -24,13 +24,16 @@ Route::get('/ddos', function () {
 });
 
 Route::get('/', [UserController::class, 'show']);
+Route::get('/auth/pgp/', [UserController::class, 'pgpView']);
+Route::post('/auth/pgp/', [UserController::class, 'pgpcheck']);
 
-// Authentication
+
+// Authentication 
 Route::middleware(['guest'])->group(function () {
-    //Route::get('/', [UserController::class, 'show']);
     Route::get('/auth/{action}/', [UserController::class, 'create']);
     Route::post('/auth/login', [UserController::class, 'authLogin']);
     Route::post('/auth/signup', [UserController::class, 'store']);
+    Route::get('/captcha', [GeneralController::class, 'captcha']);
 });
 
 // Include user routes from user.php

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Notification;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Store;
@@ -15,6 +16,11 @@ class SearchController extends Controller
 
     public function quickSearch(Request $request)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/pgp/verify');
+        }
+
         if ($request->has('advance-search')) {
             return redirect()->back()->with('advance_search', true);
         }
@@ -179,12 +185,16 @@ class SearchController extends Controller
     // store searching products
     public function storeProductsSearch($actionName, Request $request)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/store/pgp/verify');
+        }
         // Validate the incoming request data
         $store = auth()->user()->store;
         $request->validate([
             'sort_by' => ['nullable', Rule::in(['newest', 'popular', 'price_highest', 'price_lowest', 'oldest'])],
             'number_of_rows' => ['nullable', 'integer', Rule::in([50, 100, 150, 250])],
-            'payment_type' => ['nullable', 'string', Rule::in(['all','Escrow', 'FE'])],
+            'payment_type' => ['nullable', 'string', Rule::in(['all', 'Escrow', 'FE'])],
             'status' => ['nullable', Rule::in(['all', 'Active', 'Pending', 'Rejected', 'Paused'])],
             'search_term' => ['nullable', 'string'],
         ]);
@@ -247,6 +257,11 @@ class SearchController extends Controller
 
     public function storeOrdersSearch($actionName, Request $request)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/store/pgp/verify');
+        }
+
         // Validate the incoming request data
         $store = auth()->user()->store;
         $request->validate([
@@ -255,55 +270,119 @@ class SearchController extends Controller
             'payment_type' => ['nullable', 'string', Rule::in(['all', 'Escrow', 'FE'])],
             'status' => ['nullable', Rule::in(['all', 'pending', 'processing', 'shipped', 'delivered', 'dispute', 'sent', 'dispatched', 'cancelled', 'completed'])],
         ]);
-    
+
         // Retrieve validated search parameters from the request
         $sort_by = $request->sort_by;
         $number_of_rows = $request->number_of_rows;
         $status = $request->status;
         $payment_type = $request->payment_type;
-    
+
         // Build the query based on the search parameters
         $query = Order::query()->where('store_id', $store->id);
-    
+
         // Assuming $query is an instance of Eloquent query builder
         if (!empty($sort_by)) {
             switch ($sort_by) {
                 case 'newest':
                     $query->orderBy('created_at', 'desc');
                     break;
-    
+
                 case 'oldest':
                     $query->orderBy('created_at', 'asc');
                     break;
-    
+
                 case 'highest_quantity':
                     $query->orderBy('quantity', 'desc');
                     break;
-    
+
                 case 'lowest_quantity':
                     $query->orderBy('quantity', 'asc');
                     break;
-    
+
                 default:
                     break;
             }
         }
-    
+
         if ($payment_type !== 'all') {
             $query->whereHas('product', function ($productQuery) use ($payment_type) {
                 $productQuery->where('payment_type', $payment_type);
             });
         }
-    
+
         if ($status !== 'all') {
             $query->where('status', $status);
         }
-    
+
         // Execute the query to retrieve orders
         $orders = $query->paginate($number_of_rows);
-    
+
         // Return the orders to the view
         return redirect()->back()->with('orders', $orders);
     }
-    
+
+
+    public function storeNotificationsSearch(Request $request)
+    {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/store/pgp/verify');
+        }
+
+        // Validate the incoming request data
+        $store = auth()->user()->store;
+        $request->validate([
+            'sort_by' => ['nullable', Rule::in(['newest', 'oldest'])],
+            'number_of_rows' => ['nullable', 'integer', Rule::in([50, 100, 150, 250])],
+            // 'type' => ['nullable', 'string', Rule::in(['all', 'orders', 'wallet', 'account', 'news', 'share', 'referral', 'listings', 'reports', 'bugs'])],
+            'status' => ['nullable', Rule::in(['all', 'read', 'unread'])],
+            'action' => ['nullable', Rule::in(['show', 'read_all', 'delete', 'clear'])],
+        ]);
+
+        // Retrieve validated search parameters from the request
+        $sort_by = $request->sort_by;
+        $number_of_rows = $request->number_of_rows;
+        $status = $request->status;
+        $action  = $request->action;
+
+        // Build the query based on the search parameters
+        $query = Notification::query()->where('user_id', $store->user_id);
+
+        // Assuming $query is an instance of Eloquent query builder
+        if (!empty($sort_by)) {
+            switch ($sort_by) {
+                case 'newest':
+                    $query->orderBy('created_at', 'desc');
+                    break;
+
+                case 'oldest':
+                    $query->orderBy('created_at', 'asc');
+                    break;
+                default:
+                    break;
+            }
+        }
+
+
+        if ($status == 'read') {
+            $query->where('is_read', 1);
+        }
+
+        if ($status == 'unread') {
+            $query->where('is_read', 0);
+        }
+
+        // if ($action == 'read_all') {
+        //     foreach ($query as $key) {
+        //         # code...
+        //     }
+        //     $query->where('is_read', 0);
+        // }
+
+        // Execute the query to retrieve orders
+        $orders = $query->paginate($number_of_rows);
+
+        // Return the orders to the view
+        return redirect()->back()->with('notifications', $orders);
+    }
 }

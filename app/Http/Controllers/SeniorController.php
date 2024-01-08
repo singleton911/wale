@@ -35,7 +35,7 @@ class SeniorController extends Controller
         $stores = Store::paginate(50);
         $reports = Report::paginate(50);
         $wallets = Wallet::paginate(50);
-        $products = Product::paginate(50)->where('status', 'Pending');
+        $products = Product::paginate(50);
         $orders = Order::paginate(50);
         $disputes = Dispute::paginate(50);
         $featureds = Featured::paginate(50);
@@ -248,6 +248,23 @@ class SeniorController extends Controller
         $store->avatar      = $newStore->avater;
         $store->save();
         return true;
+    }
+
+
+    public function store($created_at, Store $store){
+        $auth_user = auth()->user();
+
+        if ($created_at == strtotime($store->created_at) && $auth_user->role == 'senior') {
+
+            return view('Senior.index', [
+                'user' => $auth_user,
+                'store' => $store,
+                'action'  => 'Store',
+                'icon'  => GeneralController::encodeImages(),
+                'product_image' => GeneralController::encodeImages('Product_Images'),
+                'upload_image' => GeneralController::encodeImages('Upload_Images'),
+            ]);
+        }
     }
 }
 

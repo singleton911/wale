@@ -6,13 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Whales Market | {{ $store->store_name }} > Messages</title>
-    <link rel="stylesheet" href="{{ @asset('market.white.css') }}">
+    @if ($store->user->theme == 'dark')
+        <link rel="stylesheet" href="{{ asset('dark.theme.css') }}">
+    @else
+        <link rel="stylesheet" href="{{ asset('white.theme.css') }}">
+    @endif
+    <link rel="stylesheet" href="{{ asset('market.white.css') }}">
+
+    <link rel="stylesheet" href="{{ @asset('store.white.css') }}">
     <link rel="stylesheet" href="{{ @asset('store.white.css') }}">
     <link rel="stylesheet" href="{{ @asset('filter.css') }}">
 </head>
 
 <body>
-    @include('Store.navebar')
+    @include('Store.naveBar')
 
     <div class="container">
         <div class="main-div">
@@ -390,10 +397,10 @@
                     @endif
                 @endif
 
-
+{{-- 
                 @if ($order->status == 'completed')
                     @include('User.leaveReview')
-                @endif
+                @endif --}}
             </div>
         </div>
     </div>

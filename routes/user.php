@@ -20,12 +20,18 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\SupportController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WalletController;
 use Illuminate\Support\Facades\Route;
 
 
 Route::middleware(['role:user'])->group(function () {
 
+    Route::get('/kick/{user}/out', [UserController::class, 'kickout']);
+
     Route::post('/', [UserController::class, 'show']);
+
+    Route::get('/user/captcha', [GeneralController::class, 'captcha']);
+    
     // search quick and advance
     Route::get('/search', [SearchController::class, 'quickSearch']);
     Route::get('/parent/category/{created_at}/{category}', [CategoryController::class, 'parentCategoryProducts']);
@@ -33,11 +39,9 @@ Route::middleware(['role:user'])->group(function () {
 
     // Get the qrcode
     Route::get('/account/deposit/qrcode', [GeneralController::class, 'qrcode']);
-
-    Route::post('/account/pgp', [GeneralController::class, 'pgpKeySystem']);
     Route::post('/account/changePassword', [UserController::class, 'changePassword']);
     Route::post('/bugs', [BugController::class, 'store']);
-
+    Route::post('/account/storeKey', [UserController::class, 'storeKey']);
 
     // Delete methods
     Route::delete('/blocked/b_store/{blockStore}', [BlockStoreController::class, 'destroy']);
@@ -101,6 +105,21 @@ Route::middleware(['role:user'])->group(function () {
     Route::get('/ticket', [SupportController::class, 'showTicket']);
     Route::get('/bugs', [BugController::class, 'create']);
 
+    // user theme
+    Route::get('/account/theme', [UserController::class, 'theme']);
+
+    Route::post('/market/welcome/{user}/read', [UserController::class, 'welcome']);
+
     // User 
     Route::get('/{name}/{action}', [UserController::class, 'show']);
+
+    // User pg key system 2fa verify
+    Route::post('/pgp', [GeneralController::class, 'pgpKeySystem']);
+    Route::get('/auth/pgp/verify', [UserController::class, 'pgpVerify']);
+    Route::post('/auth/pgp/verify', [UserController::class, 'pgpCodeVerify']);
+    Route::post('/account/pgp', [GeneralController::class, 'userPgpSystem']);
+
+
+    /// wallets tests
+    Route::get('/user/wallet/create/test', [WalletController::class, 'create']);
 });

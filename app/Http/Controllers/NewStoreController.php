@@ -24,6 +24,11 @@ class NewStoreController extends Controller
      */
     public function create()
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/pgp/verify');
+        }
+
         $user = auth()->user();
         return view('User.open-store', [
             'user' => $user,
@@ -76,6 +81,11 @@ class NewStoreController extends Controller
 
     public function waiver()
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/pgp/verify');
+        }
+
         $user = auth()->user();
 
         return view('User.waiver', [

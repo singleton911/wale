@@ -53,6 +53,11 @@ class ConversationController extends Controller
      */
     public function show($created_at, Conversation $conversation)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/pgp/verify');
+        }
+
         $user = auth()->user();
         $type = null;
         if (strtotime($conversation->created_at) == $created_at) {
@@ -152,6 +157,10 @@ class ConversationController extends Controller
 
     public function showStore($name, $created_at, Conversation $conversation)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/store/pgp/verify');
+        }
         $user = auth()->user();
         $store = auth()->user()->store;
 
@@ -165,7 +174,7 @@ class ConversationController extends Controller
                         if ($messageStatus) {
                             $messageStatus->is_read = 1;
                             $messageStatus->save();
-                            return redirect('/store/'.$store->store_name.'/show/messages/' . $created_at . '/' . $conversation->id);
+                            return redirect('/store/' . $store->store_name . '/show/messages/' . $created_at . '/' . $conversation->id);
                         }
                     }
                 }

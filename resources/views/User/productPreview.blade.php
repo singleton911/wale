@@ -6,7 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Whales Market | Listing > {{ $product->product_name }}</title>
-    <link rel="stylesheet" href="{{ asset('market.white.css') }}">
+    @if ($user->theme == 'dark')
+    <link rel="stylesheet" href="{{ asset('dark.theme.css') }}">
+@else
+    <link rel="stylesheet" href="{{ asset('white.theme.css') }}">
+@endif
+<link rel="stylesheet" href="{{ asset('market.white.css') }}">
+
+<link rel="stylesheet" href="{{ asset('market.white.css') }}">
     <link rel="stylesheet" href="{{ asset('filter.css') }}">
 </head>
 
@@ -93,7 +100,7 @@
                                     <h3 style="margin-bottom: 0px;">Store Public PGP Key</h3>
                                     <p style="margin:0px;font-size:.7rem;">use this store public PGP KEY below to encrypt your sensitive data!</p>
                                         
-                                 <textarea name="" id="" cols="30" rows="10" width="100" style="width: 100%;">{{ $product->store->store_key }}</textarea>
+                                 <textarea name="store_pgp" id="" cols="30" rows="10" width="100" style="width: 100%;">{{ $product->store->store_key }}</textarea>
 
 
                                  <h4 style="margin-bottom: 0px;">Please Enter below your address/notes (Optionals...)</h4>

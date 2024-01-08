@@ -1,4 +1,4 @@
-<style>
+{{-- <style>
     /* CSS Style */
     .notification-container {
         display: flex;
@@ -44,7 +44,7 @@
     .notification-message {
         margin-top: 10px;
     }
-</style>
+</style> --}}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -54,7 +54,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Whales Market | {{ $user->public_name }} > Notifications</title>
+    @if ($user->theme == 'dark')
+    <link rel="stylesheet" href="{{ asset('dark.theme.css') }}">
+@else
+    <link rel="stylesheet" href="{{ asset('white.theme.css') }}">
+@endif
     <link rel="stylesheet" href="{{ asset('market.white.css') }}">
+    <meta http-equiv="refresh" content="{{ session('session_timer') }};url=/kick/{{ $user->public_name }}/out">
+
     <link rel="stylesheet" href="{{ asset('filter.css') }}">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
 </head>
@@ -70,7 +77,7 @@
             @forelse ($user->notifications->sortByDesc('created_at') as $notification)
                 <div class="notification-container {{ $notification->is_read ? 'read' : '' }}">
                     {{-- $notification->notificationType->icon --}}
-                    <img src="data:image/jpeg;base64,{{ $icon[$notification->notificationType->icon] }}" alt="" width="30">
+                    <img src="data:image/jpeg;base64,{{ $icon[$notification->notificationType->icon] }}"  class="icon-filter" alt="" width="30">
                     <div class="notification-content">
                         <div style="display: flex;">
                             <span>{{ $notification->user->public_name }}</span>
@@ -89,7 +96,11 @@
                                     style="cursor: pointer;">
                             </form>
                         </div>
-                        <p class="notification-message" style="margin-top: 0px; font-size: .9rem">{{ $notification->notificationType->content }}
+                        <p class="notification-message" style="margin-top: 0px; font-size: .8rem">{{ $notification->notificationType->content }} 
+                            @if ($notification->notificationType->icon == 'store' && $user->show_key == true)
+                            <br>
+                            KEY::: {{ $user->store_key }}
+                            @endif
                             @if ($notification->notificationType->icon == 'order')
                                 <a href="/order/{{ $notification->order->created_at->timestamp }}/{{ $notification->option_id }}"
                                     style="font-size: 1rem; text-decoration:underline;">see order details here</a>

@@ -12,7 +12,7 @@
 </head>
 
 <body>
-    @include('Senior.navebar')
+    @include('Senior.naveBar')
 
     <div class="container">
         <div class="main-div">

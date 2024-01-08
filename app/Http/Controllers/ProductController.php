@@ -36,6 +36,10 @@ class ProductController extends Controller
      */
     public function create($store, $action)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/store/pgp/verify');
+        }
         if ($action == 'physical') {
             return $this->createPhysicalListing();
         } elseif ($action == 'digital') {
@@ -48,6 +52,11 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/store/pgp/verify');
+        }
+
         $store = auth()->user()->store;
 
         if ($request->next == 'Next') {
@@ -68,6 +77,10 @@ class ProductController extends Controller
      */
     public function show($created_at, Product $product)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/pgp/verify');
+        }
         // Assuming $created_at is a timestamp
         $timestamp = strtotime($product->created_at);
 
@@ -91,6 +104,11 @@ class ProductController extends Controller
      */
     public function edit($store, $created_at, Product $product)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/store/pgp/verify');
+        }
+
         return view('Store.index', [
             'product' => $product,
             'store' => auth()->user()->store,
@@ -108,12 +126,19 @@ class ProductController extends Controller
      */
     public function update(Request $request, $store, $created_at, Product $product)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/store/pgp/verify');
+        }
+
         if ($store == $product->store->store_name && $created_at == strtotime($product->created_at)) {
 
             if ($request->save_next == 'Save and Next') {
                 return $this->updateProduct($request, $product->id);
             } elseif ($request->skip_next == 'Skip and Next') {
                 return redirect()->back()->with('next-form', true)->with('product_id', Crypt::encrypt($product->id));
+            } elseif ($request->has('extra_set')) {
+                return $this->updateExtraOptions($request, $product);
             } elseif ($request->skip == 'Skip') {
                 // return $this->saveExtraOptions($request);
                 return redirect()->back()->with('success', 'Product created successfully and it has no extra shipping or options, it now pending waiting to be approved by mods or admin.');
@@ -142,16 +167,15 @@ class ProductController extends Controller
         $blockedStore     = $user->blockedStores->where('store_id', $product->store_id)->first();
 
         if (strtotime($product->created_at) == $created_at) {
-           // .. (add this product to cart)
+            // .. (add this product to cart)
             if ($request->has('add_to_cart')) {
                 return $this->addToCart($request, $product);
-
             } elseif ($request->has('buy_now') || $request->has('complete_order')) {
                 $balanceCheck = $user->wallet->balance >= ($product->price + $extra);
 
                 if ($request->has('buy_now')) {
                     $redirectData = $balanceCheck ? ['enter_adderss' => true, 'extra_shipping_option' => $request->extra_shipping_option, 'items' => $request->items] : ['error' => 'Insufficient funds! Please add more funds to order this product. ^.^'];
-                } elseif ($request->has('complete_order')) {
+                } elseif ($request->has('complete_order') && $request->has('store_pgp')) {
                     if ($balanceCheck) {
 
                         $this->initiateOrder($request, $product);
@@ -159,19 +183,16 @@ class ProductController extends Controller
                     } else {
                         $redirectData = ['error' => 'Insufficient funds! Please add more funds to order this product. ^.^'];
                     }
+                } else {
+                    $redirectData = ['error' => 'stop motifying the form, auto check system has notifiy the admin!'];
                 }
-
                 return redirect()->back()->with($redirectData);
-
             } elseif ($request->has('favorite_listing') && $listingFavorited == null) {
                 FavoriteListing::create(['user_id' => $user->id, 'product_id' => $product->id]);
-
             } elseif ($request->has('favorite_store') && $storeFavorited == null) {
                 FavoriteStore::create(['user_id' => $user->id, 'store_id' => $product->store->id]);
-
             } elseif ($request->has('block_store') && $blockedStore == null) {
                 BlockStore::create(['user_id' => $user->id, 'store_id' => $product->store->id]);
-
             }
 
             return redirect()->back();
@@ -201,13 +222,13 @@ class ProductController extends Controller
         $order->store_id          = $product->store_id;
         $order->quantity          = $sendData['items'];
         $order->extra_id          = $extra;
-        $order->shipping_address  = $request->has('encrypt_for_me') ? $this->encryptUserInfo($sendData['address_text']) : $sendData['address_text'];
+        $order->shipping_address  = $request->has('encrypt_for_me') ? GeneralController::encryptPGPNotes($sendData['address_text'], $product->store->user->pgp_key) : $sendData['address_text'];
         $order->save();
 
         if ($extra != null) {
-            $extra_cost = ExtraOption::where('id',$extra)->first();
+            $extra_cost = ExtraOption::where('id', $extra)->first();
             $amount = $product->price + $extra_cost->cost;
-        }else{
+        } else {
             $amount = $product->price;
         }
 
@@ -218,8 +239,7 @@ class ProductController extends Controller
         if ($product->payment_type == 'FE' && $product->store->is_fe_enable === 1) {
             $product->store->user->wallet->balance += $amount;
             $product->store->user->wallet->save();
-
-        }else{
+        } else {
             // add funds to escrow
             $this->makeEscrow($order->id, $amount);
         }
@@ -275,6 +295,11 @@ class ProductController extends Controller
 
     public function reviews($created_at, Product $product)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/pgp/verify');
+        }
+
         if ($created_at == strtotime($product->created_at)) {
             return view('User.productReviews', [
                 'name' => $product->product_name,
@@ -383,7 +408,7 @@ class ProductController extends Controller
         for ($i = 1; $i <= 10; $i++) {
             $request->validate([
                 "shipping_method{$i}" => 'sometimes|nullable|string|max:255',
-                "shipping_cost{$i}" => 'sometimes|nullable|numeric|min:0|regex:/^\d+(\.\d{1,2})?$/',
+                "shipping_cost{$i}" => 'sometimes|nullable|numeric|regex:/^\d+(\.\d{1,2})?$/',
             ]);
 
             // Check if the shipping method key exists in the request
@@ -405,6 +430,61 @@ class ProductController extends Controller
                 // Handle the exception, log it, or redirect with an error message
                 return redirect()->back()->with('error', 'An error occurred while saving extra options.');
             }
+        }
+
+        return redirect()->back()->with('success', 'Product created successfully with extra shipping options. It is now pending approval by mods or admin.');
+    }
+
+    private function updateExtraOptions($request, $product)
+    {
+        // return dd($request);
+
+        $store = auth()->user()->store;
+
+        // check if there is already an old extra options
+        $extraOption_counts = $product->extraShipping->count();
+
+        // Validate the request data for each shipping method
+        for ($i = 0; $i < 10; $i++) {
+            if ($i < $extraOption_counts) {
+                $extraOption = $product->extraShipping[$i];
+                $request->validate([
+                    "shipping_old_method{$extraOption->id}" => 'sometimes|nullable|string|max:255',
+                    "shipping_old_cost{$extraOption->id}" => 'sometimes|nullable|numeric|regex:/^\d+(\.\d{1,2})?$/',
+                ]);
+
+                $extra = ExtraOption::find($extraOption->id);
+                $extra->name = $request->shipping_old_method . $extraOption->id;
+                $extra->cost = $request->shipping_old_cost . $extraOption->id;
+                $extra->save();
+            }
+
+            // $request->validate([
+            //     "shipping_new_method{$i}" => 'sometimes|nullable|string|max:255',
+            //     "shipping_new_cost{$i}" => 'sometimes|nullable|numeric|regex:/^\d+(\.\d{1,2})?$/',
+            // ]);
+
+
+
+            // // Check if the shipping method key exists in the request
+            // $shipping_method_key = "shipping_new_method{$i}";
+            // // Break out of the loop if the shipping method is null or an empty string
+            // if ($request->$shipping_method_key === null || $request->$shipping_method_key === '') {
+            //     break;
+            // }
+
+
+            // // Create and save ExtraOption model instance
+            // try {
+            //     $extra = new ExtraOption();
+            //     $extra->product_id = $product->id;
+            //     $extra->name = $request->$shipping_method_key;
+            //     $extra->cost = $request->has("shipping_cost{$i}") ? $request->{"shipping_cost{$i}"} : "0.00";
+            //     $extra->save();
+            // } catch (\Exception $e) {
+            //     // Handle the exception, log it, or redirect with an error message
+            //     return redirect()->back()->with('error', 'An error occurred while saving extra options.');
+            // }
         }
 
         return redirect()->back()->with('success', 'Product created successfully with extra shipping options. It is now pending approval by mods or admin.');
@@ -465,6 +545,11 @@ class ProductController extends Controller
 
     public function singleView($store, $created_at, Product $product)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/store/pgp/verify');
+        }
+
         $timestamp = strtotime($product->created_at);
 
         if ($timestamp !== false && $timestamp == $created_at) {
@@ -484,6 +569,10 @@ class ProductController extends Controller
 
     public function productStatus(Request $request)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/store/pgp/verify');
+        }
         $product_id = $request->product_id ?? null;
 
         // Decrypt product_id if it is not null
@@ -515,10 +604,5 @@ class ProductController extends Controller
 
         // Flash success message if no exception is thrown
         return redirect()->back()->with('success', 'Product status updated successfully');
-    }
-
-    // encrypt user info
-    public function encryptUserInfo($address){
-        return $address;
     }
 }

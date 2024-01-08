@@ -5,7 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="{{ @asset('market.white.css') }}">
+    @if ($user->theme == 'dark')
+        <link rel="stylesheet" href="{{ asset('dark.theme.css') }}">
+    @else
+        <link rel="stylesheet" href="{{ asset('white.theme.css') }}">
+    @endif
+    
+    <link rel="stylesheet" href="{{ asset('market.white.css') }}">
     <link rel="stylesheet" href="{{ @asset('store.white.css') }}">
     <link rel="stylesheet" href="{{ @asset('filter.css') }}">
     <title>Whales Market | {{ $action != null ? $action : $user->public_name . ' Moderator' }}</title>
@@ -60,9 +66,9 @@
                                 <a href="/senior/staff/{{ $user->public_name }}/show/users">Users</a>
                             </div>
                             <div class="all-products">
-                                <img src="data:image/png;base64,{{ $icon['add-store'] }}" class="icon-filter"
+                                <img src="data:image/png;base64,{{ $icon['new_store'] }}" class="icon-filter"
                                     width="25">
-                                <a href="/senior/staff/{{ $user->public_name }}/show/new stores">New Stores(0)</a>
+                                <a href="/senior/staff/{{ $user->public_name }}/show/new stores">New Stores</a>
                             </div>
 
                             <div class="listings">
@@ -70,33 +76,84 @@
                                     width="25">
                                 <a href="/senior/staff/{{ $user->public_name }}/show/categories">Categories</a>
                             </div>
+                            <div class="support">
+                                <img src="data:image/png;base64,{{ $icon['add-store'] }}" class="icon-filter"
+                                    width="25">
+                                <a href="/senior/staff/{{ $user->public_name }}/show/stores">Stores</a>
+                            </div>
+                            <div class="wallet">
+                                <img src="data:image/png;base64,{{ $icon['inventory'] }}" class="icon-filter"
+                                    width="25">
+                                <a href="/senior/staff/{{ $user->public_name }}/show/products">Products</a>
+                            </div>
 
                             <div class="all-products">
                                 <img src="data:image/png;base64,{{ $icon['dispute'] }}" class="icon-filter"
                                     width="25">
-                                <a href="/senior/staff/{{ $user->public_name }}/show/disputes">Disputes(0)</a>
-                            </div>
-                            <div class="all-products">
-                                <img src="data:image/png;base64,{{ $icon['inventory'] }}" class="icon-filter"
-                                    width="25">
-                                <a href="/senior/staff/{{ $user->public_name }}/show/products">New Products(0)</a>
+                                <a href="/senior/staff/{{ $user->public_name }}/show/disputes">Disputes</a>
                             </div>
                             <div class="wallet">
-                                <img src="data:image/png;base64,{{ $icon['faq'] }}" class="icon-filter"
+                                <img src="data:image/png;base64,{{ $icon['plane-tickets'] }}" class="icon-filter"
                                     width="25">
-                                <a href="/senior/staff/{{ $user->public_name }}/show/support">Support(0)</a>
+                                <a href="/senior/staff/{{ $user->public_name }}/show/support">Support</a>
                             </div>
 
                             <div class="support">
                                 <img src="data:image/png;base64,{{ $icon['warn'] }}" class="icon-filter"
                                     width="25">
-                                <a href="/senior/staff/{{ $user->public_name }}/show/reports">Reports(0)</a>
+                                <a href="/senior/staff/{{ $user->public_name }}/show/reports">Reports</a>
                             </div>
                             <div class="wallet">
                                 <img src="data:image/png;base64,{{ $icon['partnership'] }}" class="icon-filter"
                                     width="25">
-                                <a href="/senior/staff/{{ $user->public_name }}/show/waivers">Waivers(0)</a>
+                                <a href="/senior/staff/{{ $user->public_name }}/show/waivers">Waivers</a>
                             </div>
+
+
+                            <hr>Supports, reports, settings...
+                            <hr>
+                            <div class="wallet">
+                                <img src="data:image/png;base64,{{ $icon['shield'] }}" class="icon-filter"
+                                    width="25">
+                                <a href="/senior/staff/{{ $user->public_name }}/show/pgp">2FA PGP KEY</a>
+                            </div>
+
+                            <div class="settings">
+                                <img alt="🖇️" style="font-size:1.5em; margin-right: .5em;" class="icon-filter"
+                                    width="25">
+                                <a href="/senior/staff/{{ $user->public_name }}/show/url">Private URL Link</a>
+                            </div>
+
+                            <div class="settings">
+                                @if ($user->theme == 'white')
+                                    <img src="data:image/png;base64,{{ $icon['night-mode'] }}" class="icon-filter"
+                                        width="25">
+                                    <a href="/senior/staff/{{ $user->public_name }}/show/theme">Dark Mode</a>
+                                @else
+                                    <img src="data:image/png;base64,{{ $icon['brightness'] }}" class="icon-filter"
+                                        width="25">
+                                    <a href="/senior/staff/{{ $user->public_name }}/show/theme">Light Mode</a>
+                                @endif
+
+                            </div>
+
+                            <div class="wallet">
+                                <img src="data:image/png;base64,{{ $icon['faq'] }}" class="icon-filter"
+                                    width="25">
+                                <a href="/senior/staff/{{ $user->public_name }}/show/faq">FAQ</a>
+                            </div>
+                            <div class="wallet">
+                                <img src="data:image/png;base64,{{ $icon['web-coding'] }}" class="icon-filter"
+                                    width="25">
+                                <a href="/senior/staff/{{ $user->public_name }}/show/bugs">Bugs</a>
+                            </div>
+                            <div class="wallet">
+                                <img src="data:image/png;base64,{{ $icon['document'] }}" class="icon-filter"
+                                    width="25">
+                                <a href="/senior/staff/{{ $user->public_name }}/show/canary">Canary</a>
+                            </div>
+
+
 
                             <div class="settings" style="border-top: 2px solid gray;">
                                 <img src="data:image/png;base64,{{ $icon['news'] }}" class="icon-filter"
@@ -136,6 +193,12 @@
                             @include('Senior.notifications')
                         @elseif($action == 'messages')
                             @include('Senior.messages')
+
+
+                            @elseif($action == 'stores')
+                            @include('Senior.stores')
+
+
                         @elseif($action === 'news')
                             @include('Senior.news')
                         @elseif($action === 'rules')
@@ -147,14 +210,29 @@
                         @elseif($action === 'waivers')
                             @include('Senior.waivers')
 
-                            {{-- Single display of actions --}}
-                            @elseif($action === 'Show User')
-                            @include('Senior.user')
-                            @elseif($action === 'New Store')
-                            @include('Senior.new_store')
-                            @elseif($action === 'product')
-                            @include('Senior.product')
+                        @elseif($action === 'url')
+                            @include('Senior.mirror')
+                        @elseif($action === 'canary')
+                            @include('Senior.canary')
+                        @elseif($action === 'pgp')
+                            @include('Senior.twofa')
+                        @elseif($action === 'faq')
+                            @include('Senior.faq')
+                        @elseif($action === 'bugs')
+                            @include('Senior.bugs')
 
+
+
+                            {{-- Single display of actions --}}
+                        @elseif($action === 'Show User')
+                            @include('Senior.user')
+                        @elseif($action === 'New Store')
+                            @include('Senior.new_store')
+                            @elseif($action === 'Store')
+                            @include('Senior.store')
+
+                        @elseif($action === 'product')
+                            @include('Senior.product')
                         @else
                             @include('Senior.dashboard')
                         @endif

@@ -68,7 +68,7 @@ class SupportController extends Controller
             $support->user_id = auth()->user()->id;
             $support->conversation_id = $conversation->id;
             $support->save();
-            
+
             return redirect()->back()->with('success', 'You have successfully created a support tciket, It now pending.');
         }
 
@@ -115,7 +115,8 @@ class SupportController extends Controller
         //
     }
 
-    public function showTicket(){
+    public function showTicket()
+    {
         $user = auth()->user();
         return view('User.ticket', [
             'user' => $user,
@@ -128,11 +129,16 @@ class SupportController extends Controller
 
 
 
-        /**
+    /**
      * Show the form for creating a new resource.
      */
     public function storeCreate($store = null, Request $request)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/store/pgp/verify');
+        }
+
         if ($request->has('new_ticket')) {
             return redirect()->back()->with('new_ticket', true);
         }
@@ -174,7 +180,7 @@ class SupportController extends Controller
             $support->user_id = auth()->user()->id;
             $support->conversation_id = $conversation->id;
             $support->save();
-            
+
             return redirect()->back()->with('success', 'You have successfully created a support tciket, It now pending.');
         }
 

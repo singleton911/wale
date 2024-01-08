@@ -26,7 +26,7 @@
             <tbody>
 
                 {{-- @if ($action = 'pending') ->where('status', $action) --}}
-                @forelse ($user->orders as $order)
+                @forelse ($user->orders->sortByDesc('updated_at') as $order)
                 {{-- @else
                 @forelse ($user->orders->where('status', $action) as $order)
                 @endif --}}

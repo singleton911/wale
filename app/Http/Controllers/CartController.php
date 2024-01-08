@@ -28,6 +28,11 @@ class CartController extends Controller
      */
     public function create()
     {
+                //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+                if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+                    return redirect('/auth/pgp/verify');
+                }
+                
         $user = auth()->user();
         return view('User.cart', [
             'user' => $user,

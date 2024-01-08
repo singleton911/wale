@@ -11,7 +11,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach ($products->where('status', 'Pending') as $product)
+        @foreach ($products->sortBy('created_at') as $product)
             <tr>
                 <td>#{{ $product->id }}</td>
                 <td>{{ Str::limit($product->product_name, 20, '...') }}</td>

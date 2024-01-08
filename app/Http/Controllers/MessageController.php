@@ -31,6 +31,11 @@ class MessageController extends Controller
      */
     public function create($name, Store $store)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/pgp/verify');
+        }
+
         $user = auth()->user();
         if ($name === $store->store_name) {
             return view('User.createMessage', [
@@ -66,6 +71,11 @@ class MessageController extends Controller
      */
     public function show($created_at, Conversation $conversation)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/pgp/verify');
+        }
+
         $user = auth()->user();
         $type = null;
 
@@ -111,6 +121,11 @@ class MessageController extends Controller
 
     public function showMessages()
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/pgp/verify');
+        }
+
         $conversations = Conversation::all();
         $participants = Participant::where('user_id', auth()->user()->id)->get();
 
@@ -158,7 +173,10 @@ class MessageController extends Controller
 
     public function storeUser(Request $request, $name, $created_at, Conversation $conversation)
     {
-
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/store/pgp/verify');
+        }
 
         if ($request->has('new_message')) {
             return redirect()->back()->with('new_message', true);

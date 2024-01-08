@@ -6,7 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Whales Market | {{ $user->public_name }} > {{ $name }} > {{ $action }}</title>
-    <link rel="stylesheet" href="{{ asset('market.white.css') }}">
+    @if ($user->theme == 'dark')
+    <link rel="stylesheet" href="{{ asset('dark.theme.css') }}">
+@else
+    <link rel="stylesheet" href="{{ asset('white.theme.css') }}">
+@endif
+<link rel="stylesheet" href="{{ asset('market.white.css') }}">
+
+<link rel="stylesheet" href="{{ asset('market.white.css') }}">
     <link rel="stylesheet" href="{{ asset('filter.css') }}">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
 </head>
@@ -30,6 +37,8 @@
             </div>
             <div class="top-div">
                 @include('User.categories')
+
+                
                 <div>
     
     
@@ -141,14 +150,14 @@
                 </div>
             @endif
 
-            <div class="listing-name">
+            {{-- <div class="listing-name">
                 <h3 style="color: #f5a623;">Sticky Listings</h3>
             </div>
 
             <div class="products-grid">
 
 
-            </div>
+            </div> --}}
 
 
             <div class="listing-name">

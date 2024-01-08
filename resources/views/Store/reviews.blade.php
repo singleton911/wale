@@ -4,6 +4,20 @@
     </span>
     <hr>
 </h3>
+@if (session('success') != null)
+    <p style="text-align: center; background: darkgreen; padding: 5px; border-radius: .5rem; color: #f1f1f1;">
+        {{ session('success') }}</p>
+@endif
+<div>
+    @if ($errors->any())
+        <ul style="margin: auto; list-style-type: none; padding: 0; text-align: center;">
+            @foreach ($errors->all() as $error)
+                <li style="color: red;">{{ $error }}</li>
+            @endforeach
+        </ul>
+    @endif
+
+</div>
 <div class="products-overview">
     <div style="display: flex; gap: 2em;" class="reviews">
         <table style="border: 1px solid gray;">

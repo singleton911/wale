@@ -25,6 +25,11 @@ class ReportController extends Controller
      */
     public function create($name = NULL, $id = null)
     {
+                //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+                if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+                    return redirect('/auth/pgp/verify');
+                }
+                
         $user = auth()->user();
         if (is_numeric($name)) {
             if (strtotime(Product::where('id', $id)->first()->created_at) == $name) {
@@ -100,6 +105,7 @@ class ReportController extends Controller
 
     public function storeUser(Request $request, $name, Store $store)
     {
+        
         $data  = $request->validate([
             'subject' => 'required|string|min:3|max:100',
             'report' => 'required|string|min:10|max:5000',

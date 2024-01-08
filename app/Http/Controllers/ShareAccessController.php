@@ -17,7 +17,6 @@ class ShareAccessController extends Controller
      */
     public function index()
     {
-
     }
 
     /**
@@ -25,7 +24,15 @@ class ShareAccessController extends Controller
      */
     public function create(Request $request)
     {
+        //check if the user has 2fa enable and if they has verified it else redirect them to /auth/pgp/verify
+        if (auth()->user()->twofa_enable == 'yes' && !session('pgp_verified')) {
+            return redirect('/auth/store/pgp/verify');
+        }
+
         if ($request->has('new_share_access')) {
+            if (!auth()->user()->store->is_verified) {
+                return redirect()->back()->withErrors('Your are not verified to access this feature!!!');
+            }
             return redirect()->back()->with('new_share_access', true);
         }
 
@@ -53,7 +60,7 @@ class ShareAccessController extends Controller
         if ($request->has('revoke_no')) {
             return redirect()->back();
         }
-        
+
         if ($request->has('revoke')) {
             return redirect()->back()->with('user_id', $request->user)->with('revoke', true);
         }
@@ -113,7 +120,7 @@ class ShareAccessController extends Controller
     }
 
 
-        /**
+    /**
      * Remove the specified resource from storage.
      */
     private function createNewAccess(Request $request)
@@ -160,10 +167,11 @@ class ShareAccessController extends Controller
         $this->createPermissions($request, $access->id);
 
 
-       return redirect()->back();
+        return redirect()->back();
     }
 
-    private function createPermissions($request, $access) {
+    private function createPermissions($request, $access)
+    {
         $permissions = [
             'dashboard',
             'add_listing',
@@ -178,7 +186,7 @@ class ShareAccessController extends Controller
             'news',
             'rules',
         ];
-    
+
         foreach ($permissions as $permission) {
             if ($request->has($permission)) {
                 $newPermission = new SharePermission();
@@ -188,5 +196,4 @@ class ShareAccessController extends Controller
             }
         }
     }
-    
 }
